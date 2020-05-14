@@ -35,11 +35,6 @@
 			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/BootLoader/Controller</locationURI>
 		</link>
 		<link>
-			<name>Source/Interface</name>
-			<type>2</type>
-			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface</locationURI>
-		</link>
-		<link>
 			<name>Source/Interrupts.c</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/BootLoader/Root/Interrupts.c</locationURI>
@@ -73,6 +68,66 @@
 			<name>Source/stdinc.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/BootLoader/Root/stdinc.h</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/BCCISlave.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/BCCISlave.c</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/BCCISlave.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/BCCISlave.h</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/BCCITypes.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/BCCITypes.h</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/CRC16.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/CRC16.c</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/CRC16.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/CRC16.h</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/SCCIParams.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/SCCIParams.h</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/SCCISlave.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/SCCISlave.c</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/SCCISlave.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/SCCISlave.h</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/SCCITypes.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/SCCITypes.h</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/xCCICommon.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/xCCICommon.c</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/xCCICommon.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/xCCICommon.h</locationURI>
+		</link>
+		<link>
+			<name>Source/Interface/xCCIParams.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/hw-STM32-libs/Interface/xCCIParams.h</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
