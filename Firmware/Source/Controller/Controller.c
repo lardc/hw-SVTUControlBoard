@@ -15,7 +15,6 @@
 #include "Global.h"
 #include "LowLevel.h"
 #include "Logic.h"
-#include "PowerCell.h"
 #include "Controller.h"
 #include "Measurement.h"
 #include "math.h"
@@ -242,6 +241,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 
 void CONTROL_HandleBatteryCharge()
 {
+	/*
 	switch (SUB_State)
 	{
 		// Запуск заряда на каждой ячейке
@@ -275,6 +275,7 @@ void CONTROL_HandleBatteryCharge()
 
 		break;
 		}
+	*/
 }
 //-----------------------------------------------
 
@@ -285,6 +286,7 @@ void CONTROL_RegistersReset()
 
 void CONTROL_HandlePulse()
 {
+	/*
 	switch (SUB_State)
 	{
 		case SS_PulsePrepStep1:
@@ -439,13 +441,7 @@ void CONTROL_HandlePulse()
 			// обработка результатов
 			break;
 	}
-
-}
-//-----------------------------------------------
-
-uint16_t CONTROL_HandleWarningCondition(ProcessResult Result)
-{
-	return WARNING_NONE;
+*/
 }
 //-----------------------------------------------
 

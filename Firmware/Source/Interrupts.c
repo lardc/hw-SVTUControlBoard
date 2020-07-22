@@ -5,6 +5,7 @@
 #include "Board.h"
 #include "Controller.h"
 #include "Logic.h"
+#include "Global.h"
 
 // Functions
 //

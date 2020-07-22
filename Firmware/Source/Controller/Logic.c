@@ -4,11 +4,10 @@
 
 // Includes
 //
-#include "PowerCell.h"
 #include "Controller.h"
 #include "DataTable.h"
 #include "DeviceObjectDictionary.h"
-
+#include "BCCIMHighLevel.h"
 
 // Types
 //
@@ -69,13 +68,13 @@ void LOGIC_FindCells()
 	ActiveCellsCounter = 0;
 	for (uint16_t i = 0; i < PC_MAX_CELLS; ++i)
 	{
-		if (PC_ReadRegister(i + PC_START_ADDR, REG_LSLPC_DEV_STATE, NULL))
+		if (BHL_ReadRegister(i + PC_START_ADDR, REG_LSLPC_DEV_STATE, NULL))
 		{
 			PC_DataArray[i].IsActive = true;
 			++ActiveCellsCounter;
 		}
 		else
-			PC_ResetError();
+			BHL_ResetError();
 	}
 
 	DataTable[REG_TOTAL_LSLPC] = ActiveCellsCounter;
@@ -91,7 +90,7 @@ bool LOGIC_UpdateCellsState()
 	{
 		if (PC_DataArray[i].IsActive)
 		{
-			if (PC_ReadRegister(i + PC_START_ADDR, LSLPC_REG_DEV_STATE, &Register))
+			if (BHL_ReadRegister(i + PC_START_ADDR, LSLPC_REG_DEV_STATE, &Register))
 				PC_DataArray[i].State = Register;
 			else
 				return false;
@@ -135,7 +134,7 @@ bool LOGIC_PowerEnableProcess()
 				{
 					if (PC_DataArray[CellPointer].State == LPC_None)
 					{
-						PC_Call(CellPointer + PC_START_ADDR, LSLPC_ACT_POWER_ENABLE);
+						BHL_Call(CellPointer + PC_START_ADDR, LSLPC_ACT_POWER_ENABLE);
 
 						Timeout = CONTROL_TimeCounter + PC_POWER_ENABLE_PAUSE;
 						LOGIC_State = LS_PowerOnPause;
