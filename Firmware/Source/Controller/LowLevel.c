@@ -1,51 +1,47 @@
 // Header
 #include "LowLevel.h"
 
+// Include
+#include "Board.h"
+
 // Functions
 //
-// LED on board
 void LL_ToggleBoardLED()
 {
-	GPIO_Bit_Toggle(GPIOB, Pin_7);
+	GPIO_Toggle(GPIO_LED);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
-// IFB_EN
-void LL_IFB_EN(bool State)
+void LL_IgFeedback(bool State)
 {
-	State ? GPIO_Bit_Set(GPIOA, Pin_3) : GPIO_Bit_Rst(GPIOA, Pin_3);
+	GPIO_SetState(GPIO_IG_FEEDBACK, State);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
-// RangeSelect
-void LL_RangeSelect(bool State)
+void LL_IdLowRange(bool State)
 {
-	State ? GPIO_Bit_Set(GPIOA, Pin_8) : GPIO_Bit_Rst(GPIOA, Pin_8);
+	GPIO_SetState(GPIO_ID_LOW_RANGE, State);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
-// SYNC_SCPC
-void LL_SYNC_SCPC(bool State)
+void LL_SyncPowerCell(bool State)
 {
-	State ? GPIO_Bit_Set(GPIOA, Pin_15) : GPIO_Bit_Rst(GPIOA, Pin_15);
+	GPIO_SetState(GPIO_SYNC_POWER_CELL, State);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
-// GATE_EN
-void LL_GATE_EN(bool State)
+void LL_IgPulse(bool State)
 {
-	State ? GPIO_Bit_Set(GPIOB, Pin_0) : GPIO_Bit_Rst(GPIOB, Pin_0);
+	GPIO_SetState(GPIO_IG_PULSE, State);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
-// SYNC_OSC
-void LL_SYNC_OSC(bool State)
+void LL_SyncScope(bool State)
 {
-	State ? GPIO_Bit_Set(GPIOB, Pin_6) : GPIO_Bit_Rst(GPIOB, Pin_6);
+	GPIO_SetState(GPIO_SYNC_SCOPE, State);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
-// DAC
 void LL_DAC_Write(uint16_t Port, uint16_t Data)
 {
 	Data |= 1<<14;
@@ -65,3 +61,4 @@ void LL_DAC_Write(uint16_t Port, uint16_t Data)
 	GPIO_Bit_Rst(GPIOA, Pin_2);
 	GPIO_Bit_Set(GPIOA, Pin_2);
 }
+//------------------------------------
