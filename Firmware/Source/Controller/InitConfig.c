@@ -1,6 +1,6 @@
 // Header
 #include "InitConfig.h"
-//
+
 // Includes
 #include "Logic.h"
 
@@ -15,7 +15,7 @@ void SysClk_Config()
 	RCC_PLL_HSE_Config(QUARTZ_FREQUENCY, PREDIV_4, PLL_14);
 	RCC_SysCfg_Clk_EN();
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void IO_Config()
 {
@@ -24,45 +24,32 @@ void IO_Config()
 	RCC_GPIO_Clk_EN(PORTB);
 	
 	// Аналоговые входы
-	GPIO_Config (GPIOA, Pin_0, Analog, NoPull, HighSpeed, NoPull);					// PA0 - вход АЦП (I_GATE)
-	GPIO_Config (GPIOA, Pin_4, Analog, NoPull, HighSpeed, NoPull);					// PA4 - вход АЦП (U_GATE)
-	GPIO_Config (GPIOB, Pin_1, Analog, NoPull, HighSpeed, NoPull);					// PB1 - вход АЦП (I_tm)
-	GPIO_Config (GPIOB, Pin_12, Analog, NoPull, HighSpeed, NoPull);					// PB12 - вход АЦП (U_tm)
+	GPIO_InitAnalog(GPIO_MEASURE_IG);
+	GPIO_InitAnalog(GPIO_MEASURE_VG);
+	GPIO_InitAnalog(GPIO_MEASURE_ID);
+	GPIO_InitAnalog(GPIO_MEASURE_VD);
 
 	// Выходы
-	GPIO_Config (GPIOA, Pin_1, Output, PushPull, HighSpeed, NoPull);				// PA1 - DAC_CS
-	GPIO_Bit_Rst(GPIOA, Pin_1);
-	GPIO_Config (GPIOA, Pin_2, Output, PushPull, HighSpeed, NoPull);				// PA2 - DAC_LDAC
-	GPIO_Bit_Rst(GPIOA, Pin_2);
-	GPIO_Config (GPIOA, Pin_3, Output, PushPull, HighSpeed, NoPull);				// PA3 - IFB_EN
-	GPIO_Bit_Rst(GPIOA, Pin_3);
-	GPIO_Config (GPIOA, Pin_8, Output, PushPull, HighSpeed, Pull_Up);				// PA8 - RangeSelect
-	GPIO_Bit_Set(GPIOA, Pin_8);
-	GPIO_Config (GPIOA, Pin_15, Output, PushPull, HighSpeed, NoPull);			 	// PA15 - SYNC_SCPC
-	GPIO_Bit_Rst(GPIOA, Pin_15);
-	GPIO_Config (GPIOB, Pin_0, Output, PushPull, HighSpeed, Pull_Up);				// PB0 - GATE_EN
-	GPIO_Bit_Set(GPIOB, Pin_0);
-	GPIO_Config (GPIOB, Pin_6, Output, PushPull, HighSpeed, NoPull);				// PB6 - SYNC_OSC
-	GPIO_Bit_Rst(GPIOB, Pin_6);
-	GPIO_Config (GPIOB, Pin_7, Output, PushPull, HighSpeed, NoPull);				// PB7 - LED
-	GPIO_Bit_Rst(GPIOB, Pin_7);
+	GPIO_InitPushPullOutput(GPIO_LED);
+	GPIO_InitPushPullOutput(GPIO_IG_FEEDBACK);
+	GPIO_InitPushPullOutput(GPIO_ID_LOW_RANGE);
+	GPIO_InitPushPullOutput(GPIO_SYNC_POWER_CELL);
+	GPIO_InitPushPullOutput(GPIO_IG_PULSE);
+	GPIO_InitPushPullOutput(GPIO_SYNC_SCOPE);
+	GPIO_InitPushPullOutput(GPIO_DAC_CS);
+	GPIO_InitPushPullOutput(GPIO_DAC_LDAC);
+	GPIO_SetState(GPIO_DAC_CS, true);
+	GPIO_SetState(GPIO_DAC_LDAC, true);
 	
 	// Альтернативные функции
-	GPIO_Config (GPIOA, Pin_11, AltFn, PushPull, HighSpeed, NoPull);				// PA11(CAN RX)
-	GPIO_AltFn  (GPIOA, Pin_11, AltFn_9);
-	GPIO_Config (GPIOA, Pin_12, AltFn, PushPull, HighSpeed, NoPull);				// PA12(CAN TX)
-	GPIO_AltFn  (GPIOA, Pin_12, AltFn_9);
-	GPIO_Config (GPIOA, Pin_9,  AltFn, PushPull, HighSpeed, NoPull);				// PA9(USART1 TX)
-	GPIO_AltFn  (GPIOA, Pin_9,  AltFn_7);
-	GPIO_Config (GPIOA, Pin_10, AltFn, PushPull, HighSpeed, NoPull);				// PA10(USART1 RX)
-	GPIO_AltFn  (GPIOA, Pin_10, AltFn_7);
-	GPIO_Config (GPIOA, Pin_5,  AltFn, PushPull, HighSpeed, NoPull); 				// PB3 - DAC_CLK (SPI_SCK)
-	GPIO_AltFn  (GPIOA, Pin_5,  AltFn_5);
-	GPIO_Config (GPIOA, Pin_7,  AltFn, PushPull, HighSpeed, NoPull); 				// PB5 - DAC_DATA (SPI_MOSI)
-	GPIO_AltFn  (GPIOA, Pin_7,  AltFn_5);
-
+	GPIO_InitAltFunction(GPIO_ALT_CAN_RX, AltFn_9);
+	GPIO_InitAltFunction(GPIO_ALT_CAN_TX, AltFn_9);
+	GPIO_InitAltFunction(GPIO_ALT_UART_RX, AltFn_7);
+	GPIO_InitAltFunction(GPIO_ALT_UART_TX, AltFn_7);
+	GPIO_InitAltFunction(GPIO_ALT_SPI1_CLK, AltFn_5);
+	GPIO_InitAltFunction(GPIO_ALT_SPI1_MOSI, AltFn_5);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void CAN_Config()
 {
@@ -71,26 +58,26 @@ void CAN_Config()
 	NCAN_FIFOInterrupt(TRUE);
 	NCAN_FilterInit(0, 0, 0);		// Фильтр 0 пропускает все сообщения
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void UART_Config()
 {
 	USART_Init(USART1, SYSCLK, USART_BAUDRATE);
 	USART_Recieve_Interupt(USART1, 0, true);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void SPI_Config()
 {
 	SPI_Init(SPI1, 3, false);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void DAC_Config()
 {
 
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void ADC_Config()
 {
@@ -134,14 +121,14 @@ void ADC_Config()
 	ADC_DMAEnable(ADC4, true);
 	*/
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void Timer2_Config()
 {
 	TIM_Clock_En(TIM_2);
 	TIM_Interupt(TIM2, 0, true);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void Timer3_Config()
 {
@@ -150,7 +137,7 @@ void Timer3_Config()
 	TIM_Interupt(TIM3, 0, true);
 	TIM_Start(TIM3);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void Timer6_Config()
 {
@@ -159,7 +146,7 @@ void Timer6_Config()
 	TIM_DMA(TIM6, DMAEN);
 	TIM_MasterMode(TIM6, MMS_UPDATE);
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void DMA_Config()
 {
@@ -192,17 +179,17 @@ void DMA_Config()
 						DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH, 0);
 	*/
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void WatchDog_Config()
 {
 	IWDG_Config();
 	IWDG_ConfigureFastUpdate();
 }
-//------------------------------------------------------------------------------
+//------------------------------------
 
 void InitializeController(Boolean GoodClock)
 {
 	CONTROL_Init();
 }
-// -----------------------------------------------------------------------------
+//------------------------------------
