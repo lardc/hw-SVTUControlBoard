@@ -2,22 +2,19 @@
 #include "InitConfig.h"
 
 // Includes
-#include "Logic.h"
-
-// Forward functions
-//
-void CONTROL_Init();
+#include "Board.h"
+#include "SysConfig.h"
 
 // Functions
 //
-void SysClk_Config()
+void INITCFG_ConfigSystemClock()
 {
 	RCC_PLL_HSE_Config(QUARTZ_FREQUENCY, PREDIV_4, PLL_14);
 	RCC_SysCfg_Clk_EN();
 }
 //------------------------------------
 
-void IO_Config()
+void INITCFG_ConfigGPIO()
 {
 	// Включение тактирования портов
 	RCC_GPIO_Clk_EN(PORTA);
@@ -28,7 +25,7 @@ void IO_Config()
 	GPIO_InitAnalog(GPIO_MEASURE_VG);
 	GPIO_InitAnalog(GPIO_MEASURE_ID);
 	GPIO_InitAnalog(GPIO_MEASURE_VD);
-
+	
 	// Выходы
 	GPIO_InitPushPullOutput(GPIO_LED);
 	GPIO_InitPushPullOutput(GPIO_IG_FEEDBACK);
@@ -51,86 +48,80 @@ void IO_Config()
 }
 //------------------------------------
 
-void CAN_Config()
+void INITCFG_ConfigCAN()
 {
 	RCC_CAN_Clk_EN(CAN_1_ClkEN);
-	NCAN_Init(SYSCLK, CAN_BAUDRATE, FALSE);
-	NCAN_FIFOInterrupt(TRUE);
+	NCAN_Init(SYSCLK, CAN_BAUDRATE, false);
+	NCAN_FIFOInterrupt(true);
 	NCAN_FilterInit(0, 0, 0);		// Фильтр 0 пропускает все сообщения
 }
 //------------------------------------
 
-void UART_Config()
+void INITCFG_ConfigUART()
 {
 	USART_Init(USART1, SYSCLK, USART_BAUDRATE);
 	USART_Recieve_Interupt(USART1, 0, true);
 }
 //------------------------------------
 
-void SPI_Config()
+void INITCFG_ConfigSPI()
 {
 	SPI_Init(SPI1, 3, false);
 }
 //------------------------------------
 
-void DAC_Config()
-{
-
-}
-//------------------------------------
-
-void ADC_Config()
+void INITCFG_ConfigADC()
 {
 	/*
-	RCC_ADC_Clk_EN(ADC_12_ClkEN);
+	 RCC_ADC_Clk_EN(ADC_12_ClkEN);
 
-	ADC_Calibration(ADC1);
-	ADC_Calibration(ADC2);
-	ADC_Calibration(ADC3);
-	ADC_Calibration(ADC4);
+	 ADC_Calibration(ADC1);
+	 ADC_Calibration(ADC2);
+	 ADC_Calibration(ADC3);
+	 ADC_Calibration(ADC4);
 
-	ADC1_2_SetDualMode(true);
-	ADC3_4_SetDualMode(true);
+	 ADC1_2_SetDualMode(true);
+	 ADC3_4_SetDualMode(true);
 
-	ADC_Enable(ADC1);
-	ADC_Enable(ADC2);
-	ADC_Enable(ADC3);
-	ADC_Enable(ADC4);
-	ADC_TrigConfig(ADC1, ADC12_TIM6_TRGO, RISE);
-	ADC_TrigConfig(ADC3, ADC34_TIM7_TRGO, RISE);
+	 ADC_Enable(ADC1);
+	 ADC_Enable(ADC2);
+	 ADC_Enable(ADC3);
+	 ADC_Enable(ADC4);
+	 ADC_TrigConfig(ADC1, ADC12_TIM6_TRGO, RISE);
+	 ADC_TrigConfig(ADC3, ADC34_TIM7_TRGO, RISE);
 
-	ADC_ChannelSeqReset(ADC1);
-	ADC_ChannelSet_Sequence(ADC1, ADC1_VOLTAGE_CHANNEL, 1);
-	ADC_ChannelSeqLen(ADC1, 1);
+	 ADC_ChannelSeqReset(ADC1);
+	 ADC_ChannelSet_Sequence(ADC1, ADC1_VOLTAGE_CHANNEL, 1);
+	 ADC_ChannelSeqLen(ADC1, 1);
 
-	ADC_ChannelSeqReset(ADC2);
-	ADC_ChannelSet_Sequence(ADC2, ADC2_CURRENT_CHANNEL, 1);
-	ADC_ChannelSeqLen(ADC2, 1);
+	 ADC_ChannelSeqReset(ADC2);
+	 ADC_ChannelSet_Sequence(ADC2, ADC2_CURRENT_CHANNEL, 1);
+	 ADC_ChannelSeqLen(ADC2, 1);
 
-	ADC_ChannelSeqReset(ADC3);
-	ADC_ChannelSet_Sequence(ADC1, ADC1_VOLTAGE_CHANNEL, 1);
-	ADC_ChannelSeqLen(ADC3, 1);
+	 ADC_ChannelSeqReset(ADC3);
+	 ADC_ChannelSet_Sequence(ADC1, ADC1_VOLTAGE_CHANNEL, 1);
+	 ADC_ChannelSeqLen(ADC3, 1);
 
-	ADC_ChannelSeqReset(ADC4);
-	ADC_ChannelSet_Sequence(ADC2, ADC2_CURRENT_CHANNEL, 3);
-	ADC_ChannelSeqLen(ADC4, 1);
+	 ADC_ChannelSeqReset(ADC4);
+	 ADC_ChannelSet_Sequence(ADC2, ADC2_CURRENT_CHANNEL, 3);
+	 ADC_ChannelSeqLen(ADC4, 1);
 
-	ADC_DMAEnable(ADC1, true);
-	ADC_DMAEnable(ADC2, true);
-	ADC_DMAEnable(ADC3, true);
-	ADC_DMAEnable(ADC4, true);
-	*/
+	 ADC_DMAEnable(ADC1, true);
+	 ADC_DMAEnable(ADC2, true);
+	 ADC_DMAEnable(ADC3, true);
+	 ADC_DMAEnable(ADC4, true);
+	 */
 }
 //------------------------------------
 
-void Timer2_Config()
+void INITCFG_ConfigTimer2()
 {
 	TIM_Clock_En(TIM_2);
 	TIM_Interupt(TIM2, 0, true);
 }
 //------------------------------------
 
-void Timer3_Config()
+void INITCFG_ConfigTimer3()
 {
 	TIM_Clock_En(TIM_3);
 	TIM_Config(TIM3, SYSCLK, TIMER3_uS);
@@ -139,7 +130,7 @@ void Timer3_Config()
 }
 //------------------------------------
 
-void Timer6_Config()
+void INITCFG_ConfigTimer6()
 {
 	TIM_Clock_En(TIM_6);
 	TIM_Config(TIM6, SYSCLK, TIMER6_uS);
@@ -148,48 +139,42 @@ void Timer6_Config()
 }
 //------------------------------------
 
-void DMA_Config()
+void INITCFG_ConfigDMA()
 {
 	DMA_Clk_Enable(DMA1_ClkEN);
 	DMA_Clk_Enable(DMA2_ClkEN);
-
+	
 	/*
-	// DMA для АЦП напряжения на DUT
-	DMA_Reset(DMA_ADC_I_GATE_CHANNEL);
-	DMAChannelX_DataConfig(DMA_ADC_I_GATE_CHANNEL, (uint32_t)LOGIC_IgtRaw, (uint32_t)(&ADC1->DR), PULSE_ARR_MAX_LENGTH);
-	DMAChannelX_Config(DMA_ADC_I_GATE_CHANNEL, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
-						DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH, 0);
+	 // DMA для АЦП напряжения на DUT
+	 DMA_Reset(DMA_ADC_I_GATE_CHANNEL);
+	 DMAChannelX_DataConfig(DMA_ADC_I_GATE_CHANNEL, (uint32_t)LOGIC_IgtRaw, (uint32_t)(&ADC1->DR), PULSE_ARR_MAX_LENGTH);
+	 DMAChannelX_Config(DMA_ADC_I_GATE_CHANNEL, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
+	 DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH, 0);
 
-	// DMA для АЦП тока на DUT
-	DMA_Reset(DMA_ADC_U_GATE_CHANNEL);
-	DMAChannelX_DataConfig(DMA_ADC_U_GATE_CHANNEL, (uint32_t)LOGIC_UgtRaw, (uint32_t)(&ADC2->DR), PULSE_ARR_MAX_LENGTH);
-	DMAChannelX_Config(DMA_ADC_U_GATE_CHANNEL, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
-						DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH, 0);
+	 // DMA для АЦП тока на DUT
+	 DMA_Reset(DMA_ADC_U_GATE_CHANNEL);
+	 DMAChannelX_DataConfig(DMA_ADC_U_GATE_CHANNEL, (uint32_t)LOGIC_UgtRaw, (uint32_t)(&ADC2->DR), PULSE_ARR_MAX_LENGTH);
+	 DMAChannelX_Config(DMA_ADC_U_GATE_CHANNEL, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
+	 DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH, 0);
 
-	// DMA для АЦП напряжения на DUT
-	DMA_Reset(DMA_ADC_Itm_CHANNEL);
-	DMAChannelX_DataConfig(DMA_ADC_Itm_CHANNEL, (uint32_t)LOGIC_ItmRaw, (uint32_t)(&ADC3->DR), PULSE_ARR_MAX_LENGTH);
-	DMAChannelX_Config(DMA_ADC_Itm_CHANNEL, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
-						DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH, 0);
+	 // DMA для АЦП напряжения на DUT
+	 DMA_Reset(DMA_ADC_Itm_CHANNEL);
+	 DMAChannelX_DataConfig(DMA_ADC_Itm_CHANNEL, (uint32_t)LOGIC_ItmRaw, (uint32_t)(&ADC3->DR), PULSE_ARR_MAX_LENGTH);
+	 DMAChannelX_Config(DMA_ADC_Itm_CHANNEL, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
+	 DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH, 0);
 
-	// DMA для АЦП тока на DUT
-	DMA_Reset(DMA_ADC_Utm_CHANNEL);
-	DMAChannelX_DataConfig(DMA_ADC_Utm_CHANNEL, (uint32_t)LOGIC_UtmRaw, (uint32_t)(&ADC4->DR), PULSE_ARR_MAX_LENGTH);
-	DMAChannelX_Config(DMA_ADC_Utm_CHANNEL, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
-						DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH, 0);
-	*/
+	 // DMA для АЦП тока на DUT
+	 DMA_Reset(DMA_ADC_Utm_CHANNEL);
+	 DMAChannelX_DataConfig(DMA_ADC_Utm_CHANNEL, (uint32_t)LOGIC_UtmRaw, (uint32_t)(&ADC4->DR), PULSE_ARR_MAX_LENGTH);
+	 DMAChannelX_Config(DMA_ADC_Utm_CHANNEL, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
+	 DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH, 0);
+	 */
 }
 //------------------------------------
 
-void WatchDog_Config()
+void INITCFG_ConfigWatchDog()
 {
 	IWDG_Config();
 	IWDG_ConfigureFastUpdate();
-}
-//------------------------------------
-
-void InitializeController(Boolean GoodClock)
-{
-	CONTROL_Init();
 }
 //------------------------------------
