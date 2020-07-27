@@ -3,6 +3,7 @@
 
 // Include
 #include "Board.h"
+#include "Delay.h"
 
 // Functions
 //
@@ -42,23 +43,16 @@ void LL_SyncScope(bool State)
 }
 //------------------------------------
 
-void LL_DAC_Write(uint16_t Port, uint16_t Data)
+void LL_WriteDAC(uint16_t Data)
 {
-	Data |= 1<<14;
-
-	Data |= Port;
-
-	GPIO_Bit_Rst(GPIOA, Pin_1);
+	GPIO_SetState(GPIO_DAC_CS, false);
 	SPI_WriteByte(SPI1, Data);
-	asm("nop");
-	asm("nop");
-	asm("nop");
-	asm("nop");
-	asm("nop");
-	asm("nop");
-	GPIO_Bit_Set(GPIOA, Pin_1);
+	GPIO_SetState(GPIO_DAC_CS, true);
+	DELAY_US(1);
 
-	GPIO_Bit_Rst(GPIOA, Pin_2);
-	GPIO_Bit_Set(GPIOA, Pin_2);
+	GPIO_SetState(GPIO_DAC_LDAC, false);
+	DELAY_US(1);
+	GPIO_SetState(GPIO_DAC_LDAC, true);
+	DELAY_US(1);
 }
-//------------------------------------
+//-----------------------------

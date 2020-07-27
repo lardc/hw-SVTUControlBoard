@@ -14,6 +14,6 @@ void LL_RangeSelect(bool State);
 void LL_SYNC_SCPC(bool State);
 void LL_GATE_EN(bool State);
 void LL_SYNC_OSC(bool State);
-void LL_DAC_Write(uint16_t Port, uint16_t Data);
+void LL_WriteDAC(uint16_t Data);
 
 #endif //__LOWLEVEL_H
