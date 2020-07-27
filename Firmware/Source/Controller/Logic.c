@@ -65,6 +65,7 @@ bool LOGIC_UpdateCellsState();
 //
 void LOGIC_FindCells()
 {
+	/*
 	ActiveCellsCounter = 0;
 	for (uint16_t i = 0; i < PC_MAX_CELLS; ++i)
 	{
@@ -79,6 +80,7 @@ void LOGIC_FindCells()
 
 	DataTable[REG_TOTAL_LSLPC] = ActiveCellsCounter;
 	DataTable[REG_CURRENT_MAX] = LSLPC_CURRENT_MAX * ActiveCellsCounter;
+	*/
 }
 // ----------------------------------------
 
@@ -109,6 +111,7 @@ void LOGIC_PowerEnablePrepare()
 
 bool LOGIC_PowerEnableProcess()
 {
+	/*
 	static uint16_t CellPointer = 0;
 	static uint64_t Timeout = 0;
 
@@ -195,7 +198,7 @@ bool LOGIC_PowerEnableProcess()
 			}
 			break;
 	}
-
+	*/
 	LOGIC_HandleCommunicationError();
 	if (LOGIC_State == LS_Error || LOGIC_State == LS_None)
 		return false;
@@ -206,6 +209,7 @@ bool LOGIC_PowerEnableProcess()
 
 void LOGIC_PowerDisable()
 {
+	/*
 	LOGIC_State = LS_None;
 
 	// Отправка команды выключения
@@ -217,12 +221,13 @@ void LOGIC_PowerDisable()
 	}
 
 	LOGIC_HandleCommunicationError();
+	*/
 }
 // ----------------------------------------
 
 void LOGIC_HandleCommunicationError()
 {
-	if ((PC_GetError().ErrorCode != ERR_NO_ERROR) && (LOGIC_State != LS_Error))
+	if ((BHL_GetError().ErrorCode != ERR_NO_ERROR) && (LOGIC_State != LS_Error))
 	{
 		LOGIC_State = LS_Error;
 		CONTROL_SwitchToFault(FAULT_PROTOCOL);
@@ -232,6 +237,7 @@ void LOGIC_HandleCommunicationError()
 
 bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current)
 {
+	/*
 	// Nid вне диапазона
 	if (Nid < PC_START_ADDR || Nid >= (PC_START_ADDR + PC_MAX_CELLS))
 		return false;
@@ -253,6 +259,7 @@ bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current)
 
 	// Конфигурация требуемой ячейки
 	PC_DataArray[Nid - PC_START_ADDR] = (uint16_t)Current;
+	*/
 	return true;
 }
 // ----------------------------------------
@@ -307,6 +314,7 @@ void LOGIC_PulsePrepare()
 
 bool LOGIC_PulseProcess()
 {
+	/*
 	static uint16_t CellPointer = 0;
 	static uint64_t Timeout = 0;
 
@@ -380,7 +388,7 @@ bool LOGIC_PulseProcess()
 			}
 			break;
 	}
-
+	*/
 	LOGIC_HandleCommunicationError();
 	if (LOGIC_State == LS_Error || LOGIC_State == LS_None)
 		return false;

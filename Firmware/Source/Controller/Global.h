@@ -77,7 +77,4 @@
 #define MEAS_BREAK_SHORT_V				100.0f						// Минимальное рабочее напряжение (в В)
 // -----------------------------------------------
 
-const Int16U I_Set = 0;
-const Int16U V_Set = 0x8000;
-
 #endif //  __GLOBAL_H
