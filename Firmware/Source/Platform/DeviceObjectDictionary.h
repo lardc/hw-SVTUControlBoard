@@ -17,13 +17,11 @@
 #define ACT_CLR_WARNING							4		// Очистка предупреждения#define ACT_START_PULSE							100		// Запуск процесса измерения
 
 
-#define ACT_DBG_IFB_EN							10		// Запуск размагничивающего тока на 1сек.
-#define ACT_DBG_RangeSelect						11		// Синхросигнал на 1сек.
-#define ACT_DBG_SYNC_SCPC						12		// Включение реле разряда на 1сек.
-#define ACT_DBG_GATE_EN							13		// Подача питания на зарядные устройства на 1сек.
-#define ACT_DBG_SYNC_OSC						14		// Включение остановки зарядных устройств на 1сек.
-#define ACT_DBG_DAC_A_Write						15		// Включение контактора на 1сек.
-#define ACT_DBG_DAC_B_Write						16		// Включение внешней индикации на 1сек
+#define ACT_DBG_PULSE_IG_FEEDBACK				10		// Запуск размагничивающего тока на 1сек.
+#define ACT_DBG_PULSE_ID_LOW_RANGE				11		// Синхросигнал на 1сек.
+#define ACT_DBG_PULSE_SYNC_SCPC					12		// Включение реле разряда на 1сек.
+#define ACT_DBG_PULSE_IG						13		// Подача питания на зарядные устройства на 1сек.
+#define ACT_DBG_PULSE_SYNC_SCOPE				14		// Включение остановки зарядных устройств на 1сек.
 
 
 #define ACT_START_PULSE							100		// Запуск процесса измерения

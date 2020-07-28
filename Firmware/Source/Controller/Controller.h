@@ -39,6 +39,7 @@ typedef enum __DeviceState
 
 // Variables
 //
+extern DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
 //
 extern volatile Int16U CONTROL_Values_Setpoint[];
@@ -50,6 +51,8 @@ extern volatile Int16U CONTROL_Values_ADCCounter;
 
 // Functions
 //
+void CONTROL_Init();
+void CONTROL_Idle();
 void CONTROL_SwitchToFault(Int16U Reason);
 
 #endif // __CONTROLLER_H

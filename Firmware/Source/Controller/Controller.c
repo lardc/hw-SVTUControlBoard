@@ -17,6 +17,7 @@
 #include "Logic.h"
 #include "Controller.h"
 #include "Measurement.h"
+#include "Diagnostic.h"
 #include "math.h"
 
 // Types
@@ -45,11 +46,7 @@ void CONTROL_ResetToDefaults(bool StopPowerSupply);
 void CONTROL_Idle();
 void CONTROL_WatchDogUpdate();
 void CONTROL_RegistersReset();
-
-
 void CONTROL_SetDeviceState(DeviceState NewState);
-void Delay_mS(uint32_t Delay);
-
 
 /*
 void CONTROL_SaveResultToEndpoints(ProcessResult Result);
@@ -171,68 +168,8 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 			}
 			break;
 
-		case ACT_DBG_IFB_EN:
-			if (CONTROL_State == DS_None)
-			{
-				LL_IFB_EN(TRUE);
-				Delay_mS(1000);
-				LL_IFB_EN(FALSE);
-			}
-			break;
-
-		case ACT_DBG_RangeSelect:
-			if (CONTROL_State == DS_None)
-			{
-				LL_RangeSelect(TRUE);
-				Delay_mS(1000);
-				LL_RangeSelect(FALSE);
-			}
-			break;
-
-		case ACT_DBG_SYNC_SCPC:
-			if (CONTROL_State == DS_None)
-			{
-				LL_SYNC_SCPC(TRUE);
-				Delay_mS(1000);
-				LL_SYNC_SCPC(FALSE);
-			}
-			break;
-
-		case ACT_DBG_GATE_EN:
-			if (CONTROL_State == DS_None)
-			{
-				LL_GATE_EN(TRUE);
-				Delay_mS(1000);
-				LL_GATE_EN(FALSE);
-			}
-			break;
-
-		case ACT_DBG_SYNC_OSC:
-			if (CONTROL_State == DS_None)
-			{
-				LL_SYNC_OSC(TRUE);
-				Delay_mS(1000);
-				LL_SYNC_OSC(FALSE);
-			}
-			break;
-
-		case ACT_DBG_DAC_A_Write:
-			if (CONTROL_State == DS_None)
-			{
-				//LL_DAC_Write((uint16_t) I_Set, DataTable[REG_DAC_I_Set]);
-			}
-			break;
-
-		case ACT_DBG_DAC_B_Write:
-			if (CONTROL_State == DS_None)
-			{
-				//LL_DAC_Write((uint16_t) V_Set, DataTable[REG_DAC_V_Set]);
-			}
-			break;
-
-
 		default:
-			return FALSE;
+			return DIAG_HandleDiagnosticAction(ActionID, pUserError);
 	}
 
 	return TRUE;
@@ -470,14 +407,6 @@ void CONTROL_SetDeviceState(DeviceState NewState)
 {
 	CONTROL_State = NewState;
 	DataTable[REG_DEV_STATE] = NewState;
-}
-//-----------------------------------------------
-
-void Delay_mS(uint32_t Delay)
-{
-	uint64_t Counter = (uint64_t)CONTROL_TimeCounter + Delay;
-	while (Counter != CONTROL_TimeCounter)
-		CONTROL_WatchDogUpdate();
 }
 //-----------------------------------------------
 
