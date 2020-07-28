@@ -5,6 +5,12 @@
 #include "Board.h"
 #include "Delay.h"
 
+// Definitions
+#define DAC_CHANNEL_B		BIT15
+
+// Forward functions
+void LL_WriteDACx(uint16_t Data);
+
 // Functions
 //
 void LL_ToggleBoardLED()
@@ -31,7 +37,7 @@ void LL_SyncScope(bool State)
 }
 //------------------------------------
 
-void LL_WriteDAC(uint16_t Data)
+void LL_WriteDACx(uint16_t Data)
 {
 	GPIO_SetState(GPIO_DAC_CS, false);
 	SPI_WriteByte(SPI1, Data);
@@ -42,5 +48,17 @@ void LL_WriteDAC(uint16_t Data)
 	DELAY_US(1);
 	GPIO_SetState(GPIO_DAC_LDAC, true);
 	DELAY_US(1);
+}
+//-----------------------------
+
+void LL_WriteDAC_ChA(uint16_t Data)
+{
+	LL_WriteDACx(Data & (~DAC_CHANNEL_B));
+}
+//-----------------------------
+
+void LL_WriteDAC_ChB(uint16_t Data)
+{
+	LL_WriteDACx(Data | DAC_CHANNEL_B);
 }
 //-----------------------------
