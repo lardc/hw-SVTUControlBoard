@@ -110,14 +110,14 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 
 	switch (ActionID)
 	{
-		case ACT_CLR_FAULT:
+		case ACT_FAULT_CLEAR:
 			{
 				if (CONTROL_State == DS_Fault)
 					CONTROL_ResetToDefaults(TRUE);
 			}
 			break;
 
-		case ACT_CLR_WARNING:
+		case ACT_WARNING_CLEAR:
 			DataTable[REG_WARNING] = 0;
 			break;
 
@@ -141,7 +141,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 			}
 			break;
 
-		case ACT_START_PULSE:
+		case ACT_START_TEST:
 			{
 				if (CONTROL_State == DS_Ready)
 				{
