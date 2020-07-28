@@ -86,6 +86,7 @@ void LOGIC_FindCells()
 
 bool LOGIC_UpdateCellsState()
 {
+	/*
 	uint16_t Register;
 
 	for (uint16_t i = 0; i < PC_MAX_CELLS; ++i)
@@ -98,7 +99,7 @@ bool LOGIC_UpdateCellsState()
 				return false;
 		}
 	}
-
+	*/
 	return true;
 }
 // ----------------------------------------
