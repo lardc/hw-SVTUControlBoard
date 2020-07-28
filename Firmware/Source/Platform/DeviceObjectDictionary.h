@@ -12,6 +12,8 @@
 #define ACT_DBG_PULSE_SYNC_SCPC			12	// Импульс синхронизации ячеек SCPC
 #define ACT_DBG_PULSE_IG				13	// Импульс включения подачи сигнала управления
 #define ACT_DBG_PULSE_SYNC_SCOPE		14	// Импульс синхронизации осциллографа
+#define ACT_DBG_SET_GATE_VG				15	// Задание напряжения в цепи управления
+#define ACT_DBG_SET_GATE_IG				16	// Задание тока в цепи управления
 
 #define ACT_START_TEST					100	// Запуск процесса измерения
 #define ACT_STOP_TEST					101	// Остановка процесса измерения
@@ -60,6 +62,10 @@
 
 // Несохраняемы регистры чтения-записи
 #define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
+
+#define REG_DBG_GATE_PULSE_TIME			150	// Отладочный регистр длительности импульса управления (в мкс)
+#define REG_DBG_VG_VALUE				151	// Отладочный регистр напряжения цепи управления (в мВ)
+#define REG_DBG_IG_VALUE				152	// Отладочный регистр тока цепи управления (в мА)
 
 // Регистры только чтение
 #define REG_DEV_STATE					192	// Регистр состояния

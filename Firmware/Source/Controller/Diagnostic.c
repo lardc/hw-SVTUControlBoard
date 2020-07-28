@@ -4,6 +4,7 @@
 // Include
 #include "Delay.h"
 #include "LowLevel.h"
+#include "DataTable.h"
 #include "DeviceObjectDictionary.h"
 #include "Controller.h"
 #include "GateDriver.h"
@@ -45,7 +46,7 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 			if(CONTROL_State == DS_None)
 			{
 				GATE_PulseOutput(true);
-				DELAY_MS(1000);
+				DELAY_US(DataTable[REG_DBG_GATE_PULSE_TIME]);
 				GATE_PulseOutput(false);
 			}
 			break;
@@ -59,6 +60,16 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 			}
 			break;
 			
+		case ACT_DBG_SET_GATE_VG:
+			if(CONTROL_State == DS_None)
+				GATE_SetVg(DataTable[REG_DBG_VG_VALUE]);
+			break;
+
+		case ACT_DBG_SET_GATE_IG:
+			if(CONTROL_State == DS_None)
+				GATE_SetIg(DataTable[REG_DBG_IG_VALUE]);
+			break;
+
 		default:
 			return false;
 	}
