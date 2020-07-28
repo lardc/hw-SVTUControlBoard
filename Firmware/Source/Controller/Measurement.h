@@ -5,10 +5,11 @@
 
 // Functions
 //
-float MEASURE_BatteryVoltage1();
-float MEASURE_BatteryVoltage2();
-//
-void MEASURE_ConvertVoltageArr(volatile uint16_t *InputArray, float *OutputArray, uint16_t DataLength);
-void MEASURE_ConvertCurrentArr(volatile uint16_t *InputArray, float *OutputArray, uint16_t DataLength);
+void MEASURE_ConvertVd(uint16_t *InputArray, float *OutputArray, uint16_t DataLength);
+void MEASURE_ConvertId(uint16_t *InputArray, float *OutputArray, uint16_t DataLength);
+void MEASURE_ConvertIdLow(uint16_t *InputArray, float *OutputArray, uint16_t DataLength);
+
+void MEASURE_ConvertVg(uint16_t *InputArray, float *OutputArray, uint16_t DataLength);
+void MEASURE_ConvertIg(uint16_t *InputArray, float *OutputArray, uint16_t DataLength);
 
 #endif // __MEASUREMENT_H
