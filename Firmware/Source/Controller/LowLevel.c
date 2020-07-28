@@ -13,12 +13,6 @@ void LL_ToggleBoardLED()
 }
 //------------------------------------
 
-void LL_IgFeedback(bool State)
-{
-	GPIO_SetState(GPIO_IG_FEEDBACK, State);
-}
-//------------------------------------
-
 void LL_IdLowRange(bool State)
 {
 	GPIO_SetState(GPIO_ID_LOW_RANGE, State);
@@ -28,12 +22,6 @@ void LL_IdLowRange(bool State)
 void LL_SyncPowerCell(bool State)
 {
 	GPIO_SetState(GPIO_SYNC_POWER_CELL, State);
-}
-//------------------------------------
-
-void LL_IgPulse(bool State)
-{
-	GPIO_SetState(GPIO_IG_PULSE, State);
 }
 //------------------------------------
 

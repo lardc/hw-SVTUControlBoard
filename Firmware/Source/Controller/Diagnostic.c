@@ -6,6 +6,7 @@
 #include "LowLevel.h"
 #include "DeviceObjectDictionary.h"
 #include "Controller.h"
+#include "GateDriver.h"
 
 // Functions
 //
@@ -16,9 +17,9 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 		case ACT_DBG_PULSE_IG_FEEDBACK:
 			if(CONTROL_State == DS_None)
 			{
-				LL_IgFeedback(true);
+				GATE_CurrentFeedback(true);
 				DELAY_MS(1000);
-				LL_IgFeedback(false);
+				GATE_CurrentFeedback(false);
 			}
 			break;
 			
@@ -43,9 +44,9 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 		case ACT_DBG_PULSE_IG:
 			if(CONTROL_State == DS_None)
 			{
-				LL_IgPulse(true);
+				GATE_PulseOutput(true);
 				DELAY_MS(1000);
-				LL_IgPulse(false);
+				GATE_PulseOutput(false);
 			}
 			break;
 			
