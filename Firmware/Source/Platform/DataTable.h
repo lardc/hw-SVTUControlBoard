@@ -66,6 +66,4 @@ void DT_ResetNVPart(FUNC_SetDefaultValues SetFunc);
 // Reset volatile read-write part of data table
 void DT_ResetWRPart(FUNC_SetDefaultValues SetFunc);
 
-void DT_ResetNVPartToDefault(void);
-
 #endif // __DATA_TABLE_H

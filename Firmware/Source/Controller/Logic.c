@@ -47,6 +47,8 @@ typedef struct __PCStructData
 	uint16_t	Current;
 } PCData, *pPCData;
 
+// Tmp
+#define PC_MAX_CURRENT 100
 
 // Variables
 //

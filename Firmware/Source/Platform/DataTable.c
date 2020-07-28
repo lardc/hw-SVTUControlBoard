@@ -69,12 +69,3 @@ void DT_ResetWRPart(FUNC_SetDefaultValues SetFunc)
 		SetFunc();
 }
 //-------------------------------------------
-
-void DT_ResetNVPartToDefault(void)
-{
-	DEVPROFILE_FillNVPartDefault();
-
-	if (EPROMServiceCfg.WriteService)
-		EPROMServiceCfg.WriteService(DT_EPROM_ADDRESS, (pInt16U)&DataTable[DATA_TABLE_NV_START], DATA_TABLE_NV_SIZE);
-}
-//------------------------------------------
