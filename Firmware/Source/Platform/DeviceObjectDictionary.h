@@ -81,7 +81,9 @@
 
 // Endpoints
 #define EP16_DATA_ID					1	// ќцифрованные данные Id
-#define EP16_DATA_UD					2	// ќцифрованные данные Vd
+#define EP16_DATA_VD					2	// ќцифрованные данные Vd
+#define EP16_DATA_IG					3	// ќцифрованные данные Ig
+#define EP16_DATA_VG					4	// ќцифрованные данные Vg
 
 // Fault and disable codes
 #define FAULT_NONE						0

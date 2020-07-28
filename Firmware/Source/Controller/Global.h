@@ -9,7 +9,7 @@
 #define	SCCI_TIMEOUT_TICKS			1000			// Таймаут протоколоа SCCI (в мс)
 #define	BCCIM_TIMEOUT_TICKS			50				// Таймаут протоколоа мастер BCCI (в мс)
 #define EP_WRITE_COUNT				0				// Количество массивов для записи
-#define EP_COUNT					1				// Количество массивов для чтения
+#define EP_COUNT					4				// Количество массивов для чтения
 #define ENABLE_LOCKING				FALSE			// Защита паролем
 #define VALUES_x_SIZE				500				// Размер выходных массивов
 
