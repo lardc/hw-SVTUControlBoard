@@ -15,13 +15,14 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 {
 	switch (ActionID)
 	{
-		case ACT_DBG_PULSE_IG_FEEDBACK:
+		case ACT_DBG_IG_FEEDBACK_ON:
 			if(CONTROL_State == DS_None)
-			{
 				GATE_CurrentFeedback(true);
-				DELAY_MS(1000);
+			break;
+
+		case ACT_DBG_IG_FEEDBACK_OFF:
+			if(CONTROL_State == DS_None)
 				GATE_CurrentFeedback(false);
-			}
 			break;
 			
 		case ACT_DBG_PULSE_ID_LOW_RANGE:
