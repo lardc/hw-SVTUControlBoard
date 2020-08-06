@@ -5,6 +5,7 @@
 #include "Interrupts.h"
 #include "SysConfig.h"
 #include "BoardConfig.h"
+#include "BCCIxParams.h"
 
 
 // Forward functions
@@ -94,7 +95,8 @@ void CAN_Config()
 	RCC_CAN_Clk_EN(CAN_1_ClkEN);
 	NCAN_Init(SYSCLK, CAN_BAUDRATE, FALSE);
 	NCAN_FIFOInterrupt(TRUE);
-	NCAN_FilterInit(0, 0, 0);		// Фильтр 0 пропускает все сообщения
+	NCAN_FilterInit(0, CAN_SLAVE_FILTER_ID, CAN_SLAVE_NID_MASK);
+	NCAN_FilterInit(1, CAN_MASTER_FILTER_ID, CAN_MASTER_NID_MASK);
 }
 //--------------------------------------------
 
