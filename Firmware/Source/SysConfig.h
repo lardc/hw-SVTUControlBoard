@@ -36,8 +36,10 @@
 // ----------------------------------------------
 
 // ADC
-#define ADC1_VOLTAGE_CHANNEL			1			// АЦП1 номер канала напряжения
-#define ADC2_CURRENT_CHANNEL			4			// АЦП2 номер канала тока
+#define ADC1_IG_CHANNEL					1			// АЦП1 номер канала измерения Ig
+#define ADC2_VG_CHANNEL					1			// АЦП2 номер канала измерения Vg
+#define ADC3_ID_CHANNEL					1			// АЦП3 номер канала измерения Id
+#define ADC4_VD_CHANNEL					3			// АЦП4 номер канала измерения Vd
 // ----------------------------------------------
 
 #endif // __SYSCONFIG_H

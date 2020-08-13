@@ -4,6 +4,7 @@
 // Includes
 #include "Board.h"
 #include "SysConfig.h"
+#include "BCCIxParams.h"
 
 // Functions
 //
@@ -73,45 +74,44 @@ void INITCFG_ConfigSPI()
 
 void INITCFG_ConfigADC()
 {
-	/*
-	 RCC_ADC_Clk_EN(ADC_12_ClkEN);
-
-	 ADC_Calibration(ADC1);
-	 ADC_Calibration(ADC2);
-	 ADC_Calibration(ADC3);
-	 ADC_Calibration(ADC4);
-
-	 ADC1_2_SetDualMode(true);
-	 ADC3_4_SetDualMode(true);
-
-	 ADC_Enable(ADC1);
-	 ADC_Enable(ADC2);
-	 ADC_Enable(ADC3);
-	 ADC_Enable(ADC4);
-	 ADC_TrigConfig(ADC1, ADC12_TIM6_TRGO, RISE);
-	 ADC_TrigConfig(ADC3, ADC34_TIM7_TRGO, RISE);
-
-	 ADC_ChannelSeqReset(ADC1);
-	 ADC_ChannelSet_Sequence(ADC1, ADC1_VOLTAGE_CHANNEL, 1);
-	 ADC_ChannelSeqLen(ADC1, 1);
-
-	 ADC_ChannelSeqReset(ADC2);
-	 ADC_ChannelSet_Sequence(ADC2, ADC2_CURRENT_CHANNEL, 1);
-	 ADC_ChannelSeqLen(ADC2, 1);
-
-	 ADC_ChannelSeqReset(ADC3);
-	 ADC_ChannelSet_Sequence(ADC1, ADC1_VOLTAGE_CHANNEL, 1);
-	 ADC_ChannelSeqLen(ADC3, 1);
-
-	 ADC_ChannelSeqReset(ADC4);
-	 ADC_ChannelSet_Sequence(ADC2, ADC2_CURRENT_CHANNEL, 3);
-	 ADC_ChannelSeqLen(ADC4, 1);
-
-	 ADC_DMAEnable(ADC1, true);
-	 ADC_DMAEnable(ADC2, true);
-	 ADC_DMAEnable(ADC3, true);
-	 ADC_DMAEnable(ADC4, true);
-	 */
+	RCC_ADC_Clk_EN(ADC_12_ClkEN);
+	RCC_ADC_Clk_EN(ADC_34_ClkEN);
+	
+	ADC_Calibration(ADC1);
+	ADC_Calibration(ADC2);
+	ADC_Calibration(ADC3);
+	ADC_Calibration(ADC4);
+	
+	ADC1_2_SetDualMode(true);
+	ADC3_4_SetDualMode(true);
+	
+	ADC_Enable(ADC1);
+	ADC_Enable(ADC2);
+	ADC_Enable(ADC3);
+	ADC_Enable(ADC4);
+	
+	ADC_TrigConfig(ADC1, ADC12_TIM6_TRGO, RISE);
+	ADC_TrigConfig(ADC3, ADC34_TIM7_TRGO, RISE);
+	
+	ADC_ChannelSeqReset(ADC1);
+	ADC_ChannelSeqReset(ADC2);
+	ADC_ChannelSeqReset(ADC3);
+	ADC_ChannelSeqReset(ADC4);
+	
+	ADC_ChannelSet_Sequence(ADC1, ADC1_IG_CHANNEL, 1);
+	ADC_ChannelSet_Sequence(ADC2, ADC2_VG_CHANNEL, 1);
+	ADC_ChannelSet_Sequence(ADC3, ADC3_ID_CHANNEL, 1);
+	ADC_ChannelSet_Sequence(ADC4, ADC4_VD_CHANNEL, 3);
+	
+	ADC_ChannelSeqLen(ADC1, 1);
+	ADC_ChannelSeqLen(ADC2, 1);
+	ADC_ChannelSeqLen(ADC3, 1);
+	ADC_ChannelSeqLen(ADC4, 1);
+	
+	ADC_DMAEnable(ADC1, true);
+	ADC_DMAEnable(ADC2, true);
+	ADC_DMAEnable(ADC3, true);
+	ADC_DMAEnable(ADC4, true);
 }
 //------------------------------------
 
