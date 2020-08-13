@@ -1,18 +1,10 @@
-// -----------------------------------------
-// Logic controller
-// ----------------------------------------
-
 #ifndef __CONTROLLER_H
 #define __CONTROLLER_H
 
-
 // Includes
-//
 #include "stdinc.h"
 
-
-//Types
-//
+// Types
 typedef enum __SubState
 {
 	SS_None				= 0,
@@ -25,7 +17,6 @@ typedef enum __SubState
 	SS_PulsePrepStep4	= 7,
 	SS_PulseFinishWait	= 8
 } SubState;
-//
 typedef enum __DeviceState
 {
 	DS_None				= 0,
@@ -36,21 +27,11 @@ typedef enum __DeviceState
 	DS_InProcess		= 5
 } DeviceState;
 
-
 // Variables
-//
 extern DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
-//
-extern volatile Int16U CONTROL_Values_Setpoint[];
-extern volatile Int16U CONTROL_Values_DUTVoltage[];
-extern volatile Int16U CONTROL_Values_DUTCurrent[];
-extern volatile Int16U CONTROL_Values_SetCounter;
-extern volatile Int16U CONTROL_Values_ADCCounter;
-
 
 // Functions
-//
 void CONTROL_Init();
 void CONTROL_Idle();
 void CONTROL_SwitchToFault(Int16U Reason);

@@ -1,17 +1,13 @@
-//-----------------------------------------------
-// Основная логика
-//-----------------------------------------------
-
 // Header
 #include "Controller.h"
 
 // Includes
 #include "DataTable.h"
-#include "DeviceProfile.h"
 #include "Board.h"
 #include "Logic.h"
 #include "Controller.h"
 #include "Diagnostic.h"
+#include "MemBuffers.h"
 
 // Types
 typedef void (*FUNC_AsyncDelegate)();
@@ -21,12 +17,7 @@ DeviceState CONTROL_State = DS_None;
 static Boolean CycleActive = false;
 SubState SUB_State = SS_None;
 
-volatile Int16U CONTROL_Values_Vd[VALUES_x_SIZE] = {0};
-volatile Int16U CONTROL_Values_Id[VALUES_x_SIZE] = {0};
-volatile Int16U CONTROL_Values_Vg[VALUES_x_SIZE] = {0};
-volatile Int16U CONTROL_Values_Ig[VALUES_x_SIZE] = {0};
 volatile Int16U CONTROL_Values_Counter = 0;
-
 volatile Int64U CONTROL_TimeCounter = 0;
 volatile Int64U CONTROL_TimeCounterDelay = 0;
 
@@ -40,13 +31,13 @@ void CONTROL_SetDeviceState(DeviceState NewState);
 //
 void CONTROL_Init()
 {
+	pInt16U cnt = (pInt16U)&CONTROL_Values_Counter;
 	// Переменные для конфигурации EndPoint
 	Int16U EPIndexes[EP_COUNT] = {EP16_DATA_ID, EP16_DATA_VD, EP16_DATA_IG, EP16_DATA_VG};
 	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
-	pInt16U EPCounters[EP_COUNT] = {(pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter,
-			(pInt16U)&CONTROL_Values_Counter, (pInt16U)&CONTROL_Values_Counter};
-	pInt16U EPDatas[EP_COUNT] = {(pInt16U)CONTROL_Values_Vd, (pInt16U)CONTROL_Values_Id, (pInt16U)CONTROL_Values_Vg,
-			(pInt16U)CONTROL_Values_Ig};
+	pInt16U EPCounters[EP_COUNT] = {cnt, cnt, cnt, cnt};
+	pInt16U EPDatas[EP_COUNT] = {(pInt16U)MEMBUF_EP_Vd, (pInt16U)MEMBUF_EP_Id, (pInt16U)MEMBUF_EP_Vg,
+			(pInt16U)MEMBUF_EP_Ig};
 	
 	// Конфигурация сервиса работы Data-table и EPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
