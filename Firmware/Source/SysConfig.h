@@ -29,10 +29,10 @@
 // ----------------------------------------------
 
 // DMA
-#define DMA_ADC_Igt_CHANNEL				DMA1_Channel1	// Канал DMA для АЦП Igt
-#define DMA_ADC_Ugt_CHANNEL				DMA2_Channel1	// Канал DMA для АЦП Ugt
-#define DMA_ADC_Itm_CHANNEL				DMA2_Channel5	// Канал DMA для АЦП Itm
-#define DMA_ADC_Utm_CHANNEL				DMA2_Channel4	// Канал DMA для АЦП Utm
+#define DMA_ADC_IG_CHANNEL				DMA1_Channel1	// Канал DMA для АЦП Ig
+#define DMA_ADC_VG_CHANNEL				DMA2_Channel1	// Канал DMA для АЦП Vg
+#define DMA_ADC_ID_CHANNEL				DMA2_Channel5	// Канал DMA для АЦП Id
+#define DMA_ADC_VD_CHANNEL				DMA2_Channel4	// Канал DMA для АЦП Vd
 // ----------------------------------------------
 
 // ADC

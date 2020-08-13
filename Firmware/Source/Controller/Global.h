@@ -25,4 +25,7 @@
 #define DAC_REF_VOLTAGE				5000.0f			// Опорное напряжение (в мВ)
 #define DAC_RESOLUTION				4095
 
+// Параметры DMA
+#define VALUES_DMA_SIZE				2000			// Размер массивов DMA
+
 #endif // __GLOBAL_H
