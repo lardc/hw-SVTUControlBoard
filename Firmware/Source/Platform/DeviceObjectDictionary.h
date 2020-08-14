@@ -61,6 +61,10 @@
 #define REG_VG_P1						25	// Полином точной корректировки Vg P1 x1000
 #define REG_VG_P2						26	// Полином точной корректировки Vg P2 x1e6
 
+#define REG_PC_MAX_COUNT				30	// Максимальное количество подключаемых силовых ячеек
+#define REG_PC_MAX_CURRENT				31	// Максимальный ток с одной силовой ячейки (в А)
+#define REG_PC_START_NID				32	// Стартовое значение NodeID для первой силовой ячейки
+
 // Несохраняемы регистры чтения-записи
 #define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
 
@@ -76,7 +80,20 @@
 #define REG_PROBLEM						196	// Регистр Problem
 #define REG_OP_RESULT					197	// Регистр результата операции
 
+#define REG_TOTAL_LSLPC					207	// Обнаруженное количество силовых ячеек
+#define REG_CURRENT_MAX					225	// Максимальный ток, получаемый с установки (в А)
+
 #define REG_QUADRATIC_CORR				254	// Use quadratic correction for block
+// -----------------------------
+
+// Регистры LSLPC
+#define REG_LSLPC_PULSE_VALUE			64	// Значение амплитуды импульса тока (в А)
+
+#define REG_LSLPC_DEV_STATE				96	// Состояние блока
+#define REG_LSLPC_FAULT_REASON			97
+#define REG_LSLPC_DISABLE_REASON		98
+#define REG_LSLPC_WARNING				99
+#define REG_LSLPC_PROBLEM				100
 // -----------------------------
 
 // Endpoints

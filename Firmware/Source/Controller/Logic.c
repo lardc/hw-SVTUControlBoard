@@ -8,6 +8,7 @@
 #include "DataTable.h"
 #include "DeviceObjectDictionary.h"
 #include "BCCIMHighLevel.h"
+#include "Constraints.h"
 
 // Types
 //
@@ -52,9 +53,9 @@ typedef struct __PCStructData
 
 // Variables
 //
-PCData PC_DataArray[PC_MAX_CELLS] = {0};
-uint16_t ActiveCellsCounter = 0;
+PCData PC_DataArray[LSLPC_COUNT_MAX] = {0};
 LogicState LOGIC_State = LS_None;
+static uint16_t ActiveCellsCounter = 0;
 
 
 // Forward functions
@@ -65,13 +66,14 @@ bool LOGIC_UpdateCellsState();
 
 // Functions
 //
-void LOGIC_FindCells()
+bool LOGIC_FindCells()
 {
-	/*
 	ActiveCellsCounter = 0;
-	for (uint16_t i = 0; i < PC_MAX_CELLS; ++i)
+	uint16_t StartNID = DataTable[REG_PC_START_NID];
+
+	for (uint16_t i = 0; i < LSLPC_COUNT_MAX; ++i)
 	{
-		if (BHL_ReadRegister(i + PC_START_ADDR, REG_LSLPC_DEV_STATE, NULL))
+		if (BHL_ReadRegister(i + StartNID, REG_LSLPC_DEV_STATE, NULL))
 		{
 			PC_DataArray[i].IsActive = true;
 			++ActiveCellsCounter;
@@ -81,8 +83,9 @@ void LOGIC_FindCells()
 	}
 
 	DataTable[REG_TOTAL_LSLPC] = ActiveCellsCounter;
-	DataTable[REG_CURRENT_MAX] = LSLPC_CURRENT_MAX * ActiveCellsCounter;
-	*/
+	DataTable[REG_CURRENT_MAX] = DataTable[REG_PC_MAX_CURRENT] * ActiveCellsCounter;
+
+	return ActiveCellsCounter;
 }
 // ----------------------------------------
 
@@ -91,7 +94,7 @@ bool LOGIC_UpdateCellsState()
 	/*
 	uint16_t Register;
 
-	for (uint16_t i = 0; i < PC_MAX_CELLS; ++i)
+	for (uint16_t i = 0; i < LSLPC_COUNT_MAX; ++i)
 	{
 		if (PC_DataArray[i].IsActive)
 		{
@@ -153,7 +156,7 @@ bool LOGIC_PowerEnableProcess()
 					}
 				}
 
-				if (++CellPointer == PC_MAX_CELLS && LOGIC_State != LS_Error)
+				if (++CellPointer == LSLPC_COUNT_MAX && LOGIC_State != LS_Error)
 				{
 					LOGIC_State = LS_PowerOnWaitCharge;
 					Timeout = CONTROL_TimeCounter + PC_CHARGE_TIMEOUT;
@@ -172,7 +175,7 @@ bool LOGIC_PowerEnableProcess()
 			{
 				// Подсчёт количества зарядившихся ячеек
 				uint16_t ChargedCells = 0;
-				for (uint16_t i = 0; i < PC_MAX_CELLS; ++i)
+				for (uint16_t i = 0; i < LSLPC_COUNT_MAX; ++i)
 				{
 					if (PC_DataArray[i].IsActive)
 					{
@@ -216,7 +219,7 @@ void LOGIC_PowerDisable()
 	LOGIC_State = LS_None;
 
 	// Отправка команды выключения
-	for (uint16_t i = 0; i < PC_MAX_CELLS; ++i)
+	for (uint16_t i = 0; i < LSLPC_COUNT_MAX; ++i)
 	{
 		if (PC_DataArray[i].IsActive)
 			if (!PC_Call(i + PC_START_ADDR, LSLPC_ACT_POWER_DISABLE))
@@ -242,7 +245,7 @@ bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current)
 {
 	/*
 	// Nid вне диапазона
-	if (Nid < PC_START_ADDR || Nid >= (PC_START_ADDR + PC_MAX_CELLS))
+	if (Nid < PC_START_ADDR || Nid >= (PC_START_ADDR + LSLPC_COUNT_MAX))
 		return false;
 
 	// Выбранная ячейка неактивна
@@ -254,7 +257,7 @@ bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current)
 		return false;
 
 	// Очистка уставки тока для всех ячеек
-	for (uint16_t i = 0; i < PC_MAX_CELLS; ++i)
+	for (uint16_t i = 0; i < LSLPC_COUNT_MAX; ++i)
 	{
 		if (PC_DataArray[i].IsActive)
 			PC_DataArray[i].Current = 0;
@@ -278,14 +281,14 @@ bool LOGIC_DistributeCurrent(float Current)
 		return false;
 
 	// Очистка уставки тока для всех ячеек
-	for (uint16_t i = 0; i < PC_MAX_CELLS; ++i)
+	for (uint16_t i = 0; i < LSLPC_COUNT_MAX; ++i)
 	{
 		if (PC_DataArray[i].IsActive)
 			PC_DataArray[i].Current = 0;
 	}
 
 	// Запись значений тока
-	for (uint16_t i = 0; (i < PC_MAX_CELLS) && (FractionCurrent > 0) && (IntCurrent > 0); ++i)
+	for (uint16_t i = 0; (i < LSLPC_COUNT_MAX) && (FractionCurrent > 0) && (IntCurrent > 0); ++i)
 	{
 		if (PC_DataArray[i].IsActive)
 		{
@@ -358,7 +361,7 @@ bool LOGIC_PulseProcess()
 					}
 				}
 
-				if (++CellPointer == PC_MAX_CELLS && LOGIC_State != LS_Error)
+				if (++CellPointer == LSLPC_COUNT_MAX && LOGIC_State != LS_Error)
 					LOGIC_State = LS_PulseCheckConfig;
 			}
 			break;
@@ -373,7 +376,7 @@ bool LOGIC_PulseProcess()
 		case LS_PulseCheckConfig:
 			{
 				// Проверка настройки ячеек
-				for (uint16_t i = 0; i < PC_MAX_CELLS; ++i)
+				for (uint16_t i = 0; i < LSLPC_COUNT_MAX; ++i)
 				{
 					if (PC_DataArray[i].IsActive && PC_DataArray[CellPointer].Current)
 					{

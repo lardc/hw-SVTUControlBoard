@@ -7,7 +7,7 @@
 
 //Functions
 //
-void LOGIC_FindCells();
+bool LOGIC_FindCells();
 //
 void LOGIC_PowerEnablePrepare();
 void LOGIC_PowerEnable();
