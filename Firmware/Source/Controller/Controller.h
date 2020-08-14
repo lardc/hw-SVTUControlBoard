@@ -5,18 +5,6 @@
 #include "stdinc.h"
 
 // Types
-typedef enum __SubState
-{
-	SS_None				= 0,
-	SS_Charge			= 1,
-	SS_ChargeWait		= 2,
-	SS_PulsePrepStep1	= 3,
-	SS_PulsePrepCheckV	= 4,
-	SS_PulsePrepStep2	= 5,
-	SS_PulsePrepStep3	= 6,
-	SS_PulsePrepStep4	= 7,
-	SS_PulseFinishWait	= 8
-} SubState;
 typedef enum __DeviceState
 {
 	DS_None				= 0,
@@ -26,6 +14,18 @@ typedef enum __DeviceState
 	DS_Ready			= 4,
 	DS_InProcess		= 5
 } DeviceState;
+typedef enum __PCDeviceState
+{
+	PCDS_None = 0,
+	PCDS_Fault = 1,
+	PCDS_Disabled = 2,
+	PCDS_BatteryCharge = 3,
+	PCDS_Ready = 4,
+
+	PCDS_WaitTimeOut = 6,
+	PCDS_PulseConfigReady = 7,
+	PCDS_PulseStart = 8
+} PCDeviceState;
 
 // Variables
 extern DeviceState CONTROL_State;

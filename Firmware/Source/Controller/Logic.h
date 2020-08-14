@@ -8,10 +8,13 @@
 //Functions
 //
 bool LOGIC_FindCells();
+bool LOGIC_UpdateCellsState();
 //
-void LOGIC_PowerEnablePrepare();
-void LOGIC_PowerEnable();
-void LOGIC_PowerDisable();
+bool LOGIC_CallCommandForCells(uint16_t Command);
+bool LOGIC_PowerEnableCells();
+bool LOGIC_WriteCellsConfig();
+bool LOGIC_AreCellsInStateX(uint16_t State);
+bool LOGIC_IsCellInFaultOrDisabled(uint16_t Fault, uint16_t Disabled);
 //
 bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current);
 bool LOGIC_DistributeCurrent(float Current);

@@ -8,9 +8,25 @@
 #include "Controller.h"
 #include "Diagnostic.h"
 #include "MemBuffers.h"
+#include "BCCIMHighLevel.h"
 
 // Types
+//
 typedef void (*FUNC_AsyncDelegate)();
+typedef enum __SubState
+{
+	SS_None = 0,
+	SS_PowerOn = 1,
+	SS_WaitCharge = 2,
+
+	SS_PowerOff = 3,
+
+	SS_ConfigSlaves = 4,
+	SS_ConfigSlavesApply = 5,
+	SS_ConfigHardware = 6,
+	SS_CommPause = 7,
+	SS_StartPulse = 8
+} SubState;
 
 // Variables
 DeviceState CONTROL_State = DS_None;
@@ -23,9 +39,11 @@ volatile Int64U CONTROL_TimeCounterDelay = 0;
 
 // Forward functions
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
+void CONTROL_SetDeviceState(DeviceState NewState, SubState NewSubState);
 void CONTROL_ResetToDefaults();
 void CONTROL_WatchDogUpdate();
-void CONTROL_SetDeviceState(DeviceState NewState);
+void CONTROL_CellsStateUpdate();
+void CONTROL_HandlePowerOn();
 
 // Functions
 //
@@ -105,22 +123,46 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 
 void CONTROL_Idle()
 {
-	CONTROL_WatchDogUpdate();
+	// ќбработка мастер-запросов по интерфейсу
 	DEVPROFILE_ProcessRequests();
+
+	// —читывание состо€ний силовых €чеек
+	CONTROL_CellsStateUpdate();
+
+	// ќбработка логики мастер-команд
+	CONTROL_HandlePowerOn();
+	//CONTROL_HandlePowerOff();
+	//CONTROL_HandlePulseConfig();
+
+	CONTROL_WatchDogUpdate();
 }
 //-----------------------------------------------
 
 void CONTROL_SwitchToFault(Int16U Reason)
 {
-	CONTROL_SetDeviceState(DS_Fault);
+	if(Reason == DF_INTERFACE)
+	{
+		BHLError Error = BHL_GetError();
+		DataTable[REG_BHL_ERROR_CODE] = Error.ErrorCode;
+		DataTable[REG_BHL_DEVICE] = Error.Device;
+		DataTable[REG_BHL_FUNCTION] = Error.Func;
+		DataTable[REG_BHL_EXT_DATA] = Error.ExtData;
+	}
+
+	CONTROL_ResetToDefaults();
+
+	CONTROL_SetDeviceState(DS_Fault, SS_None);
 	DataTable[REG_FAULT_REASON] = Reason;
 }
 //-----------------------------------------------
 
-void CONTROL_SetDeviceState(DeviceState NewState)
+void CONTROL_SetDeviceState(DeviceState NewState, SubState NewSubState)
 {
 	CONTROL_State = NewState;
 	DataTable[REG_DEV_STATE] = NewState;
+
+	SUB_State = NewSubState;
+	DataTable[REG_DEV_SUB_STATE] = NewSubState;
 }
 //-----------------------------------------------
 
@@ -128,5 +170,61 @@ void CONTROL_WatchDogUpdate()
 {
 	if(BOOT_LOADER_VARIABLE != BOOT_LOADER_REQUEST)
 		IWDG_Refresh();
+}
+//-----------------------------------------------
+
+void CONTROL_CellsStateUpdate()
+{
+	static uint64_t NextUpdate = 0;
+
+	if(SUB_State != SS_None)
+	{
+		if(CONTROL_TimeCounter > NextUpdate)
+		{
+			NextUpdate = CONTROL_TimeCounter + TIME_CELLS_UPDATE;
+			if(!LOGIC_UpdateCellsState())
+				CONTROL_SwitchToFault(DF_INTERFACE);
+		}
+	}
+}
+//-----------------------------------------------
+
+void CONTROL_HandlePowerOn()
+{
+	if(CONTROL_State == DS_InProcess)
+	{
+		switch (SUB_State)
+		{
+			case SS_PowerOn:
+				{
+					if(LOGIC_PowerEnableCells())
+					{
+						CONTROL_TimeCounterDelay = CONTROL_TimeCounter + DataTable[REG_PC_CHARGE_TIMEOUT];
+						CONTROL_SetDeviceState(DS_InProcess, SS_WaitCharge);
+					}
+					else
+						CONTROL_SwitchToFault(DF_INTERFACE);
+				}
+				break;
+
+			case SS_WaitCharge:
+				{
+					if(LOGIC_AreCellsInStateX(PCDS_Ready))
+					{
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+					else if(LOGIC_IsCellInFaultOrDisabled(PCDS_Fault, PCDS_Disabled))
+					{
+						CONTROL_SwitchToFault(DF_PC_UNEXPECTED_STATE);
+					}
+					else if(CONTROL_TimeCounter > CONTROL_TimeCounterDelay)
+						CONTROL_SwitchToFault(DF_PC_STATE_TIMEOUT);
+				}
+				break;
+
+			default:
+				break;
+		}
+	}
 }
 //-----------------------------------------------

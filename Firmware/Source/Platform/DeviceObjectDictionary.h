@@ -64,6 +64,7 @@
 #define REG_PC_MAX_COUNT				30	// Максимальное количество подключаемых силовых ячеек
 #define REG_PC_MAX_CURRENT				31	// Максимальный ток с одной силовой ячейки (в А)
 #define REG_PC_START_NID				32	// Стартовое значение NodeID для первой силовой ячейки
+#define REG_PC_CHARGE_TIMEOUT			33	// Таймаут ожидания заряда ячейки (в мс)
 
 // Несохраняемы регистры чтения-записи
 #define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
@@ -80,10 +81,28 @@
 #define REG_PROBLEM						196	// Регистр Problem
 #define REG_OP_RESULT					197	// Регистр результата операции
 
+#define REG_DUT_VOLTAGE					198	// Измеренное значение прямого напряжения (в мВ)
+#define REG_DUT_CURRENT					206	// Измеренное значение прямого тока (в А)
+
+#define REG_DEV_SUB_STATE				209	// Регистр вспомогательного состояния
+#define REG_BHL_ERROR_CODE				210	// Ошибка интерфейса ВУ: код ошибки
+#define REG_BHL_DEVICE					211	// Ошибка интерфейса ВУ: NID устройства
+#define REG_BHL_FUNCTION				212	// Ошибка интерфейса ВУ: код функции
+#define REG_BHL_EXT_DATA				213	// Ошибка интерфейса ВУ: расширенная информация
+
 #define REG_TOTAL_LSLPC					207	// Обнаруженное количество силовых ячеек
 #define REG_CURRENT_MAX					225	// Максимальный ток, получаемый с установки (в А)
 
 #define REG_QUADRATIC_CORR				254	// Use quadratic correction for block
+// -----------------------------
+
+// Команды LSLPC
+#define ACT_LSLPC_ENABLE_POWER			1	// Включение блока
+#define ACT_LSLPC_DISABLE_POWER			2	// Выключение блока
+#define ACT_LSLPC_FAULT_CLEAR			3	// Очистка fault
+#define ACT_LSLPC_WARNING_CLEAR			4	// Очистка warning
+//
+#define ACT_LSLPC_PULSE_CONFIG			100	// Команда на конфигурацию значения тока
 // -----------------------------
 
 // Регистры LSLPC
@@ -103,10 +122,10 @@
 #define EP16_DATA_VG					4	// Оцифрованные данные Vg
 
 // Fault and disable codes
-#define FAULT_NONE						0
-#define FAULT_PROTOCOL					0
-#define FAULT_PC_UNEXPECTED_STATE		0
-#define FAULT_PC_CHARGE_TIMEOUT			0
+#define DF_NONE							0
+#define DF_INTERFACE					1
+#define DF_PC_UNEXPECTED_STATE			2
+#define DF_PC_STATE_TIMEOUT				3
 
 // Warning
 #define WARNING_NONE					0
