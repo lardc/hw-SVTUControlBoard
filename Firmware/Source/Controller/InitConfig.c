@@ -92,8 +92,8 @@ void INITCFG_ConfigADC()
 	ADC_Enable(ADC3);
 	ADC_Enable(ADC4);
 	
-	ADC_TrigConfig(ADC1, ADC12_TIM6_TRGO, RISE);
-	ADC_TrigConfig(ADC3, ADC34_TIM7_TRGO, RISE);
+	ADC_TrigConfig(ADC1, ADC12_TIM1_TRGO, RISE);
+	ADC_TrigConfig(ADC3, ADC34_TIM1_TRGO, RISE);
 	
 	ADC_ChannelSeqReset(ADC1);
 	ADC_ChannelSeqReset(ADC2);
@@ -103,24 +103,22 @@ void INITCFG_ConfigADC()
 	ADC_ChannelSet_Sequence(ADC1, ADC1_IG_CHANNEL, 1);
 	ADC_ChannelSet_Sequence(ADC2, ADC2_VG_CHANNEL, 1);
 	ADC_ChannelSet_Sequence(ADC3, ADC3_ID_CHANNEL, 1);
-	ADC_ChannelSet_Sequence(ADC4, ADC4_VD_CHANNEL, 3);
+	ADC_ChannelSet_Sequence(ADC4, ADC4_VD_CHANNEL, 1);
 	
 	ADC_ChannelSeqLen(ADC1, 1);
 	ADC_ChannelSeqLen(ADC2, 1);
 	ADC_ChannelSeqLen(ADC3, 1);
 	ADC_ChannelSeqLen(ADC4, 1);
 	
+	ADC_DMAConfig(ADC1);
+	ADC_DMAConfig(ADC2);
+	ADC_DMAConfig(ADC3);
+	ADC_DMAConfig(ADC4);
+
 	ADC_DMAEnable(ADC1, true);
 	ADC_DMAEnable(ADC2, true);
 	ADC_DMAEnable(ADC3, true);
 	ADC_DMAEnable(ADC4, true);
-}
-//------------------------------------
-
-void INITCFG_ConfigTimer2()
-{
-	TIM_Clock_En(TIM_2);
-	TIM_Interupt(TIM2, 0, true);
 }
 //------------------------------------
 
@@ -133,12 +131,12 @@ void INITCFG_ConfigTimer3()
 }
 //------------------------------------
 
-void INITCFG_ConfigTimer6()
+void INITCFG_ConfigTimer1()
 {
-	TIM_Clock_En(TIM_6);
-	TIM_Config(TIM6, SYSCLK, TIMER6_uS);
-	TIM_DMA(TIM6, DMAEN);
-	TIM_MasterMode(TIM6, MMS_UPDATE);
+	TIM_Clock_En(TIM_1);
+	TIM_Config(TIM1, SYSCLK, TIMER1_uS);
+	TIM_DMA(TIM1, DMAEN);
+	TIM_MasterMode(TIM1, MMS_UPDATE);
 }
 //------------------------------------
 

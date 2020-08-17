@@ -15,9 +15,8 @@ int main()
 	INITCFG_ConfigUART();
 	INITCFG_ConfigSPI();
 	INITCFG_ConfigADC();
-	INITCFG_ConfigTimer2();
 	INITCFG_ConfigTimer3();
-	INITCFG_ConfigTimer6();
+	INITCFG_ConfigTimer1();
 	INITCFG_ConfigDMA();
 	INITCFG_ConfigWatchDog();
 	
