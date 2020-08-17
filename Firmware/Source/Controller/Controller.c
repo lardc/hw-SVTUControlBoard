@@ -16,16 +16,14 @@ typedef void (*FUNC_AsyncDelegate)();
 typedef enum __SubState
 {
 	SS_None = 0,
+
 	SS_PowerOn = 1,
 	SS_WaitCharge = 2,
 
-	SS_PowerOff = 3,
-
-	SS_ConfigSlaves = 4,
-	SS_ConfigSlavesApply = 5,
-	SS_ConfigHardware = 6,
-	SS_CommPause = 7,
-	SS_StartPulse = 8
+	SS_PulseBegin = 3,
+	SS_WaitPulsePause = 4,
+	SS_ConfigPulse = 5,
+	SS_WaitConfig = 6
 } SubState;
 
 // Variables
@@ -43,6 +41,7 @@ void CONTROL_SetDeviceState(DeviceState NewState, SubState NewSubState);
 void CONTROL_ResetToDefaults();
 void CONTROL_WatchDogUpdate();
 void CONTROL_CellsStateUpdate();
+void CONTROL_HandleFaultCellsEvents();
 void CONTROL_HandlePowerOn();
 
 // Functions
@@ -181,7 +180,7 @@ void CONTROL_CellsStateUpdate()
 	{
 		if(CONTROL_TimeCounter > NextUpdate)
 		{
-			NextUpdate = CONTROL_TimeCounter + TIME_CELLS_UPDATE;
+			NextUpdate = CONTROL_TimeCounter + TIME_PC_UPDATE;
 			if(!LOGIC_UpdateCellsState())
 				CONTROL_SwitchToFault(DF_INTERFACE);
 		}
@@ -199,7 +198,7 @@ void CONTROL_HandlePowerOn()
 				{
 					if(LOGIC_PowerEnableCells())
 					{
-						CONTROL_TimeCounterDelay = CONTROL_TimeCounter + DataTable[REG_PC_CHARGE_TIMEOUT];
+						CONTROL_TimeCounterDelay = CONTROL_TimeCounter + DataTable[REG_PC_LONG_TIMEOUT];
 						CONTROL_SetDeviceState(DS_InProcess, SS_WaitCharge);
 					}
 					else
@@ -210,15 +209,9 @@ void CONTROL_HandlePowerOn()
 			case SS_WaitCharge:
 				{
 					if(LOGIC_AreCellsInStateX(PCDS_Ready))
-					{
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
-					}
-					else if(LOGIC_IsCellInFaultOrDisabled(PCDS_Fault, PCDS_Disabled))
-					{
-						CONTROL_SwitchToFault(DF_PC_UNEXPECTED_STATE);
-					}
-					else if(CONTROL_TimeCounter > CONTROL_TimeCounterDelay)
-						CONTROL_SwitchToFault(DF_PC_STATE_TIMEOUT);
+					else
+						CONTROL_HandleFaultCellsEvents();
 				}
 				break;
 
@@ -226,5 +219,66 @@ void CONTROL_HandlePowerOn()
 				break;
 		}
 	}
+}
+//-----------------------------------------------
+
+void CONTROL_HandlePulse()
+{
+	if(CONTROL_State == DS_InProcess)
+	{
+		switch (SUB_State)
+		{
+			case SS_PulseBegin:
+				{
+					CONTROL_TimeCounterDelay = CONTROL_TimeCounter + DataTable[REG_PC_LONG_TIMEOUT];
+					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
+				}
+				break;
+
+			case SS_WaitPulsePause:
+				{
+					if(LOGIC_AreCellsInStateX(PCDS_Ready))
+						CONTROL_SetDeviceState(DS_InProcess, SS_ConfigPulse);
+					else
+						CONTROL_HandleFaultCellsEvents();
+				}
+				break;
+
+			case SS_ConfigPulse:
+				{
+					if(LOGIC_PowerEnableCells())
+					{
+						CONTROL_TimeCounterDelay = CONTROL_TimeCounter + TIMEOUT_PC_SHORT;
+						CONTROL_SetDeviceState(DS_InProcess, SS_WaitConfig);
+					}
+					else
+						CONTROL_SwitchToFault(DF_INTERFACE);
+				}
+				break;
+
+			case SS_WaitConfig:
+				{
+					if(LOGIC_AreCellsInStateX(PCDS_PulseConfigReady))
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					else
+						CONTROL_HandleFaultCellsEvents();
+				}
+				break;
+
+			default:
+				break;
+		}
+	}
+}
+//-----------------------------------------------
+
+void CONTROL_HandleFaultCellsEvents()
+{
+	if(LOGIC_IsCellInFaultOrDisabled(PCDS_Fault, PCDS_Disabled))
+	{
+		CONTROL_SwitchToFault(DF_PC_UNEXPECTED_STATE);
+	}
+	else if(CONTROL_TimeCounter > CONTROL_TimeCounterDelay)
+		CONTROL_SwitchToFault(DF_PC_STATE_TIMEOUT);
 }
 //-----------------------------------------------

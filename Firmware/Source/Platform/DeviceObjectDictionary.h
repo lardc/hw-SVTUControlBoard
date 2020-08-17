@@ -64,7 +64,7 @@
 #define REG_PC_MAX_COUNT				30	// Максимальное количество подключаемых силовых ячеек
 #define REG_PC_MAX_CURRENT				31	// Максимальный ток с одной силовой ячейки (в А)
 #define REG_PC_START_NID				32	// Стартовое значение NodeID для первой силовой ячейки
-#define REG_PC_CHARGE_TIMEOUT			33	// Таймаут ожидания заряда ячейки (в мс)
+#define REG_PC_LONG_TIMEOUT				33	// Длинный таймаут по операциям с ячейками (в мс)
 
 // Несохраняемы регистры чтения-записи
 #define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
