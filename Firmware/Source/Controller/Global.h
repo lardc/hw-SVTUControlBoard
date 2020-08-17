@@ -23,8 +23,9 @@
 #define ADC_RESOLUTION				4095
 #define DAC_REF_VOLTAGE				5000.0f			// Опорное напряжение (в мВ)
 #define DAC_RESOLUTION				4095
+#define ADC_EMA_FACTOR				0.5f			// Коэффициент экспоненциального скользящего среднего
 
 // Параметры DMA
-#define VALUES_DMA_SIZE				2000			// Размер массивов DMA
+#define VALUES_DMA_SIZE				2500			// Размер массивов DMA
 
 #endif // __GLOBAL_H

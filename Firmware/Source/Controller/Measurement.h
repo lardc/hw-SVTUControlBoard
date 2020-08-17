@@ -12,4 +12,6 @@ void MEASURE_ConvertIdLow(uint16_t *InputArray, float *OutputArray, uint16_t Dat
 void MEASURE_ConvertVg(uint16_t *InputArray, float *OutputArray, uint16_t DataLength);
 void MEASURE_ConvertIg(uint16_t *InputArray, float *OutputArray, uint16_t DataLength);
 
+void MEASURE_ArrayEMA(float *InputArray, uint16_t DataLength);
+
 #endif // __MEASUREMENT_H

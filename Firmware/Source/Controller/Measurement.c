@@ -67,3 +67,10 @@ void MEASURE_ConvertIg(uint16_t *InputArray, float *OutputArray, uint16_t DataLe
 			REG_IG_P2);
 }
 //------------------------------------
+
+void MEASURE_ArrayEMA(float *InputArray, uint16_t DataLength)
+{
+	for(uint16_t i = 1; i < DataLength; ++i)
+		InputArray[i] = InputArray[i] * ADC_EMA_FACTOR + (1 - ADC_EMA_FACTOR) * InputArray[i - 1];
+}
+//------------------------------------
