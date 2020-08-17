@@ -83,7 +83,7 @@ bool LOGIC_CallCommandForCells(uint16_t Command)
 				return false;
 		}
 	}
-
+	
 	return true;
 }
 // ----------------------------------------
@@ -142,7 +142,7 @@ bool LOGIC_WriteCellsConfig()
 				return false;
 		}
 	}
-
+	
 	return true;
 }
 // ----------------------------------------
@@ -166,7 +166,7 @@ bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current)
 	
 	// Конфигурация требуемой ячейки
 	PC_DataArray[Nid - CachedStartNid].Current = (uint16_t)Current;
-
+	
 	return true;
 }
 // ----------------------------------------
@@ -204,8 +204,22 @@ bool LOGIC_DistributeCurrent(float Current)
 			}
 		}
 	}
-
+	
 	return true;
+}
+// ----------------------------------------
+
+float LOGIC_GetCurrentSetpoint()
+{
+	float P0 = (float)((int16_t)DataTable[REG_ISET_P0]);
+	float P1 = (float)DataTable[REG_ISET_P1] / 1000;
+	float P2 = (float)((int16_t)DataTable[REG_ISET_P2]) / 1e6;
+	
+	float current = (float)DataTable[REG_CURRENT_SETPOINT];
+	current = current * (100 + DataTable[REG_CURRENT_OVERSHOOT]) / 100;
+	current = current * current * P2 + current * P1 + P0;
+	
+	return (current > 0) ? current : 0;
 }
 // ----------------------------------------
 

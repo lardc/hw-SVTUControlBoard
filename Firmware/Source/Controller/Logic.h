@@ -18,5 +18,7 @@ bool LOGIC_IsCellInFaultOrDisabled(uint16_t Fault, uint16_t Disabled);
 //
 bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current);
 bool LOGIC_DistributeCurrent(float Current);
+//
+float LOGIC_GetCurrentSetpoint();
 
 #endif //__LOGIC_H

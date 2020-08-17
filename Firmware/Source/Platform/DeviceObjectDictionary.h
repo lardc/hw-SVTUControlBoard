@@ -66,6 +66,11 @@
 #define REG_PC_START_NID				32	// Стартовое значение NodeID для первой силовой ячейки
 #define REG_PC_LONG_TIMEOUT				33	// Длинный таймаут по операциям с ячейками (в мс)
 
+#define REG_CURRENT_OVERSHOOT			40	// Перерегулирование амплитуды тока (в %)
+#define REG_ISET_P0						41	// Полином точной корректировки задания прямого тока P0 (в А)
+#define REG_ISET_P1						42	// Полином точной корректировки задания прямого тока P1 х1000
+#define REG_ISET_P2						43	// Полином точной корректировки задания прямого тока P2 х1е6
+
 // Несохраняемы регистры чтения-записи
 #define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
 
@@ -126,6 +131,7 @@
 #define DF_INTERFACE					1
 #define DF_PC_UNEXPECTED_STATE			2
 #define DF_PC_STATE_TIMEOUT				3
+#define DF_PC_CURRENT_CONFIG			4
 
 // Warning
 #define WARNING_NONE					0
