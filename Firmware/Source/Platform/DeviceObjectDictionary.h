@@ -126,6 +126,11 @@
 #define EP16_DATA_IG					3	// ќцифрованные данные Ig
 #define EP16_DATA_VG					4	// ќцифрованные данные Vg
 
+// Operation results
+#define OPRESULT_NONE					0	// No information or not finished
+#define OPRESULT_OK						1	// Operation was successful
+#define OPRESULT_FAIL					2	// Operation failed
+
 // Fault and disable codes
 #define DF_NONE							0
 #define DF_INTERFACE					1
@@ -135,6 +140,9 @@
 
 // Warning
 #define WARNING_NONE					0
+
+// Problem
+#define PROBLEM_NONE					0
 
 // User Errors
 #define ERR_NONE						0

@@ -9,6 +9,8 @@
 #include "Diagnostic.h"
 #include "MemBuffers.h"
 #include "BCCIMHighLevel.h"
+#include "GateDriver.h"
+#include "LowLevel.h"
 
 // Types
 //
@@ -38,6 +40,8 @@ volatile Int64U CONTROL_TimeCounter = 0;
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
 void CONTROL_SetDeviceState(DeviceState NewState, SubState NewSubState);
 void CONTROL_ResetToDefaults();
+void CONTROL_ResetData();
+void CONTROL_ResetHardware();
 void CONTROL_WatchDogUpdate();
 void CONTROL_CellsStateUpdate();
 void CONTROL_HandleFaultCellsEvents(Int64U Timeout);
@@ -74,6 +78,40 @@ void CONTROL_Init()
 
 void CONTROL_ResetToDefaults()
 {
+	CONTROL_ResetData();
+	CONTROL_ResetHardware();
+}
+//-----------------------------------------------
+
+void CONTROL_ResetData()
+{
+	DataTable[REG_FAULT_REASON] = DF_NONE;
+	DataTable[REG_DISABLE_REASON] = DF_NONE;
+	DataTable[REG_WARNING] = WARNING_NONE;
+	DataTable[REG_PROBLEM] = PROBLEM_NONE;
+	DataTable[REG_OP_RESULT] = OPRESULT_NONE;
+
+	DataTable[REG_DUT_VOLTAGE] = 0;
+	DataTable[REG_DUT_CURRENT] = 0;
+
+	DataTable[REG_BHL_ERROR_CODE] = 0;
+	DataTable[REG_BHL_DEVICE] = 0;
+	DataTable[REG_BHL_FUNCTION] = 0;
+	DataTable[REG_BHL_EXT_DATA] = 0;
+
+	DEVPROFILE_ResetScopes(0);
+	DEVPROFILE_ResetEPReadState();
+}
+//-----------------------------------------------
+
+void CONTROL_ResetHardware()
+{
+	GATE_PulseOutput(false);
+	LL_SyncPowerCell(false);
+	LL_SyncScope(false);
+
+	GATE_SetVg(0);
+	GATE_SetIg(0);
 }
 //-----------------------------------------------
 
