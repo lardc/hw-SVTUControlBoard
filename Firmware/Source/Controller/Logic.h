@@ -20,5 +20,6 @@ bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current);
 bool LOGIC_DistributeCurrent(float Current);
 //
 float LOGIC_GetCurrentSetpoint();
+void LOGIC_SelectCurrentRange(float Current);
 
 #endif //__LOGIC_H

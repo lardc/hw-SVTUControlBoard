@@ -9,6 +9,7 @@
 #include "DeviceObjectDictionary.h"
 #include "BCCIMHighLevel.h"
 #include "Constraints.h"
+#include "LowLevel.h"
 
 // Types
 //
@@ -230,5 +231,11 @@ void LOGIC_ResetCellsCurrent()
 		if(PC_DataArray[i].IsActive)
 			PC_DataArray[i].Current = 0;
 	}
+}
+// ----------------------------------------
+
+void LOGIC_SelectCurrentRange(float Current)
+{
+	LL_IdLowRange((uint16_t)Current <= DataTable[REG_I_LOW_RANGE_LIMIT]);
 }
 // ----------------------------------------

@@ -112,6 +112,7 @@ void CONTROL_ResetHardware()
 	GATE_PulseOutput(false);
 	LL_SyncPowerCell(false);
 	LL_SyncScope(false);
+	LL_IdLowRange(false);
 
 	GATE_SetVg(0);
 	GATE_SetIg(0);
@@ -313,9 +314,12 @@ void CONTROL_HandlePulse()
 				
 			case SS_ConfigPulse:
 				{
-					if(LOGIC_DistributeCurrent(LOGIC_GetCurrentSetpoint()))
+					float CurrentAmplitude = LOGIC_GetCurrentSetpoint();
+
+					if(LOGIC_DistributeCurrent(CurrentAmplitude))
 					{
 						bool NoError = false;
+						LOGIC_SelectCurrentRange(CurrentAmplitude);
 						
 						if(LOGIC_WriteCellsConfig())
 						{
