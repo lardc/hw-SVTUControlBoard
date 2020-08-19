@@ -25,7 +25,9 @@ typedef enum __SubState
 	SS_PulseBegin = 3,
 	SS_WaitPulsePause = 4,
 	SS_ConfigPulse = 5,
-	SS_WaitConfig = 6
+	SS_WaitConfig = 6,
+
+	SS_PowerOff = 7
 } SubState;
 
 // Variables
@@ -47,6 +49,7 @@ void CONTROL_CellsStateUpdate();
 void CONTROL_HandleFaultCellsEvents(Int64U Timeout);
 void CONTROL_HandlePowerOn();
 void CONTROL_HandlePulse();
+void CONTROL_HandlePowerOff();
 
 // Functions
 //
@@ -169,7 +172,7 @@ void CONTROL_Idle()
 	// Обработка логики мастер-команд
 	CONTROL_HandlePowerOn();
 	CONTROL_HandlePulse();
-	//CONTROL_HandlePowerOff();
+	CONTROL_HandlePowerOff();
 	
 	CONTROL_WatchDogUpdate();
 }
@@ -322,6 +325,20 @@ void CONTROL_HandlePulse()
 			default:
 				break;
 		}
+	}
+}
+//-----------------------------------------------
+
+void CONTROL_HandlePowerOff()
+{
+	if(CONTROL_State == DS_None && SUB_State == SS_PowerOff)
+	{
+		CONTROL_ResetHardware();
+
+		if(LOGIC_CallCommandForCells(ACT_LSLPC_DISABLE_POWER))
+			CONTROL_SetDeviceState(DS_None, SS_None);
+		else
+			CONTROL_SwitchToFault(DF_INTERFACE);
 	}
 }
 //-----------------------------------------------
