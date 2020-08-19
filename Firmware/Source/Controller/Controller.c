@@ -22,7 +22,7 @@ typedef enum __SubState
 	SS_PowerOn = 1,
 	SS_WaitCharge = 2,
 	
-	SS_PulseBegin = 3,
+	SS_PulseInit = 3,
 	SS_WaitPulsePause = 4,
 	SS_ConfigPulse = 5,
 	SS_WaitConfig = 6,
@@ -124,8 +124,28 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 	
 	switch (ActionID)
 	{
+		case ACT_ENABLE_POWER:
+			{
+				if(CONTROL_State == DS_None)
+					CONTROL_SetDeviceState(DS_InProcess, SS_PowerOn);
+				else if(CONTROL_State != DS_Ready)
+					*pUserError = ERR_OPERATION_BLOCKED;
+			}
+			break;
+			
+		case ACT_DISABLE_POWER:
+			{
+				if(CONTROL_State == DS_Ready)
+					CONTROL_SetDeviceState(DS_None, SS_PowerOff);
+				else if(CONTROL_State != DS_None)
+					*pUserError = ERR_OPERATION_BLOCKED;
+			}
+			break;
+			
 		case ACT_FAULT_CLEAR:
 			{
+				if(CONTROL_State == DS_Fault)
+					CONTROL_ResetToDefaults();
 			}
 			break;
 			
@@ -133,23 +153,24 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 			DataTable[REG_WARNING] = 0;
 			break;
 			
-		case ACT_ENABLE_POWER:
-			{
-			}
-			break;
-			
-		case ACT_DISABLE_POWER:
-			{
-			}
-			break;
-			
 		case ACT_START_TEST:
 			{
+				if(CONTROL_State == DS_Ready)
+					CONTROL_SetDeviceState(DS_InProcess, SS_PulseInit);
+				else
+					*pUserError = ERR_DEVICE_NOT_READY;
 			}
 			break;
 			
 		case ACT_STOP_TEST:
 			{
+				if(CONTROL_State == DS_InProcess)
+				{
+					CONTROL_ResetToDefaults();
+					CONTROL_SetDeviceState(DS_Ready, SS_None);
+				}
+				else
+					*pUserError = ERR_OPERATION_BLOCKED;
 			}
 			break;
 			
@@ -273,8 +294,9 @@ void CONTROL_HandlePulse()
 	{
 		switch (SUB_State)
 		{
-			case SS_PulseBegin:
+			case SS_PulseInit:
 				{
+					CONTROL_ResetData();
 					Timeout = CONTROL_TimeCounter + DataTable[REG_PC_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
 				}
@@ -333,7 +355,7 @@ void CONTROL_HandlePowerOff()
 {
 	if(CONTROL_State == DS_None && SUB_State == SS_PowerOff)
 	{
-		CONTROL_ResetHardware();
+		CONTROL_ResetToDefaults();
 
 		if(LOGIC_CallCommandForCells(ACT_LSLPC_DISABLE_POWER))
 			CONTROL_SetDeviceState(DS_None, SS_None);
