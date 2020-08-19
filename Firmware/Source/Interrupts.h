@@ -3,8 +3,7 @@
 
 #include "stdinc.h"
 
-// Variables
-//
-
+bool IT_DMASampleCompleted();
+void IT_DMAFlagsReset();
 
 #endif // __INTERRUPTS_H

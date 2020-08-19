@@ -9,17 +9,19 @@
 //
 bool LOGIC_FindCells();
 bool LOGIC_UpdateCellsState();
-//
+
 bool LOGIC_CallCommandForCells(uint16_t Command);
 bool LOGIC_PowerEnableCells();
 bool LOGIC_WriteCellsConfig();
 bool LOGIC_AreCellsInStateX(uint16_t State);
 bool LOGIC_IsCellInFaultOrDisabled(uint16_t Fault, uint16_t Disabled);
-//
+
 bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current);
 bool LOGIC_DistributeCurrent(float Current);
-//
+
 float LOGIC_GetCurrentSetpoint();
 void LOGIC_SelectCurrentRange(float Current);
+
+void LOGIC_ProcessPulse();
 
 #endif //__LOGIC_H

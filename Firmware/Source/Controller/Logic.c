@@ -10,6 +10,15 @@
 #include "BCCIMHighLevel.h"
 #include "Constraints.h"
 #include "LowLevel.h"
+#include "Interrupts.h"
+#include "SysConfig.h"
+#include "Delay.h"
+#include "GateDriver.h"
+#include "MemBuffers.h"
+#include "Measurement.h"
+#include "ZwDMA.h"
+#include "ZwADC.h"
+#include "ZwTIM.h"
 
 // Types
 //
@@ -237,5 +246,68 @@ void LOGIC_ResetCellsCurrent()
 void LOGIC_SelectCurrentRange(float Current)
 {
 	LL_IdLowRange((uint16_t)Current <= DataTable[REG_I_LOW_RANGE_LIMIT]);
+}
+// ----------------------------------------
+
+void LOGIC_ProcessPulse()
+{
+	uint16_t GatePulseDelay = DataTable[REG_GATE_PULSE_DELAY];
+	uint16_t GatePulseTime = DataTable[REG_GATE_PULSE_TIME];
+
+	// Задание напряжения в цепи управления
+	GATE_SetVg(DataTable[REG_VG_VALUE]);
+	DELAY_US(TIME_VG_STAB);
+
+	// Запуск оцифровки
+	IT_DMAFlagsReset();
+
+	DMA_ChannelReload(DMA_ADC_IG_CHANNEL, VALUES_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_VG_CHANNEL, VALUES_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_ID_CHANNEL, VALUES_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_VD_CHANNEL, VALUES_DMA_SIZE);
+
+	DMA_ChannelEnable(DMA_ADC_IG_CHANNEL, true);
+	DMA_ChannelEnable(DMA_ADC_VG_CHANNEL, true);
+	DMA_ChannelEnable(DMA_ADC_ID_CHANNEL, true);
+	DMA_ChannelEnable(DMA_ADC_VD_CHANNEL, true);
+
+	ADC_SamplingStart(ADC1);
+	ADC_SamplingStart(ADC2);
+	ADC_SamplingStart(ADC3);
+	ADC_SamplingStart(ADC4);
+
+	TIM_Start(TIM1);
+
+	// Запуск импульса
+	LL_SyncScope(true);
+	LL_SyncPowerCell(true);
+
+	// Задержка сигнала управления
+	if(GatePulseDelay)
+		DELAY_US(GatePulseDelay);
+
+	// Сигнал отпирания DUT
+	GATE_SetIg(DataTable[REG_IG_VALUE]);
+	DELAY_US(GatePulseTime);
+	GATE_SetIg(0);
+
+	// Синхронизация по вершине
+	DELAY_US(TIME_PULSE_WIDTH / 2 - GatePulseDelay - GatePulseTime);
+	LL_SyncScope(false);
+
+	// Синхронизация ячеек
+	DELAY_US(TIME_PULSE_WIDTH / 2);
+	LL_SyncPowerCell(false);
+
+	// Ожидание завершения оцифровки
+	while(!IT_DMASampleCompleted());
+	TIM_Stop(TIM1);
+
+	// Пересчёт значений
+	MEASURE_ConvertVd((uint16_t *)MEMBUF_DMA_Vd, VALUES_DMA_SIZE);
+	if(LL_IsIdLowRange())
+		MEASURE_ConvertIdLow((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);
+	else
+		MEASURE_ConvertId((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);
 }
 // ----------------------------------------

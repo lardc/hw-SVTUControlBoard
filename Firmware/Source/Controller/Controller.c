@@ -26,8 +26,9 @@ typedef enum __SubState
 	SS_WaitPulsePause = 4,
 	SS_ConfigPulse = 5,
 	SS_WaitConfig = 6,
+	SS_PostPulseCheck = 7,
 
-	SS_PowerOff = 7
+	SS_PowerOff = 8
 } SubState;
 
 // Variables
@@ -342,12 +343,20 @@ void CONTROL_HandlePulse()
 			case SS_WaitConfig:
 				{
 					if(LOGIC_AreCellsInStateX(PCDS_PulseConfigReady))
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					{
+						LOGIC_ProcessPulse();
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+					}
 					else
 						CONTROL_HandleFaultCellsEvents(Timeout);
 				}
 				break;
 				
+			case SS_PostPulseCheck:
+				{
+				}
+				break;
+
 			default:
 				break;
 		}

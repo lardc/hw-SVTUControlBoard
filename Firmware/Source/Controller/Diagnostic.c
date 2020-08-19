@@ -47,7 +47,7 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 			if(CONTROL_State == DS_None)
 			{
 				GATE_PulseOutput(true);
-				DELAY_US(DataTable[REG_DBG_GATE_PULSE_TIME]);
+				DELAY_US(DataTable[REG_GATE_PULSE_TIME]);
 				GATE_PulseOutput(false);
 			}
 			break;
@@ -63,12 +63,12 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 			
 		case ACT_DBG_SET_GATE_VG:
 			if(CONTROL_State == DS_None)
-				GATE_SetVg(DataTable[REG_DBG_VG_VALUE]);
+				GATE_SetVg(DataTable[REG_VG_VALUE]);
 			break;
 
 		case ACT_DBG_SET_GATE_IG:
 			if(CONTROL_State == DS_None)
-				GATE_SetIg(DataTable[REG_DBG_IG_VALUE]);
+				GATE_SetIg(DataTable[REG_IG_VALUE]);
 			break;
 
 		default:
