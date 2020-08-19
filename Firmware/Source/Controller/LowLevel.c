@@ -25,6 +25,12 @@ void LL_IdLowRange(bool State)
 }
 //------------------------------------
 
+bool LL_IsIdLowRange()
+{
+	return GPIO_GetState(GPIO_ID_LOW_RANGE);
+}
+//------------------------------------
+
 void LL_SyncPowerCell(bool State)
 {
 	GPIO_SetState(GPIO_SYNC_POWER_CELL, State);
