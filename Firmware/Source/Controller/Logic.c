@@ -309,5 +309,7 @@ void LOGIC_ProcessPulse()
 		MEASURE_ConvertIdLow((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);
 	else
 		MEASURE_ConvertId((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);
+	MEASURE_ConvertVg((uint16_t *)MEMBUF_DMA_Vg, VALUES_DMA_SIZE);
+	MEASURE_ConvertIg((uint16_t *)MEMBUF_DMA_Ig, VALUES_DMA_SIZE);
 }
 // ----------------------------------------
