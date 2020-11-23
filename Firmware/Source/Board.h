@@ -24,7 +24,6 @@ GPIO_PortPinSettingMacro GPIO_MEASURE_VD 		= {GPIOB, Pin_12};
 
 // Определения для выходных портов
 GPIO_PortPinSettingMacro GPIO_LED 				= {GPIOB, Pin_7};
-GPIO_PortPinSettingMacro GPIO_IG_FEEDBACK 		= {GPIOA, Pin_3};
 GPIO_PortPinSettingMacro GPIO_ID_LOW_RANGE	 	= {GPIOA, Pin_8};
 GPIO_PortPinSettingMacro GPIO_SYNC_POWER_CELL 	= {GPIOA, Pin_15};
 GPIO_PortPinSettingMacro GPIO_IG_PULSE			= {GPIOB, Pin_0};

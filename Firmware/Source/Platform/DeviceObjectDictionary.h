@@ -7,14 +7,12 @@
 #define ACT_FAULT_CLEAR					3	// Очистка fault
 #define ACT_WARNING_CLEAR				4	// Очистка warning
 
-#define ACT_DBG_IG_FEEDBACK_ON			10	// Включение обратной связи Ig
-#define ACT_DBG_IG_FEEDBACK_OFF			11	// Выключение обратной связи Ig
-#define ACT_DBG_PULSE_ID_LOW_RANGE		12	// Импульс включения нижнего диапазона измерения Id
-#define ACT_DBG_PULSE_SYNC_SCPC			13	// Импульс синхронизации ячеек SCPC
-#define ACT_DBG_PULSE_IG				14	// Импульс включения подачи сигнала управления
-#define ACT_DBG_PULSE_SYNC_SCOPE		15	// Импульс синхронизации осциллографа
-#define ACT_DBG_SET_GATE_VG				16	// Задание напряжения в цепи управления
-#define ACT_DBG_SET_GATE_IG				17	// Задание тока в цепи управления
+#define ACT_DBG_PULSE_ID_LOW_RANGE		10	// Импульс включения нижнего диапазона измерения Id
+#define ACT_DBG_PULSE_SYNC_SCPC			11	// Импульс синхронизации ячеек SCPC
+#define ACT_DBG_PULSE_IG				12	// Импульс включения подачи сигнала управления
+#define ACT_DBG_PULSE_SYNC_SCOPE		13	// Импульс синхронизации осциллографа
+#define ACT_DBG_SET_GATE_VG				14	// Задание напряжения в цепи управления
+#define ACT_DBG_SET_GATE_IG				15	// Задание тока в цепи управления
 
 #define ACT_START_TEST					100	// Запуск процесса измерения
 #define ACT_STOP_TEST					101	// Остановка процесса измерения
@@ -78,6 +76,8 @@
 #define REG_VG_VALUE					151	// Напряжение цепи управления (в мВ)
 #define REG_IG_VALUE					152	// Ток цепи управления (в мА)
 #define REG_GATE_PULSE_DELAY			153	// Задержка управляющего импульса (в мкс)
+
+#define REG_DBG							160	// Отладочный регистр
 
 // Регистры только чтение
 #define REG_DEV_STATE					192	// Регистр состояния

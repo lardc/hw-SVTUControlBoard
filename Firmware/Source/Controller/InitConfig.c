@@ -31,7 +31,6 @@ void INITCFG_ConfigGPIO()
 	
 	// Выходы
 	GPIO_InitPushPullOutput(GPIO_LED);
-	GPIO_InitPushPullOutput(GPIO_IG_FEEDBACK);
 	GPIO_InitPushPullOutput(GPIO_ID_LOW_RANGE);
 	GPIO_InitPushPullOutput(GPIO_SYNC_POWER_CELL);
 	GPIO_InitPushPullOutput(GPIO_IG_PULSE);

@@ -19,13 +19,7 @@ uint16_t GATE_ConvertIgToDAC(uint16_t Value);
 //
 void GATE_PulseOutput(bool State)
 {
-	GPIO_SetState(GPIO_IG_PULSE, State);
-}
-//------------------------------------
-
-void GATE_CurrentFeedback(bool State)
-{
-	GPIO_SetState(GPIO_IG_FEEDBACK, State);
+	GPIO_SetState(GPIO_IG_PULSE, !State);
 }
 //------------------------------------
 

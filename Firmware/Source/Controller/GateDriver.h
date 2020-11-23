@@ -6,7 +6,6 @@
 // Functions
 //
 void GATE_PulseOutput(bool State);
-void GATE_CurrentFeedback(bool State);
 void GATE_SetVg(uint16_t Value);
 void GATE_SetIg(uint16_t Value);
 
