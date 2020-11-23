@@ -5,21 +5,21 @@
 const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] = {
 		{0, 0, 0},																// 0
 		{0, 0, 0},																// 1
-		{0, 0, 0},																// 2
-		{0, 0, 0},																// 3
-		{0, 0, 0},																// 4
-		{0, 0, 0},																// 5
-		{0, 0, 0},																// 6
-		{0, 0, 0},																// 7
-		{0, 0, 0},																// 8
-		{0, 0, 0},																// 9
-		{0, 0, 0},																// 10
-		{0, 0, 0},																// 11
-		{0, 0, 0},																// 12
-		{0, 0, 0},																// 13
-		{0, 0, 0},																// 14
-		{0, 0, 0},																// 15
-		{0, 0, 0},																// 16
+		{0, INT16U_MAX, 0},														// 2
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 3
+		{0, INT16U_MAX, 0},														// 4
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 5
+		{0, INT16U_MAX, 0},														// 6
+		{0, INT16U_MAX, 0},														// 7
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 8
+		{0, INT16U_MAX, 0},														// 9
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 10
+		{0, INT16U_MAX, 0},														// 11
+		{0, INT16U_MAX, 0},														// 12
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 13
+		{0, INT16U_MAX, 0},														// 14
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 15
+		{0, INT16U_MAX, 0},														// 16
 		{0, INT16U_MAX, 0},														// 17
 		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 18
 		{0, INT16U_MAX, 0},														// 19
