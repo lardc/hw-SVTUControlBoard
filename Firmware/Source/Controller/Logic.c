@@ -1,4 +1,4 @@
-// Header
+п»ї// Header
 //
 #include "Logic.h"
 
@@ -159,22 +159,22 @@ bool LOGIC_WriteCellsConfig()
 
 bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current)
 {
-	// Nid вне диапазона
+	// Nid РІРЅРµ РґРёР°РїР°Р·РѕРЅР°
 	if(Nid < CachedStartNid || Nid >= (CachedStartNid + LSLPC_COUNT_MAX))
 		return false;
 	
-	// Выбранная ячейка неактивна
+	// Р’С‹Р±СЂР°РЅРЅР°СЏ СЏС‡РµР№РєР° РЅРµР°РєС‚РёРІРЅР°
 	if(!PC_DataArray[Nid - CachedStartNid].IsActive)
 		return false;
 	
-	// Ток превышает допустимый диапазон
+	// РўРѕРє РїСЂРµРІС‹С€Р°РµС‚ РґРѕРїСѓСЃС‚РёРјС‹Р№ РґРёР°РїР°Р·РѕРЅ
 	if((uint16_t)Current > DataTable[REG_PC_MAX_CURRENT])
 		return false;
 	
-	// Очистка уставки тока для всех ячеек
+	// РћС‡РёСЃС‚РєР° СѓСЃС‚Р°РІРєРё С‚РѕРєР° РґР»СЏ РІСЃРµС… СЏС‡РµРµРє
 	LOGIC_ResetCellsCurrent();
 	
-	// Конфигурация требуемой ячейки
+	// РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ С‚СЂРµР±СѓРµРјРѕР№ СЏС‡РµР№РєРё
 	PC_DataArray[Nid - CachedStartNid].Current = (uint16_t)Current;
 	
 	return true;
@@ -183,18 +183,18 @@ bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current)
 
 bool LOGIC_DistributeCurrent(float Current)
 {
-	// Определение дробной части уставки тока
+	// РћРїСЂРµРґРµР»РµРЅРёРµ РґСЂРѕР±РЅРѕР№ С‡Р°СЃС‚Рё СѓСЃС‚Р°РІРєРё С‚РѕРєР°
 	uint16_t IntCurrent = (uint16_t)Current;
 	uint16_t FractionCurrent = IntCurrent - (IntCurrent / CachedCellMaxCurrent) * CachedCellMaxCurrent;
 	
-	// Ток превышает допустимый диапазон
+	// РўРѕРє РїСЂРµРІС‹С€Р°РµС‚ РґРѕРїСѓСЃС‚РёРјС‹Р№ РґРёР°РїР°Р·РѕРЅ
 	if(IntCurrent > (CachedCellMaxCurrent * ActiveCellsCounter))
 		return false;
 	
-	// Очистка уставки тока для всех ячеек
+	// РћС‡РёСЃС‚РєР° СѓСЃС‚Р°РІРєРё С‚РѕРєР° РґР»СЏ РІСЃРµС… СЏС‡РµРµРє
 	LOGIC_ResetCellsCurrent();
 	
-	// Запись значений тока
+	// Р—Р°РїРёСЃСЊ Р·РЅР°С‡РµРЅРёР№ С‚РѕРєР°
 	for(uint16_t i = 0; (i < LSLPC_COUNT_MAX) && (FractionCurrent > 0) && (IntCurrent > 0); ++i)
 	{
 		if(PC_DataArray[i].IsActive)
@@ -254,11 +254,11 @@ void LOGIC_ProcessPulse()
 	uint16_t GatePulseDelay = DataTable[REG_GATE_PULSE_DELAY];
 	uint16_t GatePulseTime = DataTable[REG_GATE_PULSE_TIME];
 
-	// Задание напряжения в цепи управления
+	// Р—Р°РґР°РЅРёРµ РЅР°РїСЂСЏР¶РµРЅРёСЏ РІ С†РµРїРё СѓРїСЂР°РІР»РµРЅРёСЏ
 	GATE_SetVg(DataTable[REG_VG_VALUE]);
 	DELAY_US(TIME_VG_STAB);
 
-	// Запуск оцифровки
+	// Р—Р°РїСѓСЃРє РѕС†РёС„СЂРѕРІРєРё
 	IT_DMAFlagsReset();
 
 	DMA_ChannelReload(DMA_ADC_IG_CHANNEL, VALUES_DMA_SIZE);
@@ -278,32 +278,32 @@ void LOGIC_ProcessPulse()
 
 	TIM_Start(TIM1);
 
-	// Запуск импульса
+	// Р—Р°РїСѓСЃРє РёРјРїСѓР»СЊСЃР°
 	LL_SyncScope(true);
 	LL_SyncPowerCell(true);
 
-	// Задержка сигнала управления
+	// Р—Р°РґРµСЂР¶РєР° СЃРёРіРЅР°Р»Р° СѓРїСЂР°РІР»РµРЅРёСЏ
 	if(GatePulseDelay)
 		DELAY_US(GatePulseDelay);
 
-	// Сигнал отпирания DUT
+	// РЎРёРіРЅР°Р» РѕС‚РїРёСЂР°РЅРёСЏ DUT
 	GATE_SetIg(DataTable[REG_IG_VALUE]);
 	DELAY_US(GatePulseTime);
 	GATE_SetIg(0);
 
-	// Синхронизация по вершине
+	// РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ РїРѕ РІРµСЂС€РёРЅРµ
 	DELAY_US(TIME_PULSE_WIDTH / 2 - GatePulseDelay - GatePulseTime);
 	LL_SyncScope(false);
 
-	// Синхронизация ячеек
+	// РЎРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ СЏС‡РµРµРє
 	DELAY_US(TIME_PULSE_WIDTH / 2);
 	LL_SyncPowerCell(false);
 
-	// Ожидание завершения оцифровки
+	// РћР¶РёРґР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРёСЏ РѕС†РёС„СЂРѕРІРєРё
 	while(!IT_DMASampleCompleted());
 	TIM_Stop(TIM1);
 
-	// Пересчёт значений
+	// РџРµСЂРµСЃС‡С‘С‚ Р·РЅР°С‡РµРЅРёР№
 	MEASURE_ConvertVd((uint16_t *)MEMBUF_DMA_Vd, VALUES_DMA_SIZE);
 	if(LL_IsIdLowRange())
 		MEASURE_ConvertIdLow((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);

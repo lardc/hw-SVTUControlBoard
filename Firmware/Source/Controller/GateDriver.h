@@ -1,4 +1,4 @@
-#ifndef __GATE_DRIVER_H
+﻿#ifndef __GATE_DRIVER_H
 #define __GATE_DRIVER_H
 
 #include "stdinc.h"

@@ -1,4 +1,4 @@
-#include "InitConfig.h"
+п»ї#include "InitConfig.h"
 #include "Controller.h"
 #include "SysConfig.h"
 
@@ -8,7 +8,7 @@ int main()
 	SCB->VTOR = (uint32_t)BOOT_LOADER_MAIN_PR_ADDR;
 	__enable_irq();
 	
-	// Настройка аппаратной периферии
+	// РќР°СЃС‚СЂРѕР№РєР° Р°РїРїР°СЂР°С‚РЅРѕР№ РїРµСЂРёС„РµСЂРёРё
 	INITCFG_ConfigSystemClock();
 	INITCFG_ConfigGPIO();
 	INITCFG_ConfigCAN();
@@ -20,7 +20,7 @@ int main()
 	INITCFG_ConfigDMA();
 	INITCFG_ConfigWatchDog();
 	
-	// Инициализация логики контроллера
+	// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ Р»РѕРіРёРєРё РєРѕРЅС‚СЂРѕР»Р»РµСЂР°
 	CONTROL_Init();
 	
 	while(true)

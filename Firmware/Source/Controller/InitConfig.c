@@ -1,4 +1,4 @@
-// Header
+п»ї// Header
 #include "InitConfig.h"
 
 // Includes
@@ -19,17 +19,17 @@ void INITCFG_ConfigSystemClock()
 
 void INITCFG_ConfigGPIO()
 {
-	// Включение тактирования портов
+	// Р’РєР»СЋС‡РµРЅРёРµ С‚Р°РєС‚РёСЂРѕРІР°РЅРёСЏ РїРѕСЂС‚РѕРІ
 	RCC_GPIO_Clk_EN(PORTA);
 	RCC_GPIO_Clk_EN(PORTB);
 	
-	// Аналоговые входы
+	// РђРЅР°Р»РѕРіРѕРІС‹Рµ РІС…РѕРґС‹
 	GPIO_InitAnalog(GPIO_MEASURE_IG);
 	GPIO_InitAnalog(GPIO_MEASURE_VG);
 	GPIO_InitAnalog(GPIO_MEASURE_ID);
 	GPIO_InitAnalog(GPIO_MEASURE_VD);
 	
-	// Выходы
+	// Р’С‹С…РѕРґС‹
 	GPIO_InitPushPullOutput(GPIO_LED);
 	GPIO_InitPushPullOutput(GPIO_ID_LOW_RANGE);
 	GPIO_InitPushPullOutput(GPIO_SYNC_POWER_CELL);
@@ -40,7 +40,7 @@ void INITCFG_ConfigGPIO()
 	GPIO_SetState(GPIO_DAC_CS, true);
 	GPIO_SetState(GPIO_DAC_LDAC, true);
 	
-	// Альтернативные функции
+	// РђР»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹Рµ С„СѓРЅРєС†РёРё
 	GPIO_InitAltFunction(GPIO_ALT_CAN_RX, AltFn_9);
 	GPIO_InitAltFunction(GPIO_ALT_CAN_TX, AltFn_9);
 	GPIO_InitAltFunction(GPIO_ALT_UART_RX, AltFn_7);

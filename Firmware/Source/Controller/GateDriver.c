@@ -1,4 +1,4 @@
-// Header
+п»ї// Header
 #include "GateDriver.h"
 
 // Include
@@ -33,11 +33,11 @@ uint16_t GATE_ConvertValueToDAC(uint16_t Value, uint16_t RegisterOffset, uint16_
 	float P1 = (float)DataTable[RegisterP1] / 1000;
 	float P2 = (float)((int16_t)DataTable[RegisterP2]) / 1e6;
 	
-	// Квадратичная корректировка
+	// РљРІР°РґСЂР°С‚РёС‡РЅР°СЏ РєРѕСЂСЂРµРєС‚РёСЂРѕРІРєР°
 	float tmp = (float)Value;
 	tmp = tmp * tmp * P2 + tmp * P1 + P0;
 	
-	// Пересчёт в значения ЦАП
+	// РџРµСЂРµСЃС‡С‘С‚ РІ Р·РЅР°С‡РµРЅРёСЏ Р¦РђРџ
 	tmp = tmp * K / DAC_REF_VOLTAGE * DAC_RESOLUTION;
 	tmp = tmp - Offset;
 	
