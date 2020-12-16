@@ -1,4 +1,4 @@
-// Header
+п»ї// Header
 #include "Controller.h"
 
 // Includes
@@ -57,24 +57,24 @@ void CONTROL_HandlePowerOff();
 void CONTROL_Init()
 {
 	pInt16U cnt = (pInt16U)&CONTROL_Values_Counter;
-	// Переменные для конфигурации EndPoint
+	// РџРµСЂРµРјРµРЅРЅС‹Рµ РґР»СЏ РєРѕРЅС„РёРіСѓСЂР°С†РёРё EndPoint
 	Int16U EPIndexes[EP_COUNT] = {EP16_DATA_ID, EP16_DATA_VD, EP16_DATA_IG, EP16_DATA_VG};
 	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
 	pInt16U EPCounters[EP_COUNT] = {cnt, cnt, cnt, cnt};
 	pInt16U EPDatas[EP_COUNT] = {(pInt16U)MEMBUF_EP_Vd, (pInt16U)MEMBUF_EP_Id, (pInt16U)MEMBUF_EP_Vg,
 			(pInt16U)MEMBUF_EP_Ig};
 	
-	// Конфигурация сервиса работы Data-table и EPROM
+	// РљРѕРЅС„РёРіСѓСЂР°С†РёСЏ СЃРµСЂРІРёСЃР° СЂР°Р±РѕС‚С‹ Data-table Рё EPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
 	
-	// Инициализация data table
+	// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ data table
 	DT_Init(EPROMService, false);
 	
-	// Инициализация device profile
+	// РРЅРёС†РёР°Р»РёР·Р°С†РёСЏ device profile
 	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive);
 	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
 	
-	// Сброс значений
+	// РЎР±СЂРѕСЃ Р·РЅР°С‡РµРЅРёР№
 	DEVPROFILE_ResetControlSection();
 	CONTROL_ResetToDefaults();
 }
@@ -186,13 +186,13 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 
 void CONTROL_Idle()
 {
-	// Обработка мастер-запросов по интерфейсу
+	// РћР±СЂР°Р±РѕС‚РєР° РјР°СЃС‚РµСЂ-Р·Р°РїСЂРѕСЃРѕРІ РїРѕ РёРЅС‚РµСЂС„РµР№СЃСѓ
 	DEVPROFILE_ProcessRequests();
 	
-	// Считывание состояний силовых ячеек
+	// РЎС‡РёС‚С‹РІР°РЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёР№ СЃРёР»РѕРІС‹С… СЏС‡РµРµРє
 	CONTROL_CellsStateUpdate();
 	
-	// Обработка логики мастер-команд
+	// РћР±СЂР°Р±РѕС‚РєР° Р»РѕРіРёРєРё РјР°СЃС‚РµСЂ-РєРѕРјР°РЅРґ
 	CONTROL_HandlePowerOn();
 	CONTROL_HandlePulse();
 	CONTROL_HandlePowerOff();
