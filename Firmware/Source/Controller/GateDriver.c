@@ -41,6 +41,9 @@ uint16_t GATE_ConvertValueToDAC(uint16_t Value, uint16_t RegisterOffset, uint16_
 	tmp = tmp * K / DAC_REF_VOLTAGE * DAC_RESOLUTION;
 	tmp = tmp - Offset;
 	
+	if(tmp > DAC_RESOLUTION)
+		tmp = DAC_RESOLUTION;
+
 	return (tmp > 0) ? (uint16_t)tmp : 0;
 }
 //------------------------------------

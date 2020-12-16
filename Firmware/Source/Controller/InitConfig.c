@@ -70,6 +70,7 @@ void INITCFG_ConfigUART()
 void INITCFG_ConfigSPI()
 {
 	SPI_Init(SPI1, 3, false);
+	SPI_InvertClockPolarity(SPI1, true);
 }
 //------------------------------------
 
