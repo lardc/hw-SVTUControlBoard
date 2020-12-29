@@ -77,6 +77,8 @@ void CONTROL_Init()
 	// Сброс значений
 	DEVPROFILE_ResetControlSection();
 	CONTROL_ResetToDefaults();
+
+	LOGIC_FindCells();
 }
 //-----------------------------------------------
 
