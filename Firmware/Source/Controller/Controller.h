@@ -19,12 +19,9 @@ typedef enum __PCDeviceState
 	PCDS_None = 0,
 	PCDS_Fault = 1,
 	PCDS_Disabled = 2,
-	PCDS_BatteryCharge = 3,
-	PCDS_Ready = 4,
-
-	PCDS_WaitTimeOut = 6,
-	PCDS_PulseConfigReady = 7,
-	PCDS_PulseStart = 8
+	PCDS_Ready = 3,
+	PCDS_PulseConfigReady = 4,
+	PCDS_InProcess = 5
 } PCDeviceState;
 
 // Variables
