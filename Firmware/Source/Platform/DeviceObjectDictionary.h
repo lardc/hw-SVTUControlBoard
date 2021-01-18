@@ -112,13 +112,13 @@
 // -----------------------------
 
 // Регистры LSLPC
-#define REG_LSLPC_PULSE_VALUE			64	// Значение амплитуды импульса тока (в А)
+#define REG_LSLPC_PULSE_VALUE			128	// Значение амплитуды импульса тока (в А)
 
-#define REG_LSLPC_DEV_STATE				96	// Состояние блока
-#define REG_LSLPC_FAULT_REASON			97
-#define REG_LSLPC_DISABLE_REASON		98
-#define REG_LSLPC_WARNING				99
-#define REG_LSLPC_PROBLEM				100
+#define REG_LSLPC_DEV_STATE				192	// Состояние блока
+#define REG_LSLPC_FAULT_REASON			193
+#define REG_LSLPC_DISABLE_REASON		194
+#define REG_LSLPC_WARNING				195
+#define REG_LSLPC_PROBLEM				196
 // -----------------------------
 
 // Endpoints
