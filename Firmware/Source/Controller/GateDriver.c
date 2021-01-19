@@ -8,6 +8,7 @@
 #include "DataTable.h"
 #include "DeviceObjectDictionary.h"
 #include "LowLevel.h"
+#include "Delay.h"
 
 // Forward functions
 uint16_t GATE_ConvertValueToDAC(uint16_t Value, uint16_t RegisterOffset, uint16_t RegisterK, uint16_t RegisterP0,
@@ -66,9 +67,15 @@ void GATE_SetVg(uint16_t Value)
 }
 //------------------------------------
 
-void GATE_IgPulse(uint16_t Value, uint16_t PulseWidth)
+void GATE_SetIg(uint16_t Value)
 {
 	LL_WriteDAC_ChA(GATE_ConvertIgToDAC(Value));
+}
+//------------------------------------
+
+void GATE_IgPulse(uint16_t Value, uint16_t PulseWidth)
+{
+	GATE_SetIg(Value);
 
 	LL_PulseIg(true);
 	DELAY_US(PulseWidth);
