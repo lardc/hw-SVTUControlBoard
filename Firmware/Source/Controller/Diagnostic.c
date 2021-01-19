@@ -26,7 +26,7 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 			if(CONTROL_State == DS_None)
 			{
 				LL_SyncPowerCell(true);
-				DELAY_MS(1000);
+				DELAY_MS(10);
 				LL_SyncPowerCell(false);
 			}
 			break;
