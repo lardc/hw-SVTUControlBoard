@@ -45,7 +45,7 @@ void LL_SyncScope(bool State)
 
 void LL_PulseIg(bool State)
 {
-	GPIO_SetState(GPIO_IG_PULSE, State);
+	GPIO_SetState(GPIO_IG_PULSE, !State);
 }
 //------------------------------------
 

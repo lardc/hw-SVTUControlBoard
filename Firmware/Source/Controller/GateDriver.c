@@ -66,8 +66,12 @@ void GATE_SetVg(uint16_t Value)
 }
 //------------------------------------
 
-void GATE_SetIg(uint16_t Value)
+void GATE_IgPulse(uint16_t Value, uint16_t PulseWidth)
 {
 	LL_WriteDAC_ChA(GATE_ConvertIgToDAC(Value));
+
+	LL_PulseIg(true);
+	DELAY_US(PulseWidth);
+	LL_PulseIg(false);
 }
 //------------------------------------

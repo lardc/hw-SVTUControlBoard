@@ -346,8 +346,8 @@ void CONTROL_HandlePulse()
 				{
 					if(LOGIC_AreCellsInStateX(PCDS_PulseConfigReady))
 					{
-						LOGIC_ProcessPulse();
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+						//LOGIC_ProcessPulse();
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					}
 					else
 						CONTROL_HandleFaultCellsEvents(Timeout);

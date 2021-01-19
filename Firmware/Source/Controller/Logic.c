@@ -287,9 +287,7 @@ void LOGIC_ProcessPulse()
 		DELAY_US(GatePulseDelay);
 
 	// Сигнал отпирания DUT
-	GATE_SetIg(DataTable[REG_IG_VALUE]);
-	DELAY_US(GatePulseTime);
-	GATE_SetIg(0);
+	GATE_IgPulse(DataTable[REG_IG_VALUE], GatePulseTime);
 
 	// Синхронизация по вершине
 	DELAY_US(TIME_PULSE_WIDTH / 2 - GatePulseDelay - GatePulseTime);
