@@ -86,6 +86,7 @@ void CONTROL_ResetToDefaults()
 {
 	CONTROL_ResetData();
 	CONTROL_ResetHardware();
+	CONTROL_SetDeviceState(DS_None, SS_None);
 }
 //-----------------------------------------------
 
@@ -346,7 +347,7 @@ void CONTROL_HandlePulse()
 				{
 					if(LOGIC_AreCellsInStateX(PCDS_PulseConfigReady))
 					{
-						//LOGIC_ProcessPulse();
+						LOGIC_ProcessPulse();
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					}
 					else
