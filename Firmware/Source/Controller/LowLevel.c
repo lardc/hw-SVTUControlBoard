@@ -43,6 +43,12 @@ void LL_SyncScope(bool State)
 }
 //------------------------------------
 
+void LL_PulseIg(bool State)
+{
+	GPIO_SetState(GPIO_IG_PULSE, State);
+}
+//------------------------------------
+
 void LL_WriteDACx(uint16_t Data)
 {
 	GPIO_SetState(GPIO_DAC_CS, false);

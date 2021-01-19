@@ -33,12 +33,17 @@ void INITCFG_ConfigGPIO()
 	GPIO_InitPushPullOutput(GPIO_LED);
 	GPIO_InitPushPullOutput(GPIO_ID_LOW_RANGE);
 	GPIO_InitPushPullOutput(GPIO_SYNC_POWER_CELL);
-	GPIO_InitPushPullOutput(GPIO_IG_PULSE);
 	GPIO_InitPushPullOutput(GPIO_SYNC_SCOPE);
 	GPIO_InitPushPullOutput(GPIO_DAC_CS);
 	GPIO_InitPushPullOutput(GPIO_DAC_LDAC);
+
+	// Выходы с OpenDrain
+	GPIO_InitOpenDrainOutput(GPIO_IG_PULSE, NoPull);
+
+	// Начальная установка состояний
 	GPIO_SetState(GPIO_DAC_CS, true);
 	GPIO_SetState(GPIO_DAC_LDAC, true);
+	GPIO_SetState(GPIO_IG_PULSE, true);
 	
 	// Альтернативные функции
 	GPIO_InitAltFunction(GPIO_ALT_CAN_RX, AltFn_9);
