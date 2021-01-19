@@ -3,50 +3,50 @@
 
 // Constants
 const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] = {
-		{0, 0, 0},																// 0
-		{0, 0, 0},																// 1
-		{0, INT16U_MAX, 0},														// 2
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 3
+		{R_SHUNT_MIN, R_SHUNT_MAX, R_SHUNT_DEF},								// 0
+		{LOW_RANGE_I_LIM_MIN, LOW_RANGE_I_LIM_MAX, LOW_RANGE_I_LIM_MIN},		// 1
+		{0, INT16U_MAX, IDL_OFFSET_DEF},										// 2
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, IDL_K_DEF},				// 3
 		{0, INT16U_MAX, 0},														// 4
 		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 5
 		{0, INT16U_MAX, 0},														// 6
-		{0, INT16U_MAX, 0},														// 7
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 8
+		{0, INT16U_MAX, ID_OFFSET_DEF},											// 7
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, ID_K_DEF},					// 8
 		{0, INT16U_MAX, 0},														// 9
 		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 10
 		{0, INT16U_MAX, 0},														// 11
-		{0, INT16U_MAX, 0},														// 12
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 13
+		{0, INT16U_MAX, VD_OFFSET_DEF},											// 12
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, VD_K_DEF},					// 13
 		{0, INT16U_MAX, 0},														// 14
 		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 15
 		{0, INT16U_MAX, 0},														// 16
-		{0, INT16U_MAX, 0},														// 17
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 18
+		{0, INT16U_MAX, IG_OFFSET_DEF},											// 17
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, IG_K_DEF},					// 18
 		{0, INT16U_MAX, 0},														// 19
 		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 20
 		{0, INT16U_MAX, 0},														// 21
-		{0, INT16U_MAX, 0},														// 22
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 23
+		{0, INT16U_MAX, VG_OFFSET_DEF},											// 22
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, VG_K_DEF},					// 23
 		{0, INT16U_MAX, 0},														// 24
 		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 25
 		{0, INT16U_MAX, 0},														// 26
 		{0, 0, 0},																// 27
 		{0, 0, 0},																// 28
 		{0, 0, 0},																// 29
-		{0, 0, 0},																// 30
-		{0, 0, 0},																// 31
-		{0, INT16U_MAX, 0},														// 32
-		{0, INT16U_MAX, 0},														// 33
+		{LSLPC_COUNT_MIN, LSLPC_COUNT_MAX, LSLPC_COUNT_DEF},					// 30
+		{LSLPC_MAX_I_MIN, LSLPC_MAX_I_MAX, LSLPC_MAX_I_DEF},					// 31
+		{LSLPC_START_NID_MIN, LSLPC_START_NID_MAX, LSLPC_START_NID_DEF},		// 32
+		{0, INT16U_MAX, LONG_TIMEOUT_DEF},										// 33
 		{0, 0, 0},																// 34
 		{0, 0, 0},																// 35
 		{0, 0, 0},																// 36
 		{0, 0, 0},																// 37
 		{0, 0, 0},																// 38
 		{0, 0, 0},																// 39
-		{0, 0, 0},																// 40
-		{0, 0, 0},																// 41
-		{0, 0, 0},																// 42
-		{0, 0, 0},																// 43
+		{CURRENT_OVERSHOOT_MIN, CURRENT_OVERSHOOT_MAX, CURRENT_OVERSHOOT_DEF},	// 40
+		{0, INT16U_MAX, 0},														// 41
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 42
+		{0, INT16U_MAX, 0},														// 43
 		{0, 0, 0},																// 44
 		{0, 0, 0},																// 45
 		{0, 0, 0},																// 46
@@ -146,7 +146,7 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
 		{0, 0, 0},																// 137
 		{0, 0, 0},																// 138
 		{0, 0, 0},																// 139
-		{0, 0, 0},																// 140
+		{0, LSL_CURRENT_MAX, 0},												// 140
 		{0, 0, 0},																// 141
 		{0, 0, 0},																// 142
 		{0, 0, 0},																// 143
