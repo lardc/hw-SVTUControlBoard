@@ -297,17 +297,16 @@ void LOGIC_ProcessPulse()
 	DELAY_US(TIME_PULSE_WIDTH / 2);
 	LL_SyncPowerCell(false);
 
-	// Ожидание завершения оцифровки
-	//while(!IT_DMASampleCompleted());
+	// Завершение оцифровки
 	TIM_Stop(TIM1);
 
 	// Пересчёт значений
-	//MEASURE_ConvertVd((uint16_t *)MEMBUF_DMA_Vd, VALUES_DMA_SIZE);
-	//if(LL_IsIdLowRange())
-	//	MEASURE_ConvertIdLow((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);
-	//else
-	//	MEASURE_ConvertId((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);
-	//MEASURE_ConvertVg((uint16_t *)MEMBUF_DMA_Vg, VALUES_DMA_SIZE);
-	//MEASURE_ConvertIg((uint16_t *)MEMBUF_DMA_Ig, VALUES_DMA_SIZE);
+	MEASURE_ConvertVd((uint16_t *)MEMBUF_DMA_Vd, VALUES_DMA_SIZE);
+	if(LL_IsIdLowRange())
+		MEASURE_ConvertIdLow((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);
+	else
+		MEASURE_ConvertId((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);
+	MEASURE_ConvertVg((uint16_t *)MEMBUF_DMA_Vg, VALUES_DMA_SIZE);
+	MEASURE_ConvertIg((uint16_t *)MEMBUF_DMA_Ig, VALUES_DMA_SIZE);
 }
 // ----------------------------------------
