@@ -2,7 +2,7 @@
 #include "MemBuffers.h"
 
 // Includes
-#include "Global.h"
+
 
 // Variables
 //

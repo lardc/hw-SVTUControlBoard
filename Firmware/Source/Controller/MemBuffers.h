@@ -2,17 +2,18 @@
 #define __MEM_BUFFERS_H
 
 #include "stdinc.h"
+#include "Global.h"
 
 // Variables
 //
-extern Int16U MEMBUF_EP_Vd[];
-extern Int16U MEMBUF_EP_Id[];
-extern Int16U MEMBUF_EP_Vg[];
-extern Int16U MEMBUF_EP_Ig[];
+extern Int16U MEMBUF_EP_Vd[VALUES_x_SIZE];
+extern Int16U MEMBUF_EP_Id[VALUES_x_SIZE];
+extern Int16U MEMBUF_EP_Vg[VALUES_x_SIZE];
+extern Int16U MEMBUF_EP_Ig[VALUES_x_SIZE];
 
-extern volatile Int16U MEMBUF_DMA_Vd[];
-extern volatile Int16U MEMBUF_DMA_Id[];
-extern volatile Int16U MEMBUF_DMA_Vg[];
-extern volatile Int16U MEMBUF_DMA_Ig[];
+extern volatile Int16U MEMBUF_DMA_Vd[VALUES_DMA_SIZE];
+extern volatile Int16U MEMBUF_DMA_Id[VALUES_DMA_SIZE];
+extern volatile Int16U MEMBUF_DMA_Vg[VALUES_DMA_SIZE];
+extern volatile Int16U MEMBUF_DMA_Ig[VALUES_DMA_SIZE];
 
 #endif // __MEM_BUFFERS_H
