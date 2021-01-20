@@ -21,7 +21,7 @@ void LL_ToggleBoardLED()
 
 void LL_IdLowRange(bool State)
 {
-	GPIO_SetState(GPIO_ID_LOW_RANGE, State);
+	GPIO_SetState(GPIO_ID_LOW_RANGE, !State);
 }
 //------------------------------------
 
