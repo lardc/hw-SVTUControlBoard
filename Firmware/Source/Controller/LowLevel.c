@@ -27,7 +27,7 @@ void LL_IdLowRange(bool State)
 
 bool LL_IsIdLowRange()
 {
-	return GPIO_GetState(GPIO_ID_LOW_RANGE);
+	return !GPIO_GetState(GPIO_ID_LOW_RANGE);
 }
 //------------------------------------
 
