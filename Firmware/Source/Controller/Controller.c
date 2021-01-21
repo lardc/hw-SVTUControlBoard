@@ -51,6 +51,7 @@ void CONTROL_HandleFaultCellsEvents(Int64U Timeout);
 void CONTROL_HandlePowerOn();
 void CONTROL_HandlePulse();
 void CONTROL_HandlePowerOff();
+void CONTROL_SaveDataToEndpoint();
 
 // Functions
 //
@@ -61,8 +62,8 @@ void CONTROL_Init()
 	Int16U EPIndexes[EP_COUNT] = {EP16_DATA_ID, EP16_DATA_VD, EP16_DATA_IG, EP16_DATA_VG};
 	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
 	pInt16U EPCounters[EP_COUNT] = {cnt, cnt, cnt, cnt};
-	pInt16U EPDatas[EP_COUNT] = {(pInt16U)MEMBUF_EP_Vd, (pInt16U)MEMBUF_EP_Id, (pInt16U)MEMBUF_EP_Vg,
-			(pInt16U)MEMBUF_EP_Ig};
+	pInt16U EPDatas[EP_COUNT] = {(pInt16U)MEMBUF_EP_Id, (pInt16U)MEMBUF_EP_Vd, (pInt16U)MEMBUF_EP_Ig,
+			(pInt16U)MEMBUF_EP_Vg};
 	
 	// Конфигурация сервиса работы Data-table и EPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
@@ -348,7 +349,7 @@ void CONTROL_HandlePulse()
 					if(LOGIC_AreCellsInStateX(PCDS_PulseConfigReady))
 					{
 						LOGIC_ProcessPulse();
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
 					}
 					else
 						CONTROL_HandleFaultCellsEvents(Timeout);
@@ -357,6 +358,8 @@ void CONTROL_HandlePulse()
 				
 			case SS_PostPulseCheck:
 				{
+					CONTROL_SaveDataToEndpoint();
+					CONTROL_SetDeviceState(DS_Ready, SS_None);
 				}
 				break;
 
@@ -364,6 +367,16 @@ void CONTROL_HandlePulse()
 				break;
 		}
 	}
+}
+//-----------------------------------------------
+
+void CONTROL_SaveDataToEndpoint()
+{
+	LOGIC_SaveToEndpoint((uint16_t *)MEMBUF_DMA_Vd, (uint16_t *)MEMBUF_EP_Vd);
+	LOGIC_SaveToEndpoint((uint16_t *)MEMBUF_DMA_Id, (uint16_t *)MEMBUF_EP_Id);
+	LOGIC_SaveToEndpoint((uint16_t *)MEMBUF_EP_Vg, (uint16_t *)MEMBUF_EP_Vg);
+	LOGIC_SaveToEndpoint((uint16_t *)MEMBUF_EP_Ig, (uint16_t *)MEMBUF_EP_Ig);
+	CONTROL_Values_Counter = VALUES_x_SIZE;
 }
 //-----------------------------------------------
 

@@ -310,3 +310,12 @@ void LOGIC_ProcessPulse()
 	MEASURE_ConvertIg((uint16_t *)MEMBUF_DMA_Ig, VALUES_DMA_SIZE);
 }
 // ----------------------------------------
+
+void LOGIC_SaveToEndpoint(volatile Int16U *InputArray, Int16U *OutputArray)
+{
+	uint16_t BufferCompression = VALUES_DMA_SIZE / VALUES_x_SIZE;
+
+	for(int i = 0; i < VALUES_DMA_SIZE; i += BufferCompression)
+		*(OutputArray + i / BufferCompression) = *(InputArray + i);
+}
+// ----------------------------------------
