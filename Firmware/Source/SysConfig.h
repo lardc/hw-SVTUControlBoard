@@ -20,7 +20,8 @@
 // ----------------------------------------------
 
 // Timers
-#define TIMER1_uS                		5			// Таймер тактирования АЦП
+#define TIMER2_uS                		0.5f		// Таймер тактирования АЦП 1,2
+#define TIMER1_uS                		5			// Таймер тактирования АЦП 3,4
 #define TIMER3_uS                  		1000		// Таймер общего назначения
 // ----------------------------------------------
 
@@ -32,7 +33,7 @@
 #define DMA_ADC_IG_CHANNEL				DMA1_Channel1	// Канал DMA для АЦП Ig
 #define DMA_ADC_VG_CHANNEL				DMA2_Channel1	// Канал DMA для АЦП Vg
 #define DMA_ADC_ID_CHANNEL				DMA2_Channel5	// Канал DMA для АЦП Id
-#define DMA_ADC_VD_CHANNEL				DMA2_Channel4	// Канал DMA для АЦП Vd
+#define DMA_ADC_VD_CHANNEL				DMA2_Channel2	// Канал DMA для АЦП Vd
 // ----------------------------------------------
 
 // ADC

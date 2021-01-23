@@ -258,33 +258,30 @@ void LOGIC_ProcessPulse()
 	GATE_SetVg(DataTable[REG_VG_VALUE]);
 	DELAY_US(TIME_VG_STAB);
 
-	// Запуск оцифровки
+	// Подготовка оцифровки
 	IT_DMAFlagsReset();
-
 	DMA_ChannelReload(DMA_ADC_IG_CHANNEL, VALUES_IG_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_VG_CHANNEL, VALUES_VG_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_ID_CHANNEL, VALUES_ID_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_VD_CHANNEL, VALUES_VD_DMA_SIZE);
-
 	DMA_ChannelEnable(DMA_ADC_IG_CHANNEL, true);
 	DMA_ChannelEnable(DMA_ADC_VG_CHANNEL, true);
 	DMA_ChannelEnable(DMA_ADC_ID_CHANNEL, true);
 	DMA_ChannelEnable(DMA_ADC_VD_CHANNEL, true);
 
-	ADC_SamplingStart(ADC1);
-	ADC_SamplingStart(ADC2);
-	ADC_SamplingStart(ADC3);
-	ADC_SamplingStart(ADC4);
-
+	// Запуск оцифровки импульса тока и напряжения в силовой цепи
 	TIM_Start(TIM1);
 
-	// Запуск импульса
+	// Запуск импульса тока в силовой цепи
 	LL_SyncScope(true);
 	LL_SyncPowerCell(true);
 
 	// Задержка сигнала управления
 	if(GatePulseDelay)
 		DELAY_US(GatePulseDelay);
+
+	// Запуск оцифровки импульса тока и напряжения в цепи управления
+	TIM_Start(TIM2);
 
 	// Сигнал отпирания DUT
 	GATE_IgPulse(DataTable[REG_IG_VALUE], GatePulseTime);
@@ -299,6 +296,7 @@ void LOGIC_ProcessPulse()
 
 	// Завершение оцифровки
 	TIM_Stop(TIM1);
+	TIM_Stop(TIM2);
 
 	// Пересчёт значений
 	MEASURE_ConvertVd((uint16_t *)MEMBUF_DMA_Vd, VALUES_VD_DMA_SIZE);
@@ -313,7 +311,12 @@ void LOGIC_ProcessPulse()
 
 void LOGIC_SaveToEndpoint(volatile Int16U *InputArray, Int16U *OutputArray, uint16_t InputArraySize)
 {
-	uint16_t BufferCompression = InputArraySize / VALUES_x_SIZE;
+	uint16_t BufferCompression;
+
+	if(InputArraySize >= VALUES_x_SIZE)
+		BufferCompression = InputArraySize / VALUES_x_SIZE;
+	else
+		BufferCompression = 1;
 
 	for(int i = 0; i < InputArraySize; i += BufferCompression)
 		*(OutputArray + i / BufferCompression) = *(InputArray + i);

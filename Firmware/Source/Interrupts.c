@@ -58,13 +58,13 @@ void DMA2_Channel5_IRQHandler()
 }
 //-----------------------------------------
 
-void DMA2_Channel4_IRQHandler()
+void DMA2_Channel2_IRQHandler()
 {
 	// Vd
-	if(DMA_IsTransferComplete(DMA2, DMA_ISR_TCIF4))
+	if(DMA_IsTransferComplete(DMA2, DMA_ISR_TCIF2))
 	{
 		VdCompleted = true;
-		DMA_TransferCompleteReset(DMA2, DMA_IFCR_CTCIF4);
+		DMA_TransferCompleteReset(DMA2, DMA_IFCR_CTCIF2);
 	}
 }
 //-----------------------------------------

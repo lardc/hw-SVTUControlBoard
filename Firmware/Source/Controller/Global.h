@@ -21,7 +21,7 @@
 #define TIME_VG_STAB				100				// Время стабилизации Vg (в мкс)
 #define TIME_PULSE_WIDTH			10000			// Длительность импульса (в мкс)
 #define TIMEOUT_PC_SHORT			1000			// Короткий таймаут по операциям с силовыми ячейками (в мс)
-#define TIME_GATE_PULSE_MAX			1000			// Максимальная длительность импульса тока управления
+#define TIME_GATE_PULSE_MAX			100				// Максимальная длительность импульса тока управления
 
 // Параметры аналоговой подсистемы
 #define ADC_REF_VOLTAGE				3300.0f			// Опорное напряжение (в мВ)
@@ -31,9 +31,9 @@
 #define ADC_EMA_FACTOR				0.5f			// Коэффициент экспоненциального скользящего среднего
 
 // Параметры DMA
-#define VALUES_ID_DMA_SIZE				(TIME_PULSE_WIDTH / TIMER1_uS)
-#define VALUES_VD_DMA_SIZE				(TIME_PULSE_WIDTH / TIMER1_uS)
-#define VALUES_IG_DMA_SIZE				(TIME_GATE_PULSE_MAX / TIMER1_uS)
-#define VALUES_VG_DMA_SIZE				(TIME_GATE_PULSE_MAX / TIMER1_uS)
+#define VALUES_ID_DMA_SIZE			2000
+#define VALUES_VD_DMA_SIZE			2000
+#define VALUES_IG_DMA_SIZE			500
+#define VALUES_VG_DMA_SIZE			500
 
 #endif // __GLOBAL_H
