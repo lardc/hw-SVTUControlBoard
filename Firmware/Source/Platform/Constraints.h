@@ -80,7 +80,12 @@
 #define GATE_I_DEF				500
 
 // in A
-#define LSL_CURRENT_MAX			13000	// A
+#define LSL_CURRENT_MAX			13000
+
+// in uS
+#define GATE_PULSE_DELAY_MIN	0
+#define GATE_PULSE_DELAY_MAX	1000
+#define GATE_PULSE_DELAY_DEF	500
 
 
 // Types
