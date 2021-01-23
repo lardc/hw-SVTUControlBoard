@@ -261,10 +261,10 @@ void LOGIC_ProcessPulse()
 	// Запуск оцифровки
 	IT_DMAFlagsReset();
 
-	DMA_ChannelReload(DMA_ADC_IG_CHANNEL, VALUES_DMA_SIZE);
-	DMA_ChannelReload(DMA_ADC_VG_CHANNEL, VALUES_DMA_SIZE);
-	DMA_ChannelReload(DMA_ADC_ID_CHANNEL, VALUES_DMA_SIZE);
-	DMA_ChannelReload(DMA_ADC_VD_CHANNEL, VALUES_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_IG_CHANNEL, VALUES_IG_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_VG_CHANNEL, VALUES_VG_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_ID_CHANNEL, VALUES_ID_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_VD_CHANNEL, VALUES_VD_DMA_SIZE);
 
 	DMA_ChannelEnable(DMA_ADC_IG_CHANNEL, true);
 	DMA_ChannelEnable(DMA_ADC_VG_CHANNEL, true);
@@ -301,21 +301,21 @@ void LOGIC_ProcessPulse()
 	TIM_Stop(TIM1);
 
 	// Пересчёт значений
-	MEASURE_ConvertVd((uint16_t *)MEMBUF_DMA_Vd, VALUES_DMA_SIZE);
+	MEASURE_ConvertVd((uint16_t *)MEMBUF_DMA_Vd, VALUES_VD_DMA_SIZE);
 	if(LL_IsIdLowRange())
-		MEASURE_ConvertIdLow((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);
+		MEASURE_ConvertIdLow((uint16_t *)MEMBUF_DMA_Id, VALUES_ID_DMA_SIZE);
 	else
-		MEASURE_ConvertId((uint16_t *)MEMBUF_DMA_Id, VALUES_DMA_SIZE);
-	MEASURE_ConvertVg((uint16_t *)MEMBUF_DMA_Vg, VALUES_DMA_SIZE);
-	MEASURE_ConvertIg((uint16_t *)MEMBUF_DMA_Ig, VALUES_DMA_SIZE);
+		MEASURE_ConvertId((uint16_t *)MEMBUF_DMA_Id, VALUES_ID_DMA_SIZE);
+	MEASURE_ConvertVg((uint16_t *)MEMBUF_DMA_Vg, VALUES_VG_DMA_SIZE);
+	MEASURE_ConvertIg((uint16_t *)MEMBUF_DMA_Ig, VALUES_IG_DMA_SIZE);
 }
 // ----------------------------------------
 
-void LOGIC_SaveToEndpoint(volatile Int16U *InputArray, Int16U *OutputArray)
+void LOGIC_SaveToEndpoint(volatile Int16U *InputArray, Int16U *OutputArray, uint16_t InputArraySize)
 {
-	uint16_t BufferCompression = VALUES_DMA_SIZE / VALUES_x_SIZE;
+	uint16_t BufferCompression = InputArraySize / VALUES_x_SIZE;
 
-	for(int i = 0; i < VALUES_DMA_SIZE; i += BufferCompression)
+	for(int i = 0; i < InputArraySize; i += BufferCompression)
 		*(OutputArray + i / BufferCompression) = *(InputArray + i);
 }
 // ----------------------------------------

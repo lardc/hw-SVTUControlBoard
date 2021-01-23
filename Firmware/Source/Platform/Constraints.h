@@ -66,7 +66,7 @@
 
 // in us
 #define GATE_PULSE_MIN			10
-#define GATE_PULSE_MAX			1000
+#define GATE_PULSE_MAX			TIME_GATE_PULSE_MAX
 #define GATE_PULSE_DEF			100
 
 // in mV
