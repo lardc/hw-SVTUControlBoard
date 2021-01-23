@@ -228,7 +228,7 @@ float LOGIC_GetCurrentSetpoint()
 	float current = (float)DataTable[REG_CURRENT_SETPOINT];
 	current = current * (100 + DataTable[REG_CURRENT_OVERSHOOT]) / 100;
 	current = current * current * P2 + current * P1 + P0;
-	
+
 	return (current > 0) ? current : 0;
 }
 // ----------------------------------------

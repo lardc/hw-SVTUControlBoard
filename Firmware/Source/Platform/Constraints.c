@@ -20,20 +20,20 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] = {
 		{0, INT16U_MAX, 0},														// 14
 		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 15
 		{0, INT16U_MAX, 0},														// 16
-		{0, INT16U_MAX, IG_OFFSET_DEF},											// 17
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, IG_K_DEF},					// 18
+		{0, INT16U_MAX, 0},														// 17
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 18
 		{0, INT16U_MAX, 0},														// 19
 		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 20
 		{0, INT16U_MAX, 0},														// 21
-		{0, INT16U_MAX, VG_OFFSET_DEF},											// 22
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, VG_K_DEF},					// 23
+		{0, INT16U_MAX, 0},														// 22
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 23
 		{0, INT16U_MAX, 0},														// 24
 		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 25
 		{0, INT16U_MAX, 0},														// 26
 		{0, 0, 0},																// 27
 		{0, 0, 0},																// 28
 		{0, 0, 0},																// 29
-		{LSLPC_COUNT_MIN, LSLPC_COUNT_MAX, LSLPC_COUNT_DEF},					// 30
+		{0, 0, 0},																// 30
 		{LSLPC_MAX_I_MIN, LSLPC_MAX_I_MAX, LSLPC_MAX_I_DEF},					// 31
 		{LSLPC_START_NID_MIN, LSLPC_START_NID_MAX, LSLPC_START_NID_DEF},		// 32
 		{0, INT16U_MAX, LONG_TIMEOUT_DEF},										// 33
@@ -53,16 +53,16 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] = {
 		{0, 0, 0},																// 47
 		{0, 0, 0},																// 48
 		{0, 0, 0},																// 49
-		{0, 0, 0},																// 50
-		{0, 0, 0},																// 51
-		{0, 0, 0},																// 52
-		{0, 0, 0},																// 53
-		{0, 0, 0},																// 54
-		{0, 0, 0},																// 55
-		{0, 0, 0},																// 56
-		{0, 0, 0},																// 57
-		{0, 0, 0},																// 58
-		{0, 0, 0},																// 59
+		{0, INT16U_MAX, VG_SET_OFFSET_DEF},										// 50
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, VG_SET_K_DEF},				// 51
+		{0, INT16U_MAX, 0},														// 52
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 53
+		{0, INT16U_MAX, 0},														// 54
+		{0, INT16U_MAX, IG_SET_OFFSET_DEF},										// 55
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, IG_SET_K_DEF},				// 56
+		{0, INT16U_MAX, 0},														// 57
+		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 58
+		{0, INT16U_MAX, 0},														// 59
 		{0, 0, 0},																// 60
 		{0, 0, 0},																// 61
 		{0, 0, 0},																// 62

@@ -51,13 +51,13 @@ uint16_t GATE_ConvertValueToDAC(uint16_t Value, uint16_t RegisterOffset, uint16_
 
 uint16_t GATE_ConvertVgToDAC(uint16_t Value)
 {
-	return GATE_ConvertValueToDAC(Value, REG_VG_OFFSET, REG_VG_K, REG_VG_P0, REG_VG_P1, REG_VG_P2);
+	return GATE_ConvertValueToDAC(Value, REG_VG_SET_OFFSET, REG_VG_SET_K, REG_VG_SET_P0, REG_VG_SET_P1, REG_VG_SET_P2);
 }
 //------------------------------------
 
 uint16_t GATE_ConvertIgToDAC(uint16_t Value)
 {
-	return GATE_ConvertValueToDAC(Value, REG_IG_OFFSET, REG_IG_K, REG_IG_P0, REG_IG_P1, REG_IG_P2);
+	return GATE_ConvertValueToDAC(Value, REG_IG_SET_OFFSET, REG_IG_SET_K, REG_IG_SET_P0, REG_IG_SET_P1, REG_IG_SET_P2);
 }
 //------------------------------------
 

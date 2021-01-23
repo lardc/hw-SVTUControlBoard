@@ -68,6 +68,18 @@
 #define REG_ISET_P1						42	// Полином точной корректировки задания прямого тока P1 х1000
 #define REG_ISET_P2						43	// Полином точной корректировки задания прямого тока P2 х1е6
 
+#define REG_VG_SET_OFFSET				50	// Смещение при преобразовании Vg -> DAC
+#define REG_VG_SET_K					51	// Коэффициент преобразованиия Vg -> DAC
+#define REG_VG_SET_P0					52	// Полином точной корректировки Vg P0 (в мВ)
+#define REG_VG_SET_P1					53	// Полином точной корректировки Vg P1 x1000
+#define REG_VG_SET_P2					54	// Полином точной корректировки Vg P2 x1e6
+
+#define REG_IG_SET_OFFSET				55	// Смещение при преобразовании Ig -> DAC
+#define REG_IG_SET_K					56	// Коэффициент преобразованиия Vg -> DAC
+#define REG_IG_SET_P0					57	// Полином точной корректировки Ig P0 (в мA)
+#define REG_IG_SET_P1					58	// Полином точной корректировки Ig P1 x1000
+#define REG_IG_SET_P2					59	// Полином точной корректировки Ig P2 x1e6
+
 // Несохраняемы регистры чтения-записи
 #define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
 

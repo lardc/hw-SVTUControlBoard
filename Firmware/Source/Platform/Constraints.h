@@ -20,16 +20,21 @@
 #define LOW_RANGE_I_LIM_DEF		1000
 
 //
-#define IDL_OFFSET_DEF			0
-#define IDL_K_DEF				0
+#define IDL_OFFSET_DEF			65530
+#define IDL_K_DEF				349
+
 #define ID_OFFSET_DEF			0
-#define ID_K_DEF				0
+#define ID_K_DEF				2236
+
+//
 #define VD_OFFSET_DEF			0
 #define VD_K_DEF				0
-#define IG_OFFSET_DEF			64140
-#define IG_K_DEF				1800
-#define VG_OFFSET_DEF			270
-#define VG_K_DEF				473
+
+//
+#define IG_SET_OFFSET_DEF		64140
+#define IG_SET_K_DEF			1800
+#define VG_SET_OFFSET_DEF		270
+#define VG_SET_K_DEF			473
 
 // in pcs
 #define LSLPC_COUNT_MIN			1
