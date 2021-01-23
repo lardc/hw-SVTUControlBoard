@@ -27,8 +27,15 @@
 #define ID_K_DEF				2236
 
 //
-#define VD_OFFSET_DEF			0
-#define VD_K_DEF				0
+#define VD_OFFSET_DEF			65446
+#define VD_K_DEF				3440
+
+//
+#define IG_OFFSET_DEF			1
+#define IG_K_DEF				349
+
+#define VG_OFFSET_DEF			0
+#define VG_K_DEF				0
 
 //
 #define IG_SET_OFFSET_DEF		64140
@@ -70,8 +77,8 @@
 #define GATE_PULSE_DEF			100
 
 // in mV
-#define GATE_V_MIN				2000
-#define GATE_V_MAX				12000
+#define GATE_V_MIN				1000
+#define GATE_V_MAX				10000
 #define GATE_V_DEF				5000
 
 // in mA
