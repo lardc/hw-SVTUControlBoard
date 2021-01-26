@@ -30,6 +30,10 @@
 #define DAC_RESOLUTION				4095
 #define ADC_EMA_FACTOR				0.5f			// Коэффициент экспоненциального скользящего среднего
 
+// Предельный измеряемые значения
+#define VOLTAGE_MIN_VALUE			500				// Минимальное измеряемое напряжение
+#define VOLTAGE_MAX_VALUE			5000				// Максимальное измеряемое напряжение
+
 // Параметры DMA
 #define VALUES_ID_DMA_SIZE			2000
 #define VALUES_VD_DMA_SIZE			2000

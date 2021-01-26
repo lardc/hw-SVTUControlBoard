@@ -7,10 +7,12 @@
 #include "Global.h"
 #include "DataTable.h"
 #include "DeviceObjectDictionary.h"
+#include "stdlib.h"
 
 // Forward functions
 void MEASURE_ConvertADCtoValx(uint16_t *InputArray, uint16_t DataLength, uint16_t RegisterOffset,
 		uint16_t RegisterK, uint16_t RegisterP0, uint16_t RegisterP1, uint16_t RegisterP2);
+int MEASURE_SortCondition(const void *A, const void *B);
 
 // Functions
 //
@@ -69,6 +71,32 @@ void MEASURE_ConvertIg(uint16_t *InputArray, uint16_t DataLength)
 			REG_IG_P2);
 }
 //------------------------------------
+
+Int16U MEASURE_InstantVd(Int16U *InputArray)
+{
+	qsort(InputArray, VALUES_VD_DMA_SIZE, sizeof(*InputArray), MEASURE_SortCondition);
+
+	return 0;
+}
+//------------------------------------
+
+Int16U MEASURE_InstantId(Int16U *InputArray)
+{
+	qsort(InputArray, VALUES_ID_DMA_SIZE, sizeof(*InputArray), MEASURE_SortCondition);
+
+	return 0;
+}
+//------------------------------------
+
+int MEASURE_SortCondition(const void *A, const void *B)
+{
+	return (*(int *)A) - (*(int *)B);
+}
+//-----------------------------------------
+
+
+
+
 
 void MEASURE_ArrayEMA(uint16_t *InputArray, uint16_t DataLength)
 {

@@ -52,6 +52,7 @@ void CONTROL_HandlePowerOn();
 void CONTROL_HandlePulse();
 void CONTROL_HandlePowerOff();
 void CONTROL_SaveDataToEndpoint();
+void CONTROL_SaveResults();
 
 // Functions
 //
@@ -359,6 +360,8 @@ void CONTROL_HandlePulse()
 			case SS_PostPulseCheck:
 				{
 					CONTROL_SaveDataToEndpoint();
+					CONTROL_SaveResults();
+					DataTable[REG_OP_RESULT] = OPRESULT_OK;
 					CONTROL_SetDeviceState(DS_Ready, SS_None);
 				}
 				break;
@@ -377,6 +380,12 @@ void CONTROL_SaveDataToEndpoint()
 	LOGIC_SaveToEndpoint((uint16_t *)MEMBUF_DMA_Vg, (uint16_t *)MEMBUF_EP_Vg, VALUES_VG_DMA_SIZE);
 	LOGIC_SaveToEndpoint((uint16_t *)MEMBUF_DMA_Ig, (uint16_t *)MEMBUF_EP_Ig, VALUES_IG_DMA_SIZE);
 	CONTROL_Values_Counter = VALUES_x_SIZE;
+}
+//-----------------------------------------------
+
+void CONTROL_SaveResults()
+{
+	LOGIC_SaveResults();
 }
 //-----------------------------------------------
 

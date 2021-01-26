@@ -19,6 +19,7 @@
 #include "ZwDMA.h"
 #include "ZwADC.h"
 #include "ZwTIM.h"
+#include "Global.h"
 
 // Types
 //
@@ -320,5 +321,15 @@ void LOGIC_SaveToEndpoint(volatile Int16U *InputArray, Int16U *OutputArray, uint
 
 	for(int i = 0; i < InputArraySize; i += BufferCompression)
 		*(OutputArray + i / BufferCompression) = *(InputArray + i);
+}
+// ----------------------------------------
+
+void LOGIC_SaveResults()
+{
+	DataTable[REG_DUT_VOLTAGE] = MEASURE_InstantVd((uint16_t *)MEMBUF_DMA_Мd);
+	DataTable[REG_DUT_CURRENT] = MEASURE_InstantId((uint16_t *)MEMBUF_DMA_Id);
+
+	if((DataTable[REG_DUT_VOLTAGE] > VOLTAGE_MAX_VALUE) || (DataTable[REG_DUT_VOLTAGE] < VOLTAGE_MIN_VALUE))
+		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
 }
 // ----------------------------------------

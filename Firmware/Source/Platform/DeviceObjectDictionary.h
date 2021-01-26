@@ -98,8 +98,10 @@
 #define REG_PROBLEM						196	// Регистр Problem
 #define REG_OP_RESULT					197	// Регистр результата операции
 
-#define REG_DUT_VOLTAGE					198	// Измеренное значение прямого напряжения (в мВ)
-#define REG_DUT_CURRENT					206	// Измеренное значение прямого тока (в А)
+#define REG_DUT_VOLTAGE					200	// Измеренное значение прямого напряжения (в мВ)
+#define REG_DUT_CURRENT					201	// Измеренное значение прямого тока (в А)
+#define REG_GATE_VOLTAGE				202	// Измеренное значение напряжения в цепи управления (в мВ)
+#define REG_GATE_CURRENT				203	// Измеренное значение тока в цепи управления (в мА)
 
 #define REG_DEV_SUB_STATE				209	// Регистр вспомогательного состояния
 #define REG_BHL_ERROR_CODE				210	// Ошибка интерфейса ВУ: код ошибки
@@ -152,6 +154,8 @@
 
 // Warning
 #define WARNING_NONE					0
+#define WARNING_VOLTAGE_OUT_OF_RANGE	1
+#define WARNING_CURRENT_OUT_OF_RANGE	2
 
 // Problem
 #define PROBLEM_NONE					0

@@ -25,5 +25,6 @@ void LOGIC_SelectCurrentRange(float Current);
 void LOGIC_ProcessPulse();
 
 void LOGIC_SaveToEndpoint(volatile Int16U *InputArray, Int16U *OutputArray, uint16_t InputArraySize);
+void LOGIC_SaveResults();
 
 #endif //__LOGIC_H
