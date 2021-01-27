@@ -9,6 +9,10 @@
 #include "DeviceObjectDictionary.h"
 #include "stdlib.h"
 
+// Definitions
+//
+#define SAMPLING_AVG_NUM		15
+
 // Forward functions
 void MEASURE_ConvertADCtoValx(uint16_t *InputArray, uint16_t DataLength, uint16_t RegisterOffset,
 		uint16_t RegisterK, uint16_t RegisterP0, uint16_t RegisterP1, uint16_t RegisterP2);
@@ -72,31 +76,48 @@ void MEASURE_ConvertIg(uint16_t *InputArray, uint16_t DataLength)
 }
 //------------------------------------
 
-Int16U MEASURE_InstantVd(Int16U *InputArray)
+Int16U MEASURE_InstantValues(Int16U *InputArray, Int16U Size)
 {
-	qsort(InputArray, VALUES_VD_DMA_SIZE, sizeof(*InputArray), MEASURE_SortCondition);
+	Int32U AverageValue = 0;
 
-	return 0;
+	qsort(InputArray, Size, sizeof(*InputArray), MEASURE_SortCondition);
+
+	for (int i = Size - SAMPLING_AVG_NUM; i < Size; ++i)
+		AverageValue += *(InputArray + i);
+
+	return (AverageValue / SAMPLING_AVG_NUM);
 }
 //------------------------------------
 
-Int16U MEASURE_InstantId(Int16U *InputArray)
+Int16U MEASURE_InstantValuesOnFallEdge(Int16U *Voltage, Int16U *Current, Int16U Size)
 {
-	qsort(InputArray, VALUES_ID_DMA_SIZE, sizeof(*InputArray), MEASURE_SortCondition);
+	Int32U AverageValue = 0;
+	Int16U Index = 0;
 
-	return 0;
+	qsort((Voltage + Size / 2), (Size / 2), sizeof(*Voltage), MEASURE_SortCondition);
+	qsort((Current + Size / 2), (Size / 2), sizeof(*Current), MEASURE_SortCondition);
+
+	for(int i = Size / 2; i < Size; i++)
+	{
+		if(DataTable[REG_CURRENT_SETPOINT] >= *(Current + i))
+		{
+			Index = i;
+			break;
+		}
+	}
+
+	for (int i = Index; i < (Index + SAMPLING_AVG_NUM); i++)
+		AverageValue += *(Voltage + i);
+
+	return (AverageValue / SAMPLING_AVG_NUM);
 }
 //------------------------------------
 
 int MEASURE_SortCondition(const void *A, const void *B)
 {
-	return (*(int *)A) - (*(int *)B);
+	return (int)(*(uint16_t *)A) - (int)(*(uint16_t *)B);
 }
 //-----------------------------------------
-
-
-
-
 
 void MEASURE_ArrayEMA(uint16_t *InputArray, uint16_t DataLength)
 {

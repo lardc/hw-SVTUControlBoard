@@ -35,9 +35,7 @@
 #define VOLTAGE_MAX_VALUE			5000				// Максимальное измеряемое напряжение
 
 // Параметры DMA
-#define VALUES_ID_DMA_SIZE			2000
-#define VALUES_VD_DMA_SIZE			2000
-#define VALUES_IG_DMA_SIZE			500
-#define VALUES_VG_DMA_SIZE			500
+#define VALUES_POWER_DMA_SIZE		2000
+#define VALUES_GATE_DMA_SIZE		500
 
 #endif // __GLOBAL_H
