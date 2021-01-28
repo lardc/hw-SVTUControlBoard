@@ -11,7 +11,8 @@
 
 // Definitions
 //
-#define SAMPLING_AVG_NUM		15
+#define SAMPLING_AVG_NUM			15
+#define MAX_SAMPLES_CUTOFF_NUM		5
 
 // Forward functions
 void MEASURE_ConvertADCtoValx(uint16_t *InputArray, uint16_t DataLength, uint16_t RegisterOffset,
@@ -82,7 +83,7 @@ Int16U MEASURE_InstantValues(Int16U *InputArray, Int16U Size)
 
 	qsort(InputArray, Size, sizeof(*InputArray), MEASURE_SortCondition);
 
-	for (int i = Size - SAMPLING_AVG_NUM; i < Size; ++i)
+	for (int i = Size - SAMPLING_AVG_NUM - MAX_SAMPLES_CUTOFF_NUM; i < Size - MAX_SAMPLES_CUTOFF_NUM; ++i)
 		AverageValue += *(InputArray + i);
 
 	return (AverageValue / SAMPLING_AVG_NUM);
@@ -99,7 +100,7 @@ Int16U MEASURE_InstantValuesOnFallEdge(Int16U *Voltage, Int16U *Current, Int16U 
 
 	for(int i = Size / 2; i < Size; i++)
 	{
-		if(DataTable[REG_CURRENT_SETPOINT] >= *(Current + i))
+		if(DataTable[REG_CURRENT_SETPOINT] <= *(Current + i))
 		{
 			Index = i;
 			break;
