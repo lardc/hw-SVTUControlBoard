@@ -22,7 +22,7 @@
 //
 #define IDL_OFFSET_DEF			65530
 #define IDL_K_DEF				349
-
+//
 #define ID_OFFSET_DEF			0
 #define ID_K_DEF				2236
 
@@ -87,7 +87,7 @@
 #define GATE_I_DEF				500
 
 // in A
-#define LSL_CURRENT_MAX			13000
+#define LSL_CURRENT_MAX			6000
 
 // in uS
 #define GATE_PULSE_DELAY_MIN	0

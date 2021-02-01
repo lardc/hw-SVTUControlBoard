@@ -196,11 +196,11 @@ bool LOGIC_DistributeCurrent(float Current)
 	LOGIC_ResetCellsCurrent();
 	
 	// Запись значений тока
-	for(uint16_t i = 0; (i < LSLPC_COUNT_MAX) && (FractionCurrent > 0) && (IntCurrent > 0); ++i)
+	for(uint16_t i = 0; (i < LSLPC_COUNT_MAX) && (FractionCurrent >= 0) && (IntCurrent > 0); ++i)
 	{
 		if(PC_DataArray[i].IsActive)
 		{
-			if(FractionCurrent > 0)
+			if(FractionCurrent >= 0)
 			{
 				PC_DataArray[i].Current = FractionCurrent;
 				IntCurrent -= FractionCurrent;
@@ -254,6 +254,7 @@ void LOGIC_ProcessPulse()
 {
 	uint16_t GatePulseDelay = DataTable[REG_GATE_PULSE_DELAY];
 	uint16_t GatePulseTime = DataTable[REG_GATE_PULSE_TIME];
+	int16_t OscSyncCompensationDelay = (int16_t)DataTable[REG_OSC_SYNC_TUNE_DELAY];
 
 	// Задание напряжения в цепи управления
 	GATE_SetVg(DataTable[REG_VG_VALUE]);
@@ -288,7 +289,7 @@ void LOGIC_ProcessPulse()
 	GATE_IgPulse(DataTable[REG_IG_VALUE], GatePulseTime);
 
 	// Синхронизация по вершине
-	DELAY_US(TIME_PULSE_WIDTH / 2 - GatePulseDelay - GatePulseTime);
+	DELAY_US(TIME_PULSE_WIDTH / 2 - GatePulseDelay - GatePulseTime + OscSyncCompensationDelay);
 	LL_SyncScope(false);
 
 	// Синхронизация ячеек
