@@ -12,7 +12,7 @@
 // Definitions
 //
 #define SAMPLING_AVG_NUM			15
-#define MAX_SAMPLES_CUTOFF_NUM		5
+#define MAX_SAMPLES_CUTOFF_NUM		10
 
 // Forward functions
 void MEASURE_ConvertADCtoValx(uint16_t *InputArray, uint16_t DataLength, uint16_t RegisterOffset,
