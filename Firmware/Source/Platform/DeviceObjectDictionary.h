@@ -113,6 +113,12 @@
 
 #define REG_TOTAL_LSLPC					207	// Обнаруженное количество силовых ячеек
 #define REG_CURRENT_MAX					225	// Максимальный ток, получаемый с установки (в А)
+
+#define REG_FWINFO_SLAVE_NID			256	// Device CAN slave node ID
+#define REG_FWINFO_MASTER_NID			257	// Device CAN master node ID (if presented)
+// 258 - 259
+#define REG_FWINFO_STR_LEN				260	// Length of the information string record
+#define REG_FWINFO_STR_BEGIN			261	// Begining of the information string record
 // -----------------------------
 
 // Команды LSLPC

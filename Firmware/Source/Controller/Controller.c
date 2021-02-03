@@ -11,6 +11,7 @@
 #include "BCCIMHighLevel.h"
 #include "GateDriver.h"
 #include "LowLevel.h"
+#include "BCCIxParams.h"
 
 // Types
 //
@@ -71,6 +72,7 @@ void CONTROL_Init()
 	
 	// Инициализация data table
 	DT_Init(EPROMService, false);
+	DT_SaveFirmwareInfo(CAN_SLAVE_NID, CAN_MASTER_NID);
 	
 	// Инициализация device profile
 	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive);
