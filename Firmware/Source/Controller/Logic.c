@@ -21,6 +21,10 @@
 #include "ZwTIM.h"
 #include "Global.h"
 
+// Definitions
+//
+#define ARR_START_INDEX_SHIFT			300
+
 // Types
 //
 typedef struct __PCStructData
@@ -330,7 +334,11 @@ void LOGIC_SaveResults()
 	if(DataTable[REG_CURRENT_OVERSHOOT])
 		DataTable[REG_DUT_VOLTAGE] = MEASURE_InstantValuesOnFallEdge((uint16_t *)MEMBUF_DMA_Vd, (uint16_t *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
 	else
-		DataTable[REG_DUT_VOLTAGE] = MEASURE_InstantValues((uint16_t *)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
+	{
+		// Значения до ARR_START_INDEX игнорируются, т.к. в этот момент DUT может быть еще закрыт
+		DataTable[REG_DUT_VOLTAGE] = MEASURE_InstantValues((uint16_t *)(MEMBUF_DMA_Vd + ARR_START_INDEX_SHIFT),
+				                                                       VALUES_POWER_DMA_SIZE - ARR_START_INDEX_SHIFT);
+	}
 
 	DataTable[REG_DUT_CURRENT] = MEASURE_InstantValues((uint16_t *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
 	DataTable[REG_GATE_VOLTAGE] = MEASURE_InstantValues((uint16_t *)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
