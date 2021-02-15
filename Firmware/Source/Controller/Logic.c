@@ -20,6 +20,7 @@
 #include "ZwADC.h"
 #include "ZwTIM.h"
 #include "Global.h"
+#include "math.h"
 
 // Definitions
 //
@@ -331,6 +332,8 @@ void LOGIC_SaveToEndpoint(volatile Int16U *InputArray, Int16U *OutputArray, uint
 
 void LOGIC_SaveResults()
 {
+	double Current, Fraction;
+
 	if(DataTable[REG_CURRENT_OVERSHOOT])
 		DataTable[REG_DUT_VOLTAGE] = MEASURE_InstantValuesOnFallEdge((uint16_t *)MEMBUF_DMA_Vd, (uint16_t *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
 	else
@@ -340,7 +343,10 @@ void LOGIC_SaveResults()
 				                                                       VALUES_POWER_DMA_SIZE - ARR_START_INDEX_SHIFT);
 	}
 
-	DataTable[REG_DUT_CURRENT] = MEASURE_InstantValues((uint16_t *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
+	Current = MEASURE_InstantValues((uint16_t *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
+	Fraction = modf(Current, &Current);
+	DataTable[REG_DUT_CURRENT] = (uint16_t) Current;
+	DataTable[REG_DUT_CURRENT_FRACTION] = (uint16_t) (Fraction * 10);
 	DataTable[REG_GATE_VOLTAGE] = MEASURE_InstantValues((uint16_t *)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
 	DataTable[REG_GATE_CURRENT] = MEASURE_InstantValues((uint16_t *)MEMBUF_DMA_Ig, VALUES_GATE_DMA_SIZE);
 

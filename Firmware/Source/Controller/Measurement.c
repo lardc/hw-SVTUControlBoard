@@ -85,9 +85,9 @@ void MEASURE_ConvertIg(uint16_t *InputArray, uint16_t DataLength)
 }
 //------------------------------------
 
-Int16U MEASURE_InstantValues(Int16U *InputArray, Int16U Size)
+float MEASURE_InstantValues(Int16U *InputArray, Int16U Size)
 {
-	Int32U AverageValue = 0;
+	float AverageValue = 0;
 
 	qsort(InputArray, Size, sizeof(*InputArray), MEASURE_SortCondition);
 
