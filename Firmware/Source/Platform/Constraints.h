@@ -49,9 +49,9 @@
 #define LSLPC_COUNT_DEF			2
 
 // in A
-#define LSLPC_MAX_I_MIN			100
-#define LSLPC_MAX_I_MAX			6500
-#define LSLPC_MAX_I_DEF			6500
+#define LSLPC_MAX_I_MIN			30
+#define LSLPC_MAX_I_MAX			400
+#define LSLPC_MAX_I_DEF			400
 
 //
 #define LSLPC_START_NID_MIN		1
