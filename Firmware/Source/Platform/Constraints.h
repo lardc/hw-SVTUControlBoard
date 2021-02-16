@@ -87,7 +87,7 @@
 #define GATE_I_DEF				500
 
 // in A
-#define LSL_CURRENT_MAX			6000
+#define LSL_CURRENT_MAX			400
 
 // in uS
 #define GATE_PULSE_DELAY_MIN	0
