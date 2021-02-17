@@ -34,8 +34,11 @@ bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
 		case ACT_DBG_PULSE_IG:
 			if(CONTROL_State == DS_None)
 			{
+				LL_SyncScope(true);
 				GATE_PulseOutput(true);
-				DELAY_US(DataTable[REG_GATE_PULSE_TIME]);
+				DELAY_US(DataTable[REG_GATE_PULSE_TIME] / 2);
+				LL_SyncScope(false);
+				DELAY_US(DataTable[REG_GATE_PULSE_TIME] / 2);
 				GATE_PulseOutput(false);
 			}
 			break;
