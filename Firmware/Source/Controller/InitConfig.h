@@ -16,5 +16,6 @@ void INITCFG_ConfigTimer1();
 void INITCFG_ConfigDMA();
 void INITCFG_ConfigWatchDog();
 void INITCFG_ConfigTimer2();
+void INITCFG_ConfigTimer6();
 
 #endif // __INITCONFIG_H

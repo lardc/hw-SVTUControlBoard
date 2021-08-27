@@ -295,15 +295,21 @@ void LOGIC_ProcessPulse()
 
 	// Синхронизация по вершине
 	DELAY_US(TIME_PULSE_WIDTH / 2 - GatePulseDelay - GatePulseTime + OscSyncCompensationDelay);
-	LL_SyncScope(false);
 
-	// Синхронизация ячеек
-	DELAY_US(TIME_PULSE_WIDTH / 2);
-	LL_SyncPowerCell(false);
+	// Синхронизация осциллографа, если не задано превышение уставки
+	if(!DataTable[REG_CURRENT_OVERSHOOT])
+		LL_SyncScope(false);
+	else
+		TIM_Start(TIM6);	// Запуск таймера определения момента синхронизации
 
 	// Завершение оцифровки
+	while(!IT_DMASampleCompleted()){}
+
 	TIM_Stop(TIM1);
 	TIM_Stop(TIM2);
+	TIM_Stop(TIM6);
+
+	LL_SyncPowerCell(false);
 
 	// Пересчёт значений
 	MEASURE_ConvertVd((uint16_t *)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);

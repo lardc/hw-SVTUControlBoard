@@ -6,6 +6,9 @@
 #include "Controller.h"
 #include "Logic.h"
 #include "Global.h"
+#include "DataTable.h"
+#include "Measurement.h"
+#include "MemBuffers.h"
 
 // Variables
 //
@@ -13,6 +16,40 @@ static volatile bool IgCompleted, VgCompleted, IdCompleted, VdCompleted;
 
 // Functions
 //
+void TIM6_DAC_IRQHandler()
+{
+	Int16U ADC_RawValue = 0;
+	static Int16U ItmMax = 0;
+	Int16U ArrayIndex = 0;
+
+	if(TIM_StatusCheck(TIM6))
+	{
+		if(LL_SyncScopeGetState())
+		{
+			ArrayIndex = DMA_ReadDataCount(DMA_ADC_ID_CHANNEL) - 1;
+			ADC_RawValue = MEMBUF_DMA_Id[ArrayIndex];
+			if(LL_IsIdLowRange())
+				MEASURE_ConvertIdLow(&ADC_RawValue, 1);
+			else
+				MEASURE_ConvertId(&ADC_RawValue, 1);
+
+			if(ItmMax < ADC_RawValue)
+				ItmMax = ADC_RawValue;
+
+			if((ADC_RawValue <= DataTable[REG_CURRENT_SETPOINT]) && (ADC_RawValue < ItmMax))
+				LL_SyncScope(false);
+		}
+		else
+		{
+			ItmMax = 0;
+			TIM_Stop(TIM6);
+		}
+
+		TIM_StatusClear(TIM6);
+	}
+}
+//-----------------------------------------
+
 bool IT_DMASampleCompleted()
 {
 	return IgCompleted && VgCompleted && IdCompleted && VdCompleted;
