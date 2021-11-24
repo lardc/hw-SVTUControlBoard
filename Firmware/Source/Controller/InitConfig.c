@@ -7,7 +7,7 @@
 #include "BCCIxParams.h"
 #include "MemBuffers.h"
 #include "Global.h"
-
+#include "LowLevel.h"
 // Functions
 //
 void INITCFG_ConfigSystemClock()
@@ -38,6 +38,7 @@ void INITCFG_ConfigGPIO()
 
 	// Выходы с OpenDrain
 	GPIO_InitOpenDrainOutput(GPIO_IG_PULSE, NoPull);
+	LL_PulseIg(false);
 	GPIO_InitOpenDrainOutput(GPIO_ID_LOW_RANGE, NoPull);
 
 	// Начальная установка состояний

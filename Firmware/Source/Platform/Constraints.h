@@ -12,7 +12,7 @@
 // in uOhm
 #define R_SHUNT_MIN				0
 #define R_SHUNT_MAX				2000
-#define R_SHUNT_DEF				250
+#define R_SHUNT_DEF				750
 
 // in A
 #define LOW_RANGE_I_LIM_MIN		0
@@ -49,8 +49,8 @@
 #define LSLPC_COUNT_DEF			2
 
 // in A
-#define LSLPC_MAX_I_MIN			30
-#define LSLPC_MAX_I_MAX			400
+#define LSLPC_MAX_I_MIN			100
+#define LSLPC_MAX_I_MAX			1650
 #define LSLPC_MAX_I_DEF			400
 
 //
@@ -74,25 +74,25 @@
 // in us
 #define GATE_PULSE_MIN			10
 #define GATE_PULSE_MAX			TIME_GATE_PULSE_MAX
-#define GATE_PULSE_DEF			100
+#define GATE_PULSE_DEF			TIME_GATE_PULSE_MAX
 
 // in mV
 #define GATE_V_MIN				1000
-#define GATE_V_MAX				10000
-#define GATE_V_DEF				5000
+#define GATE_V_MAX				12000
+#define GATE_V_DEF				10000
 
 // in mA
 #define GATE_I_MIN				100
 #define GATE_I_MAX				1000
-#define GATE_I_DEF				500
+#define GATE_I_DEF				1000
 
 // in A
-#define LSL_CURRENT_MAX			400
+#define LSL_CURRENT_MAX			1650
 
 // in uS
 #define GATE_PULSE_DELAY_MIN	0
 #define GATE_PULSE_DELAY_MAX	1000
-#define GATE_PULSE_DELAY_DEF	500
+#define GATE_PULSE_DELAY_DEF	0
 
 
 // Types

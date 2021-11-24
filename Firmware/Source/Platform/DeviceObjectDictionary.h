@@ -11,8 +11,7 @@
 #define ACT_DBG_PULSE_SYNC_SCPC			11	// Импульс синхронизации ячеек SCPC
 #define ACT_DBG_PULSE_IG				12	// Импульс включения подачи сигнала управления
 #define ACT_DBG_PULSE_SYNC_SCOPE		13	// Импульс синхронизации осциллографа
-#define ACT_DBG_SET_GATE_VG				14	// Задание напряжения в цепи управления
-#define ACT_DBG_SET_GATE_IG				15	// Задание тока в цепи управления
+
 
 #define ACT_START_TEST					100	// Запуск процесса измерения
 #define ACT_STOP_TEST					101	// Остановка процесса измерения
@@ -75,7 +74,7 @@
 #define REG_VG_SET_P2					54	// Полином точной корректировки Vg P2 x1e6
 
 #define REG_IG_SET_OFFSET				55	// Смещение при преобразовании Ig -> DAC
-#define REG_IG_SET_K					56	// Коэффициент преобразованиия Vg -> DAC
+#define REG_IG_SET_K					56	// Коэффициент преобразованиия Ig -> DAC
 #define REG_IG_SET_P0					57	// Полином точной корректировки Ig P0 (в мA)
 #define REG_IG_SET_P1					58	// Полином точной корректировки Ig P1 x1000
 #define REG_IG_SET_P2					59	// Полином точной корректировки Ig P2 x1e6

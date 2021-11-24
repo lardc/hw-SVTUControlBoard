@@ -68,7 +68,7 @@ void IO_Config()
 	GPIO_Bit_Set(GPIOA, Pin_8);
 	GPIO_Config (GPIOA, Pin_15, Output, PushPull, HighSpeed, NoPull);			 	// PA15 - SYNC_SCPC
 	GPIO_Bit_Rst(GPIOA, Pin_15);
-	GPIO_Config (GPIOB, Pin_0, Output, PushPull, HighSpeed, Pull_Up);				// PB0 - GATE_EN
+	GPIO_Config (GPIOB, Pin_0, Output, OpenDrain, HighSpeed, NoPull);				// PB0 - GATE_EN
 	GPIO_Bit_Set(GPIOB, Pin_0);
 	GPIO_Config (GPIOB, Pin_6, Output, PushPull, HighSpeed, NoPull);				// PB6 - SYNC_OSC
 	GPIO_Bit_Rst(GPIOB, Pin_6);
