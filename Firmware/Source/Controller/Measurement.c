@@ -85,38 +85,66 @@ void MEASURE_ConvertIg(uint16_t *InputArray, uint16_t DataLength)
 }
 //------------------------------------
 
-float MEASURE_InstantValues(Int16U *InputArray, Int16U Size)
+float MEASURE_ExtractMaxValues(Int16U *InputArray, Int16U Size)
 {
 	float AverageValue = 0;
+	static Int16U InputArrayCopy[VALUES_POWER_DMA_SIZE];
 
-	qsort(InputArray, Size, sizeof(*InputArray), MEASURE_SortCondition);
+	for (int i = 0; i < Size; i++)
+		{
+			// Из-за процесса отпирания прибора 1/3 массива содержит ненужные данные, которые необходимо обнулить
+			if(i < (Size / 3))
+				InputArrayCopy[i] = 0;
+			else
+				InputArrayCopy[i] = *(InputArray + i);
+		}
+
+	qsort(InputArrayCopy, Size, sizeof(*InputArrayCopy), MEASURE_SortCondition);
 
 	for (int i = Size - SAMPLING_AVG_NUM - MAX_SAMPLES_CUTOFF_NUM; i < Size - MAX_SAMPLES_CUTOFF_NUM; ++i)
-		AverageValue += *(InputArray + i);
+		AverageValue += *(InputArrayCopy + i);
 
 	return (AverageValue / SAMPLING_AVG_NUM);
 }
 //------------------------------------
 
-Int16U MEASURE_InstantValuesOnFallEdge(Int16U *Voltage, Int16U *Current, Int16U Size)
+Int16U MEASURE_ExtractVoltage(Int16U *VoltageArray, Int16U *CurrentArray, Int16U CurrentPoint, Int16U Size)
 {
 	Int32U AverageValue = 0;
-	Int16U Index = 0;
+	Int16U Index = 0, IndexMax = 0;
+	Int16U CurrentMax = 0;
 
-	qsort((Voltage + Size / 2), (Size / 2), sizeof(*Voltage), MEASURE_SortCondition);
-	qsort((Current + Size / 2), (Size / 2), sizeof(*Current), MEASURE_SortCondition);
-
-	for(int i = Size / 2; i < Size; i++)
+	// Поиск значения CurrentPoint в массиве CurrentArray
+	for(int i = (Size / 3); i < Size; i++)
 	{
-		if(DataTable[REG_CURRENT_SETPOINT] <= *(Current + i))
+		if(CurrentMax < *(CurrentArray + i))
 		{
-			Index = i;
-			break;
+			CurrentMax = *(CurrentArray + i);
+			IndexMax = i;
 		}
+
+		if(*(CurrentArray + i) <= CurrentPoint)
+		{
+			if(!Index)
+				Index = i;
+		}
+		else
+			Index = 0;
 	}
 
+	if(Index <= (Size / 3))
+			Index = IndexMax;
+
+	DataTable[100] = AverageValue;
+
+	// Усредение в точке измерения
 	for (int i = Index; i < (Index + SAMPLING_AVG_NUM); i++)
-		AverageValue += *(Voltage + i);
+		AverageValue += *(VoltageArray + i);
+
+	DataTable[101] = *(VoltageArray + Index);
+	DataTable[102] = Index;
+	DataTable[103] = CurrentPoint;
+	DataTable[104] = (Int16U) (AverageValue / SAMPLING_AVG_NUM);
 
 	return (AverageValue / SAMPLING_AVG_NUM);
 }

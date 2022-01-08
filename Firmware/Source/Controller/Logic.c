@@ -24,7 +24,7 @@
 
 // Definitions
 //
-#define ARR_START_INDEX_SHIFT			300
+#define ARR_START_INDEX_SHIFT			700
 
 // Types
 //
@@ -338,24 +338,21 @@ void LOGIC_SaveToEndpoint(volatile Int16U *InputArray, Int16U *OutputArray, uint
 
 void LOGIC_SaveResults()
 {
-	double Current, Fraction;
+	float Current, WholeNumber, Fraction;
+
+	DataTable[REG_GATE_VOLTAGE] = MEASURE_ExtractMaxValues((uint16_t *)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
+	DataTable[REG_GATE_CURRENT] = MEASURE_ExtractMaxValues((uint16_t *)MEMBUF_DMA_Ig, VALUES_GATE_DMA_SIZE);
+	//
+	Current = MEASURE_ExtractMaxValues((uint16_t *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
 
 	if(DataTable[REG_CURRENT_OVERSHOOT])
-		DataTable[REG_DUT_VOLTAGE] = MEASURE_InstantValuesOnFallEdge((uint16_t *)MEMBUF_DMA_Vd, (uint16_t *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
-	else
-	{
-		// Значения до ARR_START_INDEX игнорируются, т.к. в этот момент DUT может быть еще закрыт
-		DataTable[REG_DUT_VOLTAGE] = MEASURE_InstantValues((uint16_t *)(MEMBUF_DMA_Vd + ARR_START_INDEX_SHIFT),
-				                                                       VALUES_POWER_DMA_SIZE - ARR_START_INDEX_SHIFT);
-	}
+		Current = Current / ((float)(100 + DataTable[REG_CURRENT_OVERSHOOT]) / 100);
 
-	Current = MEASURE_InstantValues((uint16_t *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
-	Fraction = modf(Current, &Current);
-	DataTable[REG_DUT_CURRENT] = (uint16_t) Current;
+	Fraction = modff(Current, &WholeNumber);
+	DataTable[REG_DUT_CURRENT] = (uint16_t) WholeNumber;
 	DataTable[REG_DUT_CURRENT_FRACTION] = (uint16_t) (Fraction * 10);
-	DataTable[REG_GATE_VOLTAGE] = MEASURE_InstantValues((uint16_t *)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
-	DataTable[REG_GATE_CURRENT] = MEASURE_InstantValues((uint16_t *)MEMBUF_DMA_Ig, VALUES_GATE_DMA_SIZE);
-
+	//
+	DataTable[REG_DUT_VOLTAGE] = MEASURE_ExtractVoltage((uint16_t *)MEMBUF_DMA_Vd, (uint16_t *)MEMBUF_DMA_Id, Current, VALUES_POWER_DMA_SIZE);
 
 	if((DataTable[REG_DUT_VOLTAGE] > VOLTAGE_MAX_VALUE) || (DataTable[REG_DUT_VOLTAGE] < VOLTAGE_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;

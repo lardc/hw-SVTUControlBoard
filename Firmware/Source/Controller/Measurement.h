@@ -12,8 +12,8 @@ void MEASURE_ConvertIdLow(uint16_t *InputArray, uint16_t DataLength);
 void MEASURE_ConvertVg(uint16_t *InputArray, uint16_t DataLength);
 void MEASURE_ConvertIg(uint16_t *InputArray, uint16_t DataLength);
 //
-float MEASURE_InstantValues(Int16U *InputArray, Int16U Size);
-Int16U MEASURE_InstantValuesOnFallEdge(Int16U *Voltage, Int16U *Current, Int16U Size);
+float MEASURE_ExtractMaxValues(Int16U *InputArray, Int16U Size);
+Int16U MEASURE_ExtractVoltage(Int16U *VoltageArray, Int16U *CurrentArray, Int16U CurrentPoint, Int16U Size);
 //
 void MEASURE_ArrayEMA(uint16_t *InputArray, uint16_t DataLength);
 
