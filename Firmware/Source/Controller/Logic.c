@@ -193,14 +193,16 @@ bool LOGIC_SetCurrentForCertainBlock(uint16_t Nid, float Current)
 
 bool LOGIC_DistributeCurrent(float Current)
 {
-	// Определение дробной части уставки тока
 	uint16_t IntCurrent = (uint16_t)Current;
-	uint16_t FractionCurrent = IntCurrent - (IntCurrent / CachedCellMaxCurrent) * CachedCellMaxCurrent;
 	
 	// Ток превышает допустимый диапазон
 	if(IntCurrent > (CachedCellMaxCurrent * ActiveCellsCounter))
 		return false;
 	
+	// Определение целой и дробной частей уставки тока
+	uint16_t FractionCurrent = IntCurrent % CachedCellMaxCurrent;
+	uint16_t NoFractionCurrent = IntCurrent - FractionCurrent;
+
 	// Очистка уставки тока для всех ячеек
 	LOGIC_ResetCellsCurrent();
 	
@@ -212,22 +214,19 @@ bool LOGIC_DistributeCurrent(float Current)
 	}
 
 	// Запись значений тока
-	for(uint16_t i = 0; (i < LSLPC_COUNT_MAX) && (FractionCurrent >= 0) && (IntCurrent > 0); ++i)
+	for(uint16_t i = 0; (i < LSLPC_COUNT_MAX) && (FractionCurrent >= 0) && (NoFractionCurrent > 0); ++i)
 	{
 		if(PC_DataArray[i].IsActive)
 		{
-			if(FractionCurrent >= 0)
+			if(FractionCurrent > 0)
 			{
 				PC_DataArray[i].Current = FractionCurrent;
-				IntCurrent -= FractionCurrent;
 				FractionCurrent = 0;
-				continue;
 			}
-			
-			if(IntCurrent > 0)
+			else if(NoFractionCurrent > 0)
 			{
 				PC_DataArray[i].Current = CachedCellMaxCurrent;
-				IntCurrent -= CachedCellMaxCurrent;
+				NoFractionCurrent -= CachedCellMaxCurrent;
 			}
 		}
 	}
