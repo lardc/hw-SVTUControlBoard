@@ -33,6 +33,7 @@ typedef struct __PCStructData
 	bool IsActive;
 	PCDeviceState State;
 	uint16_t Current;
+	bool PulseMode;
 } PCData, *pPCData;
 
 // Variables
@@ -156,6 +157,9 @@ bool LOGIC_WriteCellsConfig()
 		{
 			if(!BHL_WriteRegister(i + CachedStartNid, REG_LSLPC_PULSE_VALUE, PC_DataArray[i].Current * 10))
 				return false;
+
+			if(!BHL_WriteRegister(i + CachedStartNid, REG_LSLPC_PULSE_MODE, PC_DataArray[i].PulseMode ? 1 : 0))
+				return false;
 		}
 	}
 	
@@ -200,6 +204,13 @@ bool LOGIC_DistributeCurrent(float Current)
 	// Очистка уставки тока для всех ячеек
 	LOGIC_ResetCellsCurrent();
 	
+	// Запись флага модифицированного синус сигнала
+	for(uint16_t i = 0; i < LSLPC_COUNT_MAX; ++i)
+	{
+		if(PC_DataArray[i].IsActive)
+			PC_DataArray[i].PulseMode = DataTable[REG_PULSE_MODE];
+	}
+
 	// Запись значений тока
 	for(uint16_t i = 0; (i < LSLPC_COUNT_MAX) && (FractionCurrent >= 0) && (IntCurrent > 0); ++i)
 	{

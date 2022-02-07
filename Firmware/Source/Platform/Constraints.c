@@ -160,7 +160,7 @@ const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START]
 		{GATE_V_MIN, GATE_V_MAX, GATE_V_DEF},									// 151
 		{GATE_I_MIN, GATE_I_MAX, GATE_I_DEF},									// 152
 		{GATE_PULSE_DELAY_MIN, GATE_PULSE_DELAY_MAX, GATE_PULSE_DELAY_DEF},		// 153
-		{0, 0, 0},																// 154
+		{NO, YES, NO},															// 154
 		{0, 0, 0},																// 155
 		{0, 0, 0},																// 156
 		{0, 0, 0},																// 157

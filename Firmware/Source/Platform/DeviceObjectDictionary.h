@@ -88,6 +88,7 @@
 #define REG_VG_VALUE					151	// Напряжение цепи управления (в мВ)
 #define REG_IG_VALUE					152	// Ток цепи управления (в мА)
 #define REG_GATE_PULSE_DELAY			153	// Задержка управляющего импульса (в мкс)
+#define REG_PULSE_MODE					154	// Тип сигнала тока: 0 - sin, 1 - mod sin
 
 #define REG_DBG							160	// Отладочный регистр
 
@@ -132,6 +133,7 @@
 
 // Регистры LSLPC
 #define REG_LSLPC_PULSE_VALUE			128	// Значение амплитуды импульса тока (в А)
+#define REG_LSLPC_PULSE_MODE			130	// Формирование модицифированного синус сигнала
 
 #define REG_LSLPC_DEV_STATE				192	// Состояние блока
 #define REG_LSLPC_FAULT_REASON			193

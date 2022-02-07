@@ -8,6 +8,8 @@
 
 // Definitions
 //
+#define YES						1
+#define NO						0
 
 // in uOhm
 #define R_SHUNT_MIN				0
