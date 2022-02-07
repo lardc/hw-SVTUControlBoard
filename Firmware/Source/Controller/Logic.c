@@ -214,7 +214,7 @@ bool LOGIC_DistributeCurrent(float Current)
 	}
 
 	// Запись значений тока
-	for(uint16_t i = 0; (i < LSLPC_COUNT_MAX) && (FractionCurrent >= 0) && (NoFractionCurrent > 0); ++i)
+	for(uint16_t i = 0; i < LSLPC_COUNT_MAX; ++i)
 	{
 		if(PC_DataArray[i].IsActive)
 		{
@@ -228,6 +228,8 @@ bool LOGIC_DistributeCurrent(float Current)
 				PC_DataArray[i].Current = CachedCellMaxCurrent;
 				NoFractionCurrent -= CachedCellMaxCurrent;
 			}
+			else
+				PC_DataArray[i].Current = 0;
 		}
 	}
 	
