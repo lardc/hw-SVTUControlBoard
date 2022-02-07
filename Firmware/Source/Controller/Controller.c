@@ -210,6 +210,8 @@ void CONTROL_Idle()
 
 void CONTROL_SwitchToFault(Int16U Reason)
 {
+	CONTROL_ResetToDefaults();
+
 	if(Reason == DF_INTERFACE)
 	{
 		BHLError Error = BHL_GetError();
@@ -218,8 +220,6 @@ void CONTROL_SwitchToFault(Int16U Reason)
 		DataTable[REG_BHL_FUNCTION] = Error.Func;
 		DataTable[REG_BHL_EXT_DATA] = Error.ExtData;
 	}
-	
-	CONTROL_ResetToDefaults();
 	
 	CONTROL_SetDeviceState(DS_Fault, SS_None);
 	DataTable[REG_FAULT_REASON] = Reason;
