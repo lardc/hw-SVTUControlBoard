@@ -172,14 +172,10 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 			break;
 			
 		case ACT_STOP_TEST:
+			if(CONTROL_State == DS_InProcess)
 			{
-				if(CONTROL_State == DS_InProcess)
-				{
-					CONTROL_ResetToDefaults();
-					CONTROL_SetDeviceState(DS_Ready, SS_None);
-				}
-				else
-					*pUserError = ERR_OPERATION_BLOCKED;
+				CONTROL_ResetToDefaults();
+				CONTROL_SetDeviceState(DS_Ready, SS_None);
 			}
 			break;
 			
