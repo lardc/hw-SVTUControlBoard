@@ -92,6 +92,8 @@
 
 #define REG_DBG							160	// Отладочный регистр
 
+#define REG_COMATIBILITY_1				162
+
 // Регистры только чтение
 #define REG_DEV_STATE					192	// Регистр состояния
 #define REG_FAULT_REASON				193	// Регистр Fault
