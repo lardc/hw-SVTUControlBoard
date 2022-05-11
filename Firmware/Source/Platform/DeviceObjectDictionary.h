@@ -88,11 +88,11 @@
 #define REG_VG_VALUE					151	// Напряжение цепи управления (в мВ)
 #define REG_IG_VALUE					152	// Ток цепи управления (в мА)
 #define REG_GATE_PULSE_DELAY			153	// Задержка управляющего импульса (в мкс)
-#define REG_PULSE_MODE					154	// Тип сигнала тока: 0 - sin, 1 - mod sin
 
 #define REG_DBG							160	// Отладочный регистр
 
 #define REG_COMATIBILITY_1				162
+#define REG_PULSE_MODE					163	// Тип сигнала тока: 0 - sin, 1 - mod sin
 
 // Регистры только чтение
 #define REG_DEV_STATE					192	// Регистр состояния
