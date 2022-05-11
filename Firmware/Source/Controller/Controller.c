@@ -135,6 +135,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 	{
 		case ACT_ENABLE_POWER:
 			{
+				LOGIC_FindCells();
 				if(CONTROL_State == DS_None)
 					CONTROL_SetDeviceState(DS_InProcess, SS_PowerOn);
 				else if(CONTROL_State != DS_Ready)
