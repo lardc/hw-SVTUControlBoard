@@ -33,23 +33,17 @@ void INITCFG_ConfigGPIO()
 	
 	// Выходы
 	GPIO_InitPushPullOutput(GPIO_LED);
-	GPIO_InitPushPullOutput(GPIO_TGATE_ST);
 	GPIO_InitPushPullOutput(GPIO_SYNC_OSC);
 	GPIO_InitPushPullOutput(GPIO_AIN_ST);
 	GPIO_InitPushPullOutput(GPIO_SYNC_LCSU);
 	GPIO_InitPushPullOutput(GPIO_IND_CTRL);
 
-	// Выходы с OpenDrain
-	GPIO_InitOpenDrainOutput(GPIO_GATE_EN, NoPull);
-
 	// Начальная установка состояний
 	GPIO_SetState(GPIO_LED, false);
-	GPIO_SetState(GPIO_TGATE_ST, false);
 	GPIO_SetState(GPIO_SYNC_OSC, false);
 	GPIO_SetState(GPIO_AIN_ST, false);
 	GPIO_SetState(GPIO_SYNC_LCSU, false);
 	GPIO_SetState(GPIO_IND_CTRL, false);
-	GPIO_SetState(GPIO_GATE_EN, false);
 	
 	// Альтернативные функции
 	GPIO_InitAltFunction(GPIO_ALT_CAN_RX, AltFn_9);
