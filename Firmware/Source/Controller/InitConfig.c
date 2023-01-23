@@ -24,27 +24,32 @@ void INITCFG_ConfigGPIO()
 	RCC_GPIO_Clk_EN(PORTB);
 	
 	// Аналоговые входы
-	GPIO_InitAnalog(GPIO_MEASURE_IG);
-	GPIO_InitAnalog(GPIO_MEASURE_VG);
-	GPIO_InitAnalog(GPIO_MEASURE_ID);
-	GPIO_InitAnalog(GPIO_MEASURE_VD);
+	GPIO_InitAnalog(GPIO_MSR_THYRISTOR_UG);
+	GPIO_InitAnalog(GPIO_MSR_THYRISTOR_IG);
+	GPIO_InitAnalog(GPIO_MSR_IGBT_UG);
+	GPIO_InitAnalog(GPIO_MSR_UD);
+	GPIO_InitAnalog(GPIO_MSR_ID_R0);
+	GPIO_InitAnalog(GPIO_MSR_ID_R1);
 	
 	// Выходы
 	GPIO_InitPushPullOutput(GPIO_LED);
-	GPIO_InitPushPullOutput(GPIO_SYNC_POWER_CELL);
-	GPIO_InitPushPullOutput(GPIO_SYNC_SCOPE);
-	GPIO_InitPushPullOutput(GPIO_DAC_CS);
-	GPIO_InitPushPullOutput(GPIO_DAC_LDAC);
+	GPIO_InitPushPullOutput(GPIO_TGATE_ST);
+	GPIO_InitPushPullOutput(GPIO_SYNC_OSC);
+	GPIO_InitPushPullOutput(GPIO_AIN_ST);
+	GPIO_InitPushPullOutput(GPIO_SYNC_LCSU);
+	GPIO_InitPushPullOutput(GPIO_IND_CTRL);
 
 	// Выходы с OpenDrain
-	GPIO_InitOpenDrainOutput(GPIO_IG_PULSE, NoPull);
-	LL_PulseIg(false);
-	GPIO_InitOpenDrainOutput(GPIO_ID_LOW_RANGE, NoPull);
+	GPIO_InitOpenDrainOutput(GPIO_GATE_EN, NoPull);
 
 	// Начальная установка состояний
-	GPIO_SetState(GPIO_DAC_CS, true);
-	GPIO_SetState(GPIO_DAC_LDAC, true);
-	GPIO_SetState(GPIO_IG_PULSE, true);
+	GPIO_SetState(GPIO_LED, false);
+	GPIO_SetState(GPIO_TGATE_ST, false);
+	GPIO_SetState(GPIO_SYNC_OSC, false);
+	GPIO_SetState(GPIO_AIN_ST, false);
+	GPIO_SetState(GPIO_SYNC_LCSU, false);
+	GPIO_SetState(GPIO_IND_CTRL, false);
+	GPIO_SetState(GPIO_GATE_EN, false);
 	
 	// Альтернативные функции
 	GPIO_InitAltFunction(GPIO_ALT_CAN_RX, AltFn_9);
