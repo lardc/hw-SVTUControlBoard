@@ -14,15 +14,9 @@
 uint16_t GATE_ConvertValueToDAC(uint16_t Value, uint16_t RegisterOffset, uint16_t RegisterK, uint16_t RegisterP0,
 		uint16_t RegisterP1, uint16_t RegisterP2);
 uint16_t GATE_ConvertVgToDAC(uint16_t Value);
-uint16_t GATE_ConvertIgToDAC(uint16_t Value);
 
 // Functions
 //
-void GATE_PulseOutput(bool State)
-{
-	GPIO_SetState(GPIO_IG_PULSE, !State);
-}
-//------------------------------------
 
 uint16_t GATE_ConvertValueToDAC(uint16_t Value, uint16_t RegisterOffset, uint16_t RegisterK, uint16_t RegisterP0,
 		uint16_t RegisterP1, uint16_t RegisterP2)
@@ -63,22 +57,7 @@ uint16_t GATE_ConvertIgToDAC(uint16_t Value)
 
 void GATE_SetVg(uint16_t Value)
 {
-	LL_WriteDAC_ChB(GATE_ConvertVgToDAC(Value));
+	LL_WriteDAC(GATE_ConvertVgToDAC(Value));
 }
 //------------------------------------
 
-void GATE_SetIg(uint16_t Value)
-{
-	LL_WriteDAC_ChA(GATE_ConvertIgToDAC(Value));
-}
-//------------------------------------
-
-void GATE_IgPulse(uint16_t Value, uint16_t PulseWidth)
-{
-	GATE_SetIg(Value);
-
-	LL_PulseIg(true);
-	DELAY_US(PulseWidth);
-	LL_PulseIg(false);
-}
-//------------------------------------

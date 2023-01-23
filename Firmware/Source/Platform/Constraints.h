@@ -33,32 +33,26 @@
 #define VD_K_DEF				1660
 
 //
-#define IG_OFFSET_DEF			1
-#define IG_K_DEF				349
 
 #define VG_OFFSET_DEF			65446
 #define VG_K_DEF				3440
 
 //
-#define IG_SET_OFFSET_DEF		64140
-#define IG_SET_K_DEF			1800
-#define VG_SET_OFFSET_DEF		270
-#define VG_SET_K_DEF			473
 
 // in pcs
-#define LSLPC_COUNT_MIN			1
-#define LSLPC_COUNT_MAX			2
-#define LSLPC_COUNT_DEF			2
+#define LCSU_COUNT_MIN			1
+#define LCSU_COUNT_MAX			2
+#define LCSU_COUNT_DEF			2
 
 // in A
-#define LSLPC_MAX_I_MIN			100
-#define LSLPC_MAX_I_MAX			1650
-#define LSLPC_MAX_I_DEF			400
+#define LCSU_MAX_I_MIN			100
+#define LCSU_MAX_I_MAX			1650
+#define LCSU_MAX_I_DEF			400
 
 //
-#define LSLPC_START_NID_MIN		1
-#define LSLPC_START_NID_MAX		250
-#define LSLPC_START_NID_DEF		150
+#define LCSU_START_NID_MIN		1
+#define LCSU_START_NID_MAX		250
+#define LCSU_START_NID_DEF		150
 
 // in ms
 #define LONG_TIMEOUT_DEF		60000
@@ -87,9 +81,6 @@
 #define GATE_I_MIN				100
 #define GATE_I_MAX				1000
 #define GATE_I_DEF				1000
-
-// in A
-#define LSL_CURRENT_MAX			8000
 
 // in uS
 #define GATE_PULSE_DELAY_MIN	0

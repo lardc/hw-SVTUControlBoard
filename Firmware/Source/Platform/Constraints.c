@@ -3,67 +3,67 @@
 
 // Constants
 const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
-		{R_SHUNT_MIN, R_SHUNT_MAX, R_SHUNT_DEF},								// 0
-		{LOW_RANGE_I_LIM_MIN, LOW_RANGE_I_LIM_MAX, LOW_RANGE_I_LIM_MIN},		// 1
-		{0, INT16U_MAX, IDL_OFFSET_DEF},										// 2
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, IDL_K_DEF},				// 3
-		{0, INT16U_MAX, 0},														// 4
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 5
-		{0, INT16U_MAX, 0},														// 6
-		{0, INT16U_MAX, ID_OFFSET_DEF},											// 7
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, ID_K_DEF},					// 8
-		{0, INT16U_MAX, 0},														// 9
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 10
-		{0, INT16U_MAX, 0},														// 11
-		{0, INT16U_MAX, VD_OFFSET_DEF},											// 12
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, VD_K_DEF},					// 13
-		{0, INT16U_MAX, 0},														// 14
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 15
-		{0, INT16U_MAX, 0},														// 16
-		{0, INT16U_MAX, IG_OFFSET_DEF},											// 17
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, IG_K_DEF},					// 18
-		{0, INT16U_MAX, 0},														// 19
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 20
-		{0, INT16U_MAX, 0},														// 21
-		{0, INT16U_MAX, VG_OFFSET_DEF},											// 22
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, VG_K_DEF},					// 23
-		{0, INT16U_MAX, 0},														// 24
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 25
-		{0, INT16U_MAX, 0},														// 26
+		{0, 0, 0},								// 0
+		{0, 0, 0},		// 1
+		{0, 0, 0},										// 2
+		{0, 0, 0},				// 3
+		{0, 0, 0},														// 4
+		{0, 0, 0},		// 5
+		{0, 0, 0},														// 6
+		{0, 0, 0},											// 7
+		{0, 0, 0},					// 8
+		{0, 0, 0},														// 9
+		{0, 0, 0},		// 10
+		{0, 0, 0},														// 11
+		{0, 0, 0},											// 12
+		{0, 0, 0},					// 13
+		{0, 0, 0},														// 14
+		{0, 0, 0},		// 15
+		{0, 0, 0},														// 16
+		{0, 0, 0},											// 17
+		{0, 0, 0},					// 18
+		{0, 0, 0},														// 19
+		{0, 0, 0},		// 20
+		{0, 0, 0},														// 21
+		{0, 0, 0},											// 22
+		{0, 0, 0},					// 23
+		{0, 0, 0},														// 24
+		{0, 0, 0},		// 25
+		{0, 0, 0},														// 26
 		{0, 0, 0},																// 27
 		{0, 0, 0},																// 28
 		{0, 0, 0},																// 29
 		{0, 0, 0},																// 30
-		{LSLPC_MAX_I_MIN, LSLPC_MAX_I_MAX, LSLPC_MAX_I_DEF},					// 31
-		{LSLPC_START_NID_MIN, LSLPC_START_NID_MAX, LSLPC_START_NID_DEF},		// 32
-		{0, INT16U_MAX, LONG_TIMEOUT_DEF},										// 33
+		{0, 0, 0},					// 31
+		{0, 0, 0},		// 32
+		{0, 0, 0},										// 33
 		{0, 0, 0},																// 34
 		{0, 0, 0},																// 35
 		{0, 0, 0},																// 36
 		{0, 0, 0},																// 37
 		{0, 0, 0},																// 38
 		{0, 0, 0},																// 39
-		{CURRENT_OVERSHOOT_MIN, CURRENT_OVERSHOOT_MAX, CURRENT_OVERSHOOT_DEF},	// 40
-		{0, INT16U_MAX, 0},														// 41
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 42
-		{0, INT16U_MAX, 0},														// 43
+		{0, 0, 0},	// 40
+		{0, 0, 0},														// 41
+		{0, 0, 0},		// 42
+		{0, 0, 0},														// 43
 		{0, 0, 0},																// 44
 		{0, 0, 0},																// 45
 		{0, 0, 0},																// 46
 		{0, 0, 0},																// 47
 		{0, 0, 0},																// 48
 		{0, 0, 0},																// 49
-		{0, INT16U_MAX, VG_SET_OFFSET_DEF},										// 50
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, VG_SET_K_DEF},				// 51
-		{0, INT16U_MAX, 0},														// 52
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 53
-		{0, INT16U_MAX, 0},														// 54
-		{0, INT16U_MAX, IG_SET_OFFSET_DEF},										// 55
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, IG_SET_K_DEF},				// 56
-		{0, INT16U_MAX, 0},														// 57
-		{GAIN_COEFFICIENT_MIN, GAIN_COEFFICIENT_MAX, GAIN_COEFFICIENT_DEF},		// 58
-		{0, INT16U_MAX, 0},														// 59
-		{0, INT16U_MAX, 0},														// 60
+		{0, 0, 0},										// 50
+		{0, 0, 0},				// 51
+		{0, 0, 0},														// 52
+		{0, 0, 0},		// 53
+		{0, 0, 0},														// 54
+		{0, 0, 0},										// 55
+		{0, 0, 0},				// 56
+		{0, 0, 0},														// 57
+		{0, 0, 0},		// 58
+		{0, 0, 0},														// 59
+		{0, 0, 0},														// 60
 		{0, 0, 0},																// 61
 		{0, 0, 0},																// 62
 		{0, 0, 0},																// 63
@@ -131,7 +131,7 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 125
 		{0, 0, 0},																// 126
 		{0, 0, 0},																// 127
-		{0, INT16U_MAX, 0},														// 128
+		{0, 0, 0},														// 128
 		{0, 0, 0},																// 129
 		{0, 0, 0},																// 130
 		{0, 0, 0},																// 131
@@ -143,8 +143,8 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 137
 		{0, 0, 0},																// 138
 		{0, 0, 0},																// 139
-		{0, LSL_CURRENT_MAX, 0},												// 140
-		{0, INT16U_MAX, 0},														// 141
+		{0, 0, 0},												// 140
+		{0, 0, 0},														// 141
 		{0, 0, 0},																// 142
 		{0, 0, 0},																// 143
 		{0, 0, 0},																// 144
@@ -153,20 +153,20 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 147
 		{0, 0, 0},																// 148
 		{0, 0, 0},																// 149
-		{GATE_PULSE_MIN, GATE_PULSE_MAX, GATE_PULSE_DEF},						// 150
-		{GATE_V_MIN, GATE_V_MAX, GATE_V_DEF},									// 151
-		{GATE_I_MIN, GATE_I_MAX, GATE_I_DEF},									// 152
-		{GATE_PULSE_DELAY_MIN, GATE_PULSE_DELAY_MAX, GATE_PULSE_DELAY_DEF},		// 153
+		{0, 0, 0},						// 150
+		{0, 0, 0},									// 151
+		{0, 0, 0},									// 152
+		{0, 0, 0},		// 153
 		{0, 0, 0},																// 154
 		{0, 0, 0},																// 155
 		{0, 0, 0},																// 156
 		{0, 0, 0},																// 157
 		{0, 0, 0},																// 158
 		{0, 0, 0},																// 159
-		{0, INT16U_MAX, 0},														// 160
-		{0, INT16U_MAX, 0},														// 161
-		{0, INT16U_MAX, 0},														// 162
-		{NO, YES, NO},															// 163
+		{0, 0, 0},														// 160
+		{0, 0, 0},														// 161
+		{0, 0, 0},														// 162
+		{0, 0, 0},															// 163
 		{0, 0, 0},																// 164
 		{0, 0, 0},																// 165
 		{0, 0, 0},																// 166

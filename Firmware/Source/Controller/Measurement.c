@@ -78,13 +78,6 @@ void MEASURE_ConvertVg(uint16_t *InputArray, uint16_t DataLength)
 }
 //------------------------------------
 
-void MEASURE_ConvertIg(uint16_t *InputArray, uint16_t DataLength)
-{
-	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_IG_OFFSET, REG_IG_K, REG_IG_P0, REG_IG_P1,
-			REG_IG_P2, 0);
-}
-//------------------------------------
-
 float MEASURE_ExtractMaxValues(Int16U *InputArray, Int16U Size)
 {
 	float AverageValue = 0;
@@ -108,7 +101,7 @@ float MEASURE_ExtractMaxValues(Int16U *InputArray, Int16U Size)
 }
 //------------------------------------
 
-Int16U MEASURE_ExtractVoltage(Int16U *VoltageArray, Int16U *CurrentArray, Int16U CurrentPoint, Int16U Size)
+Int16U MEASURE_ExtractVoltage(pFloat32 VoltageArray, pFloat32 CurrentArray, Int16U CurrentPoint, Int16U Size)
 {
 	Int32U AverageValue = 0;
 	Int16U Index = 0, IndexMax = 0;
@@ -140,11 +133,6 @@ Int16U MEASURE_ExtractVoltage(Int16U *VoltageArray, Int16U *CurrentArray, Int16U
 	// Усредение в точке измерения
 	for (int i = Index; i < (Index + SAMPLING_AVG_NUM); i++)
 		AverageValue += *(VoltageArray + i);
-
-	DataTable[101] = *(VoltageArray + Index);
-	DataTable[102] = Index;
-	DataTable[103] = CurrentPoint;
-	DataTable[104] = (Int16U) (AverageValue / SAMPLING_AVG_NUM);
 
 	return (AverageValue / SAMPLING_AVG_NUM);
 }

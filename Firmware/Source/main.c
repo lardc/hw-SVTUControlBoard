@@ -13,7 +13,6 @@ int main()
 	INITCFG_ConfigGPIO();
 	INITCFG_ConfigCAN();
 	INITCFG_ConfigUART();
-	INITCFG_ConfigSPI();
 	INITCFG_ConfigADC();
 	INITCFG_ConfigTimer3();
 	INITCFG_ConfigTimer1();

@@ -26,12 +26,9 @@ void TIM6_DAC_IRQHandler()
 	{
 		if(LL_SyncScopeGetState())
 		{
-			ArrayIndex = DMA_ReadDataCount(DMA_ADC_ID_CHANNEL) - 1;
+			ArrayIndex = DMA_ReadDataCount(DMA_ADC_ID_CH) - 1;
 			ADC_RawValue = MEMBUF_DMA_Id[ArrayIndex];
-			if(LL_IsIdLowRange())
-				MEASURE_ConvertIdLow(&ADC_RawValue, 1);
-			else
-				MEASURE_ConvertId(&ADC_RawValue, 1);
+			MEASURE_ConvertId(&ADC_RawValue, 1);
 
 			if(ItmMax < ADC_RawValue)
 				ItmMax = ADC_RawValue;

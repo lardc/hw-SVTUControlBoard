@@ -58,9 +58,9 @@
 #define REG_VG_P1						25	// Полином точной корректировки Vg P1 x1000
 #define REG_VG_P2						26	// Полином точной корректировки Vg P2 x1e6
 
-#define REG_PC_MAX_CURRENT				31	// Максимальный ток с одной силовой ячейки (в А)
-#define REG_PC_START_NID				32	// Стартовое значение NodeID для первой силовой ячейки
-#define REG_PC_LONG_TIMEOUT				33	// Длинный таймаут по операциям с ячейками (в мс)
+#define REG_LCSU_MAX_CURRENT			31	// Максимальный ток с одной силовой ячейки (в А)
+#define REG_LCSU_START_NID				32	// Стартовое значение NodeID для первой силовой ячейки
+#define REG_LCSU_LONG_TIMEOUT			33	// Длинный таймаут по операциям с ячейками (в мс)
 
 #define REG_CURRENT_OVERSHOOT			40	// Перерегулирование амплитуды тока (в %)
 #define REG_ISET_P0						41	// Полином точной корректировки задания прямого тока P0 (в А)
@@ -84,10 +84,8 @@
 // Несохраняемы регистры чтения-записи
 #define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
 
-#define REG_GATE_PULSE_TIME				150	// Длительность импульса управления (в мкс)
 #define REG_VG_VALUE					151	// Напряжение цепи управления (в мВ)
 #define REG_IG_VALUE					152	// Ток цепи управления (в мА)
-#define REG_GATE_PULSE_DELAY			153	// Задержка управляющего импульса (в мкс)
 
 #define REG_DBG							160	// Отладочный регистр
 
@@ -103,10 +101,8 @@
 #define REG_OP_RESULT					197	// Регистр результата операции
 
 #define REG_DUT_VOLTAGE					198	// Измеренное значение прямого напряжения (в мВ)
-#define REG_DUT_CURRENT_FRACTION		205	// Дробная часть измеренного значения тока (в А * 10)
 #define REG_DUT_CURRENT					206	// Измеренное значение прямого тока (в А)
 #define REG_GATE_VOLTAGE				202	// Измеренное значение напряжения в цепи управления (в мВ)
-#define REG_GATE_CURRENT				203	// Измеренное значение тока в цепи управления (в мА)
 
 #define REG_DEV_SUB_STATE				209	// Регистр вспомогательного состояния
 #define REG_BHL_ERROR_CODE				210	// Ошибка интерфейса ВУ: код ошибки
@@ -114,7 +110,7 @@
 #define REG_BHL_FUNCTION				212	// Ошибка интерфейса ВУ: код функции
 #define REG_BHL_EXT_DATA				213	// Ошибка интерфейса ВУ: расширенная информация
 
-#define REG_TOTAL_LSLPC					207	// Обнаруженное количество силовых ячеек
+#define REG_TOTAL_LCSU					207	// Обнаруженное количество силовых ячеек
 #define REG_CURRENT_MAX					225	// Максимальный ток, получаемый с установки (в А)
 
 #define REG_FWINFO_SLAVE_NID			256	// Device CAN slave node ID
@@ -124,24 +120,24 @@
 #define REG_FWINFO_STR_BEGIN			261	// Begining of the information string record
 // -----------------------------
 
-// Команды LSLPC
-#define ACT_LSLPC_ENABLE_POWER			1	// Включение блока
-#define ACT_LSLPC_DISABLE_POWER			2	// Выключение блока
-#define ACT_LSLPC_FAULT_CLEAR			3	// Очистка fault
-#define ACT_LSLPC_WARNING_CLEAR			4	// Очистка warning
+// Команды LCSU
+#define ACT_LCSU_ENABLE_POWER			1	// Включение блока
+#define ACT_LCSU_DISABLE_POWER			2	// Выключение блока
+#define ACT_LCSU_FAULT_CLEAR			3	// Очистка fault
+#define ACT_LCSU_WARNING_CLEAR			4	// Очистка warning
 //
-#define ACT_LSLPC_PULSE_CONFIG			100	// Команда на конфигурацию значения тока
+#define ACT_LCSU_PULSE_CONFIG			100	// Команда на конфигурацию значения тока
 // -----------------------------
 
-// Регистры LSLPC
-#define REG_LSLPC_PULSE_VALUE			128	// Значение амплитуды импульса тока (в А)
-#define REG_LSLPC_PULSE_MODE			130	// Формирование модицифированного синус сигнала
+// Регистры LCSU
+#define REG_LCSU_PULSE_VALUE			128	// Значение амплитуды импульса тока (в А)
+#define REG_LCSU_PULSE_MODE			130	// Формирование модицифированного синус сигнала
 
-#define REG_LSLPC_DEV_STATE				192	// Состояние блока
-#define REG_LSLPC_FAULT_REASON			193
-#define REG_LSLPC_DISABLE_REASON		194
-#define REG_LSLPC_WARNING				195
-#define REG_LSLPC_PROBLEM				196
+#define REG_LCSU_DEV_STATE				192	// Состояние блока
+#define REG_LCSU_FAULT_REASON			193
+#define REG_LCSU_DISABLE_REASON		194
+#define REG_LCSU_WARNING				195
+#define REG_LCSU_PROBLEM				196
 // -----------------------------
 
 // Endpoints
@@ -158,9 +154,9 @@
 // Fault and disable codes
 #define DF_NONE							0
 #define DF_INTERFACE					1
-#define DF_PC_UNEXPECTED_STATE			2
-#define DF_PC_STATE_TIMEOUT				3
-#define DF_PC_CURRENT_CONFIG			4
+#define DF_LCSU_UNEXPECTED_STATE		2
+#define DF_LCSU_STATE_TIMEOUT			3
+#define DF_LCSU_CURRENT_CONFIG			4
 
 // Warning
 #define WARNING_NONE					0
