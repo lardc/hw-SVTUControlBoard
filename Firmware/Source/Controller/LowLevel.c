@@ -54,3 +54,9 @@ void LL_WriteDAC(Int16U Data)
 	DAC_SetValueCh2(DAC1, Data);
 }
 //-----------------------------
+
+bool LL_SafetyIsActive()
+{
+	return !GPIO_GetState(GPIO_SAFETY);
+}
+//------------------------------------

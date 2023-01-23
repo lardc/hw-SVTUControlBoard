@@ -14,5 +14,6 @@ void LL_AnalogInputsSelftTest(bool State);
 void LL_ExtIndication(bool State);
 void LL_ExtIndicationToggle();
 void LL_WriteDAC(Int16U Data);
+bool LL_SafetyIsActive();
 
 #endif // __LOWLEVEL_H
