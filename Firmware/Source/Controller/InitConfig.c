@@ -182,6 +182,25 @@ void INITCFG_ConfigDMA()
 }
 //------------------------------------
 
+void INITCFG_ConfigDAC()
+{
+	DACx_Clk_Enable(DAC_1_ClkEN);
+	DACx_Reset();
+	DAC_TriggerConfigCh1(DAC1, TRIG1_TIMER15, TRIG1_ENABLE);
+	DAC_BufferCh2(DAC1, false);
+	DAC_EnableCh2(DAC1);
+}
+//------------------------------------------------
+
+void INITCFG_ConfigTimer15()
+{
+	TIM_Clock_En(TIM_15);
+	TIM_Config(TIM15, SYSCLK, TIMER15_uS);
+	TIM_MasterMode(TIM15, MMS_UPDATE);
+	TIM_Start(TIM15);
+}
+//------------------------------------------------
+
 void INITCFG_ConfigWatchDog()
 {
 	IWDG_Config();
