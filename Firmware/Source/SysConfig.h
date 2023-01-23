@@ -20,8 +20,8 @@
 // ----------------------------------------------
 
 // Timers
-#define TIMER2_uS                		0.5f		// Таймер тактирования АЦП 1,2
-#define TIMER1_uS                		5			// Таймер тактирования АЦП 3,4
+#define TIMER2_uS                		50			// Таймер тактирования АЦП 1,2
+#define TIMER1_uS                		0.5f		// Таймер тактирования АЦП 3,4
 #define TIMER3_uS                  		1000		// Таймер общего назначения
 #define TIMER6_uS                  		20			// Таймер определения момента синхронизации
 // ----------------------------------------------
@@ -31,17 +31,19 @@
 // ----------------------------------------------
 
 // DMA
-#define DMA_ADC_IG_CHANNEL				DMA1_Channel1	// Канал DMA для АЦП Ig
-#define DMA_ADC_VG_CHANNEL				DMA2_Channel1	// Канал DMA для АЦП Vg
-#define DMA_ADC_ID_CHANNEL				DMA2_Channel5	// Канал DMA для АЦП Id
-#define DMA_ADC_VD_CHANNEL				DMA2_Channel2	// Канал DMA для АЦП Vd
+#define DMA_ADC_THYRISTOR_GATE_CH		DMA1_Channel1	// Канал DMA для АЦП Vg, Ig тиристора
+#define DMA_ADC_IGBT_GATE_CH			DMA2_Channel1	// Канал DMA для АЦП Vg IGBT
+#define DMA_ADC_ID_CH					DMA2_Channel2	// Канал DMA для АЦП Id
+#define DMA_ADC_VD_CH					DMA2_Channel5	// Канал DMA для АЦП Vd
 // ----------------------------------------------
 
 // ADC
-#define ADC1_IG_CHANNEL					1			// АЦП1 номер канала измерения Ig
-#define ADC2_VG_CHANNEL					1			// АЦП2 номер канала измерения Vg
-#define ADC3_ID_CHANNEL					1			// АЦП3 номер канала измерения Id
-#define ADC4_VD_CHANNEL					3			// АЦП4 номер канала измерения Vd
+#define ADC1_THYRISTOR_UG_CH			2			// АЦП1 номер канала измерения Ug тиристора
+#define ADC1_THYRISTOR_IG_CH			3			// АЦП1 номер канала измерения Ig тиристора
+#define ADC2_IGBT_UG_CH					4			// АЦП2 номер канала измерения Ug IGBT
+#define ADC3_UD_CH						5			// АЦП3 номер канала измерения Ud
+#define ADC4_ID_R0_CH					3			// АЦП4 номер канала измерения Id (диапазон 0)
+#define ADC4_ID_R1_CH					4			// АЦП4 номер канала измерения Id (диапазон 1)
 // ----------------------------------------------
 
 #endif // __SYSCONFIG_H

@@ -36,6 +36,6 @@
 
 // Параметры DMA
 #define VALUES_POWER_DMA_SIZE		2000
-#define VALUES_GATE_DMA_SIZE		500
+#define VALUES_GATE_DMA_SIZE		3
 
 #endif // __GLOBAL_H
