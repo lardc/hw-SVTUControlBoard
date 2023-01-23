@@ -145,10 +145,10 @@
 // -----------------------------
 
 // Endpoints
-#define EP16_DATA_ID					1	// Оцифрованные данные Id
-#define EP16_DATA_VD					2	// Оцифрованные данные Vd
-#define EP16_DATA_IG					3	// Оцифрованные данные Ig
-#define EP16_DATA_VG					4	// Оцифрованные данные Vg
+#define EP_ID							1	// Оцифрованные данные Id
+#define EP_VD							2	// Оцифрованные данные Vd
+#define EP_VG							3	// Оцифрованные данные Vg
+#define EP_VG_ERR						4	// Ошибка регулятора Vg
 
 // Operation results
 #define OPRESULT_NONE					0	// No information or not finished

@@ -61,11 +61,11 @@ void CONTROL_Init()
 {
 	pInt16U cnt = (pInt16U)&CONTROL_Values_Counter;
 	// Переменные для конфигурации EndPoint
-	Int16U EPIndexes[EP_COUNT] = {EP16_DATA_ID, EP16_DATA_VD, EP16_DATA_IG, EP16_DATA_VG};
-	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
-	pInt16U EPCounters[EP_COUNT] = {cnt, cnt, cnt, cnt};
-	pInt16U EPDatas[EP_COUNT] = {(pInt16U)MEMBUF_EP_Id, (pInt16U)MEMBUF_EP_Vd, (pInt16U)MEMBUF_EP_Ig,
-			(pInt16U)MEMBUF_EP_Vg};
+	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR};
+	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
+	pInt16U FEPCounters[FEP_COUNT] = {cnt, cnt, cnt, cnt};
+	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_Id, (pFloat32)MEMBUF_EP_Vd, (pFloat32)MEMBUF_EP_Vg,
+			(pFloat32)MEMBUF_EP_VgErr};
 	
 	// Конфигурация сервиса работы Data-table и EPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
@@ -76,7 +76,7 @@ void CONTROL_Init()
 	
 	// Инициализация device profile
 	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive);
-	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
+	DEVPROFILE_InitFEPService(FEPIndexes, FEPSized, FEPCounters, FEPDatas);
 	
 	// Сброс значений
 	DEVPROFILE_ResetControlSection();

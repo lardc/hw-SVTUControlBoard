@@ -2,7 +2,7 @@
 #include "Constraints.h"
 
 // Constants
-const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] = {
+const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{R_SHUNT_MIN, R_SHUNT_MAX, R_SHUNT_DEF},								// 0
 		{LOW_RANGE_I_LIM_MIN, LOW_RANGE_I_LIM_MAX, LOW_RANGE_I_LIM_MIN},		// 1
 		{0, INT16U_MAX, IDL_OFFSET_DEF},										// 2
@@ -130,10 +130,7 @@ const TableItemConstraint NVConstraint[DATA_TABLE_NV_SIZE] = {
 		{0, 0, 0},																// 124
 		{0, 0, 0},																// 125
 		{0, 0, 0},																// 126
-		{0, 0, 0}																// 127
-};
-
-const TableItemConstraint VConstraint[DATA_TABLE_WP_START - DATA_TABLE_WR_START] = {
+		{0, 0, 0},																// 127
 		{0, INT16U_MAX, 0},														// 128
 		{0, 0, 0},																// 129
 		{0, 0, 0},																// 130
