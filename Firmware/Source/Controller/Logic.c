@@ -33,13 +33,13 @@ typedef struct __LCSUStructData
 	bool IsActive;
 	LCSUState State;
 	float Current;
-	Int16U PulseMode;
+	Int16U PulseShape;
 } LCSUData, *pLCSUData;
 
 // Variables
 //
 LCSUData LCSU_DataArray[LCSU_COUNT_MAX] = {0};
-static uint16_t ActiveLCSUCounter = 0, CachedLCSUStartNid = 0, CachedLCSUMaxCurrent = 0;
+static Int16U ActiveLCSUCounter = 0, CachedLCSUStartNid = 0, CachedLCSUMaxCurrent = 0;
 
 // Forward functions
 //
@@ -53,7 +53,7 @@ bool LOGIC_FindLCSU()
 	CachedLCSUStartNid = DataTable[REG_LCSU_START_NID];
 	CachedLCSUMaxCurrent = DataTable[REG_LCSU_MAX_CURRENT];
 	
-	for(uint16_t i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
 	{
 		if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_DEV_STATE, NULL))
 		{
@@ -73,9 +73,9 @@ bool LOGIC_FindLCSU()
 
 bool LOGIC_UpdateLCSUState()
 {
-	uint16_t Register;
+	Int16U Register;
 	
-	for(uint16_t i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -90,9 +90,9 @@ bool LOGIC_UpdateLCSUState()
 }
 // ----------------------------------------
 
-bool LOGIC_CallCommandForLCSU(uint16_t Command)
+bool LOGIC_CallCommandForLCSU(Int16U Command)
 {
-	for(uint16_t i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -107,7 +107,7 @@ bool LOGIC_CallCommandForLCSU(uint16_t Command)
 
 bool LOGIC_PowerEnableLCSU()
 {
-	for(uint16_t i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -123,11 +123,11 @@ bool LOGIC_PowerEnableLCSU()
 }
 // ----------------------------------------
 
-bool LOGIC_AreLCSUInStateX(uint16_t State)
+bool LOGIC_AreLCSUInStateX(Int16U State)
 {
 	bool result = true;
 	
-	for(uint16_t i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State != State)
 			result = false;
@@ -137,9 +137,9 @@ bool LOGIC_AreLCSUInStateX(uint16_t State)
 }
 // ----------------------------------------
 
-bool LOGIC_IsLCSUInFaultOrDisabled(uint16_t Fault, uint16_t Disabled)
+bool LOGIC_IsLCSUInFaultOrDisabled(Int16U Fault, Int16U Disabled)
 {
-	for(uint16_t i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
 	{
 		if(LCSU_DataArray[i].State == Fault || LCSU_DataArray[i].State == Disabled)
 			return true;
@@ -151,14 +151,14 @@ bool LOGIC_IsLCSUInFaultOrDisabled(uint16_t Fault, uint16_t Disabled)
 
 bool LOGIC_WriteLCSUConfig()
 {
-	for(uint16_t i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
 			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
 				return false;
 
-			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_PULSE_MODE, LCSU_DataArray[i].PulseMode ? 1 : 0))
+			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_PULSE_SHAPE, LCSU_DataArray[i].PulseShape))
 				return false;
 		}
 	}
@@ -167,7 +167,7 @@ bool LOGIC_WriteLCSUConfig()
 }
 // ----------------------------------------
 
-bool LOGIC_SetCurrentForCertainLCSU(uint16_t Nid, float Current)
+bool LOGIC_SetCurrentForCertainLCSU(Int16U Nid, float Current)
 {
 	// Nid вне диапазона
 	if(Nid < CachedLCSUStartNid || Nid >= (CachedLCSUStartNid + LCSU_COUNT_MAX))
@@ -193,43 +193,27 @@ bool LOGIC_SetCurrentForCertainLCSU(uint16_t Nid, float Current)
 
 bool LOGIC_DistributeCurrent(float Current)
 {
-	uint16_t IntCurrent = (uint16_t)Current;
-	
 	// Ток превышает допустимый диапазон
-	if(IntCurrent > (CachedLCSUMaxCurrent * ActiveLCSUCounter))
+	if(Current > (CachedLCSUMaxCurrent * ActiveLCSUCounter))
 		return false;
-	
-	// Определение целой и дробной частей уставки тока
-	uint16_t FractionCurrent = IntCurrent % CachedLCSUMaxCurrent;
-	uint16_t NoFractionCurrent = IntCurrent - FractionCurrent;
 
 	// Очистка уставки тока для всех LCSU
 	LOGIC_ResetLCSUCurrent();
-	
-	// Запись флага модифицированного синус сигнала
-	for(uint16_t i = 0; i < LCSU_COUNT_MAX; ++i)
-	{
-		if(LCSU_DataArray[i].IsActive)
-			LCSU_DataArray[i].PulseMode = (Int16U)DataTable[REG_PULSE_MODE];
-	}
 
-	// Запись значений тока
-	for(uint16_t i = 0; i < LCSU_COUNT_MAX; ++i)
+	// Запись значений и формы импульса тока
+	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
-			if(FractionCurrent > 0)
-			{
-				LCSU_DataArray[i].Current = FractionCurrent;
-				FractionCurrent = 0;
-			}
-			else if(NoFractionCurrent > 0)
+			if(Current >= CachedLCSUMaxCurrent)
 			{
 				LCSU_DataArray[i].Current = CachedLCSUMaxCurrent;
-				NoFractionCurrent -= CachedLCSUMaxCurrent;
+				Current -= CachedLCSUMaxCurrent;
 			}
 			else
-				LCSU_DataArray[i].Current = 0;
+				LCSU_DataArray[i].Current = Current;
+
+			LCSU_DataArray[i].PulseShape = (Int16U)DataTable[REG_PULSE_SHAPE];
 		}
 	}
 	
@@ -253,7 +237,7 @@ float LOGIC_GetCurrentSetpoint()
 
 void LOGIC_ResetLCSUCurrent()
 {
-	for(uint16_t i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 			LCSU_DataArray[i].Current = 0;
@@ -263,10 +247,7 @@ void LOGIC_ResetLCSUCurrent()
 
 void LOGIC_SelectCurrentRange(float Current)
 {
-	if(Current <= DataTable[REG_I_LOW_RANGE_LIMIT])
-	{
-
-	}
+	(Current <= DataTable[REG_I_LOW_RANGE_LIMIT]) ? LL_SetIdRange(false) : LL_SetIdRange(true);
 }
 // ----------------------------------------
 
@@ -308,15 +289,15 @@ void LOGIC_ProcessPulse()
 	LL_SyncLCSU(false);
 
 	// Пересчёт значений
-	MEASURE_ConvertVd((uint16_t *)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
-	MEASURE_ConvertIdLow((uint16_t *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
-	MEASURE_ConvertVg((uint16_t *)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
+	MEASURE_ConvertVd((Int16U *)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
+	MEASURE_ConvertIdLow((Int16U *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
+	MEASURE_ConvertVg((Int16U *)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
 }
 // ----------------------------------------
 
-void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, uint16_t InputArraySize)
+void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, Int16U InputArraySize)
 {
-	uint16_t BufferCompression;
+	Int16U BufferCompression;
 
 	if(InputArraySize >= VALUES_x_SIZE)
 		BufferCompression = InputArraySize / VALUES_x_SIZE;
@@ -332,9 +313,9 @@ void LOGIC_SaveResults()
 {
 	float Current;
 
-	DataTable[REG_GATE_VOLTAGE] = MEASURE_ExtractMaxValues((uint16_t *)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
+	DataTable[REG_GATE_VOLTAGE] = MEASURE_ExtractMaxValues((Int16U *)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
 	//
-	Current = MEASURE_ExtractMaxValues((uint16_t *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
+	Current = MEASURE_ExtractMaxValues((Int16U *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
 
 	if(DataTable[REG_CURRENT_OVERSHOOT])
 		Current = Current / ((float)(100 + DataTable[REG_CURRENT_OVERSHOOT]) / 100);

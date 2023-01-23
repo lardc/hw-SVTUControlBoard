@@ -12,61 +12,25 @@
 
 // Variables
 //
-static volatile bool IgCompleted, VgCompleted, IdCompleted, VdCompleted;
+static volatile bool VgCompleted, IdCompleted, VdCompleted;
 
 // Functions
 //
-void TIM6_DAC_IRQHandler()
+void ADC1_2_IRQHandler()
 {
-	Int16U ADC_RawValue = 0;
-	static Int16U ItmMax = 0;
-	Int16U ArrayIndex = 0;
-
-	if(TIM_StatusCheck(TIM6))
-	{
-		if(LL_SyncScopeGetState())
-		{
-			ArrayIndex = DMA_ReadDataCount(DMA_ADC_ID_CH) - 1;
-			ADC_RawValue = MEMBUF_DMA_Id[ArrayIndex];
-			MEASURE_ConvertId(&ADC_RawValue, 1);
-
-			if(ItmMax < ADC_RawValue)
-				ItmMax = ADC_RawValue;
-
-			if((ADC_RawValue <= DataTable[REG_CURRENT_SETPOINT]) && (ADC_RawValue < ItmMax))
-				LL_SyncScope(false);
-		}
-		else
-		{
-			ItmMax = 0;
-			TIM_Stop(TIM6);
-		}
-
-		TIM_StatusClear(TIM6);
-	}
+	GATE_RegulatorProcess(MEASURE_ConvertVg(&ADC2->DR));
 }
 //-----------------------------------------
 
 bool IT_DMASampleCompleted()
 {
-	return IgCompleted && VgCompleted && IdCompleted && VdCompleted;
+	return VgCompleted && IdCompleted && VdCompleted;
 }
 //-----------------------------------------
 
 void IT_DMAFlagsReset()
 {
-	IgCompleted = VgCompleted = IdCompleted = VdCompleted = false;
-}
-//-----------------------------------------
-
-void DMA1_Channel1_IRQHandler()
-{
-	// Ig
-	if(DMA_IsTransferComplete(DMA1, DMA_ISR_TCIF1))
-	{
-		IgCompleted = true;
-		DMA_TransferCompleteReset(DMA1, DMA_IFCR_CTCIF1);
-	}
+	VgCompleted = IdCompleted = VdCompleted = false;
 }
 //-----------------------------------------
 

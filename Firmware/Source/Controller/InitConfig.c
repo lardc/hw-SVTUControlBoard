@@ -87,39 +87,32 @@ void INITCFG_ConfigADC()
 	ADC_Enable(ADC1);
 
 	// ADC2
-	INITCFG_ConfigSlaveADCChannel(ADC2, ADC2_IGBT_UG_CH);
+	ADC_Calibration(ADC2);
+	ADC_ChannelSeqReset(ADC2);
+	ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
+	ADC_ChannelSeqLen(ADC2, 1);
+	ADC_Interrupt(ADC2, EOCIE, 0, true);
+	ADC_Enable(ADC2);
 
 	// ADC3
-	INITCFG_ConfigMasterADCChannel(ADC3, ADC3_UD_CH, ADC34_TIM1_TRGO);
+	ADC_Calibration(ADC3);
+	ADC_TrigConfig(ADC3, ADC34_TIM1_TRGO, RISE);
+	ADC_ChannelSeqReset(ADC3);
+	ADC_ChannelSet_Sequence(ADC3, ADC3_UD_CH, 1);
+	ADC_ChannelSeqLen(ADC3, 1);
+	ADC_DMAConfig(ADC3);
+	ADC_Enable(ADC3);
 
 	// ADC4
-	INITCFG_ConfigSlaveADCChannel(ADC4, ADC4_ID_CH);
+	ADC_Calibration(ADC4);
+	ADC_ChannelSeqReset(ADC4);
+	ADC_ChannelSet_Sequence(ADC4, ADC4_ID_CH, 1);
+	ADC_ChannelSeqLen(ADC4, 1);
+	ADC_DMAConfig(ADC4);
+	ADC_Enable(ADC4);
 
 	ADC_SamplingStart(ADC1);
 	ADC_SamplingStart(ADC3);
-}
-//------------------------------------
-
-void INITCFG_ConfigSlaveADCChannel(ADC_TypeDef* ADCx, Int16U Channel)
-{
-	ADC_Calibration(ADCx);
-	ADC_ChannelSeqReset(ADCx);
-	ADC_ChannelSet_Sequence(ADCx, Channel, 1);
-	ADC_ChannelSeqLen(ADCx, 1);
-	ADC_DMAConfig(ADCx);
-	ADC_Enable(ADCx);
-}
-//------------------------------------
-
-void INITCFG_ConfigMasterADCChannel(ADC_TypeDef* ADCx, Int16U Channel, Int32U TrigSource)
-{
-	ADC_Calibration(ADCx);
-	ADC_TrigConfig(ADCx, TrigSource, RISE);
-	ADC_ChannelSeqReset(ADCx);
-	ADC_ChannelSet_Sequence(ADCx, Channel, 1);
-	ADC_ChannelSeqLen(ADCx, 1);
-	ADC_DMAConfig(ADCx);
-	ADC_Enable(ADCx);
 }
 //------------------------------------
 
@@ -141,14 +134,6 @@ void INITCFG_ConfigTimer1()
 }
 //------------------------------------
 
-void INITCFG_ConfigTimer6()
-{
-	TIM_Clock_En(TIM_6);
-	TIM_Config(TIM6, SYSCLK, TIMER6_uS);
-	TIM_Interupt(TIM6, 0, true);
-}
-//------------------------------------
-
 void INITCFG_ConfigTimer2()
 {
 	TIM_Clock_En(TIM_2);
@@ -162,12 +147,6 @@ void INITCFG_ConfigDMA()
 {
 	DMA_Clk_Enable(DMA1_ClkEN);
 	DMA_Clk_Enable(DMA2_ClkEN);
-	
-	DMA_Reset(DMA_ADC_IGBT_GATE_CH);
-	DMA_Interrupt(DMA_ADC_IGBT_GATE_CH, DMA_TRANSFER_COMPLETE, 0, true);
-	DMAChannelX_DataConfig(DMA_ADC_IGBT_GATE_CH, (uint32_t)(&MEMBUF_DMA_Vg[0]), (uint32_t)(&ADC2->DR), VALUES_GATE_DMA_SIZE);
-	DMAChannelX_Config(DMA_ADC_IGBT_GATE_CH, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
-			DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH);
 	
 	DMA_Reset(DMA_ADC_ID_CH);
 	DMA_Interrupt(DMA_ADC_ID_CH, DMA_TRANSFER_COMPLETE, 0, true);
