@@ -60,3 +60,9 @@ bool LL_SafetyIsActive()
 	return !GPIO_GetState(GPIO_SAFETY);
 }
 //------------------------------------
+
+void LL_SetIdRange(bool Range)
+{
+	GPIO_SetState(GPIO_ID_RANGE, Range);
+}
+//------------------------------------

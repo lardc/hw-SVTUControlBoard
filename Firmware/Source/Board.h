@@ -21,8 +21,8 @@ GPIO_PortPinSettingMacro GPIO_MSR_THYRISTOR_UG 		= {GPIOA, Pin_1};
 GPIO_PortPinSettingMacro GPIO_MSR_THYRISTOR_IG 		= {GPIOA, Pin_2};
 GPIO_PortPinSettingMacro GPIO_MSR_IGBT_UG 			= {GPIOA, Pin_7};
 GPIO_PortPinSettingMacro GPIO_MSR_UD 				= {GPIOB, Pin_13};
-GPIO_PortPinSettingMacro GPIO_MSR_ID_R0				= {GPIOB, Pin_12};
-GPIO_PortPinSettingMacro GPIO_MSR_ID_R1				= {GPIOB, Pin_14};
+GPIO_PortPinSettingMacro GPIO_MSR_ID				= {GPIOB, Pin_12};
+GPIO_PortPinSettingMacro GPIO_ID_RANGE				= {GPIOB, Pin_14};
 
 // Определения для выходных портов
 GPIO_PortPinSettingMacro GPIO_LED 				= {GPIOA, Pin_8};

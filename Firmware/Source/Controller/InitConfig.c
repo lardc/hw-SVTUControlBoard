@@ -28,8 +28,7 @@ void INITCFG_ConfigGPIO()
 	GPIO_InitAnalog(GPIO_MSR_THYRISTOR_IG);
 	GPIO_InitAnalog(GPIO_MSR_IGBT_UG);
 	GPIO_InitAnalog(GPIO_MSR_UD);
-	GPIO_InitAnalog(GPIO_MSR_ID_R0);
-	GPIO_InitAnalog(GPIO_MSR_ID_R1);
+	GPIO_InitAnalog(GPIO_MSR_ID);
 	
 	// Выходы
 	GPIO_InitPushPullOutput(GPIO_LED);
@@ -37,6 +36,7 @@ void INITCFG_ConfigGPIO()
 	GPIO_InitPushPullOutput(GPIO_AIN_ST);
 	GPIO_InitPushPullOutput(GPIO_SYNC_LCSU);
 	GPIO_InitPushPullOutput(GPIO_IND_CTRL);
+	GPIO_InitPushPullOutput(GPIO_ID_RANGE);
 
 	// Начальная установка состояний
 	GPIO_SetState(GPIO_LED, false);
@@ -44,6 +44,7 @@ void INITCFG_ConfigGPIO()
 	GPIO_SetState(GPIO_AIN_ST, false);
 	GPIO_SetState(GPIO_SYNC_LCSU, false);
 	GPIO_SetState(GPIO_IND_CTRL, false);
+	GPIO_SetState(GPIO_ID_RANGE, false);
 	
 	// Альтернативные функции
 	GPIO_InitAltFunction(GPIO_ALT_CAN_RX, AltFn_9);
@@ -92,7 +93,7 @@ void INITCFG_ConfigADC()
 	INITCFG_ConfigMasterADCChannel(ADC3, ADC3_UD_CH, ADC34_TIM1_TRGO);
 
 	// ADC4
-	INITCFG_ConfigSlaveADCChannel(ADC4, ADC4_ID_R0_CH);
+	INITCFG_ConfigSlaveADCChannel(ADC4, ADC4_ID_CH);
 
 	ADC_SamplingStart(ADC1);
 	ADC_SamplingStart(ADC3);
