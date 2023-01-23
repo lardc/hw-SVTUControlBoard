@@ -6,20 +6,20 @@
 #define ACT_DISABLE_POWER				2	// Отключение блока
 #define ACT_FAULT_CLEAR					3	// Очистка fault
 #define ACT_WARNING_CLEAR				4	// Очистка warning
-
-#define ACT_DBG_PULSE_ID_LOW_RANGE		10	// Импульс включения нижнего диапазона измерения Id
-#define ACT_DBG_PULSE_SYNC_SCPC			11	// Импульс синхронизации ячеек SCPC
-#define ACT_DBG_PULSE_IG				12	// Импульс включения подачи сигнала управления
-#define ACT_DBG_PULSE_SYNC_SCOPE		13	// Импульс синхронизации осциллографа
-
-
+//
+#define ACT_DBG_PULSE_V_GATE			10	// Импульс напряжения управления IGBT
+#define ACT_DBG_PULSE_SYNC_OSC			11	// Импульс синхронизации для осциллографа
+#define ACT_DBG_VIN_ST					12	// Переключение канала напряжения в режим самотестирования
+#define ACT_DBG_PULSE_SYNC_LCSU			13	// Импульс синхронизации LCSU
+#define ACT_DBG_EXT_INDICATION			14	// Управление внешней индикацией
+//
 #define ACT_START_TEST					100	// Запуск процесса измерения
 #define ACT_STOP_TEST					101	// Остановка процесса измерения
-
+//
 #define ACT_SAVE_TO_ROM					200	// Сохранение пользовательских данных во FLASH процессора
 #define ACT_RESTORE_FROM_ROM			201	// Восстановление данных из FLASH
 #define ACT_RESET_TO_DEFAULT			202	// Сброс DataTable в состояние по умолчанию
-
+//
 #define ACT_BOOT_LOADER_REQUEST			320	// Перезапуск процессора с целью перепрограммирования
 // -----------------------------
 
