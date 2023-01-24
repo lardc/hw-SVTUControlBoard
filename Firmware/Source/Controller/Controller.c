@@ -107,8 +107,9 @@ void CONTROL_ResetData()
 	DataTable[REG_PROBLEM] = PROBLEM_NONE;
 	DataTable[REG_OP_RESULT] = OPRESULT_NONE;
 
-	DataTable[REG_DUT_VOLTAGE] = 0;
-	DataTable[REG_DUT_CURRENT] = 0;
+	DataTable[REG_RESULT_VD] = 0;
+	DataTable[REG_RESULT_ID] = 0;
+	DataTable[REG_RESULT_VG] = 0;
 
 	DataTable[REG_BHL_ERROR_CODE] = 0;
 	DataTable[REG_BHL_DEVICE] = 0;
@@ -336,7 +337,7 @@ void CONTROL_HandlePulse()
 				
 			case SS_ConfigPulse:
 				{
-					float CurrentAmplitude = SelfTest ? DataTable[REG_CURRENT_MAX] : LOGIC_GetCurrentSetpoint();
+					float CurrentAmplitude = SelfTest ? DataTable[REG_ID_MAX] : LOGIC_GetCurrentSetpoint();
 
 					if(LOGIC_DistributeCurrent(CurrentAmplitude))
 					{
@@ -434,13 +435,13 @@ void CONTROL_HandlePulse()
 
 Int16U CONTROL_CheckSelfTestResults()
 {
-	if(DataTable[REG_GATE_VOLTAGE] / DataTable[REG_GATE_VOLTAGE_SETPOINT] * 100 > SELFTEST_ALLOWED_ERROR)
+	if(DataTable[REG_RESULT_VG] / DataTable[REG_VG_SETPOINT] * 100 > SELFTEST_ALLOWED_ERROR)
 		return DF_SELFTEST_GATE;
 
-	if(DataTable[REG_DUT_CURRENT] / DataTable[REG_CURRENT_MAX] * 100 > SELFTEST_ALLOWED_ERROR)
+	if(DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX] * 100 > SELFTEST_ALLOWED_ERROR)
 		return DF_SELFTEST_CURRENT;
 
-	if(DataTable[REG_DUT_VOLTAGE] / (DataTable[REG_DUT_CURRENT] * DataTable[REG_R_SHUNT]) * 100 > SELFTEST_ALLOWED_ERROR)
+	if(DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT]) * 100 > SELFTEST_ALLOWED_ERROR)
 		return DF_SELFTEST_VOLTAGE;
 
 	return 0;

@@ -48,14 +48,14 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U Reg
 
 void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength)
 {
-	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_OFFSET, REG_VD_K, REG_VD_P0, REG_VD_P1,
+	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_B, REG_VD_K, REG_VD_P0, REG_VD_P1,
 			REG_VD_P2, 0);
 }
 //------------------------------------
 
 void MEASURE_ConvertVg(pFloat32 InputArray, Int16U DataLength)
 {
-	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VG_OFFSET, REG_VG_K, REG_VG_P0, REG_VG_P1,
+	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VG_B, REG_VG_K, REG_VG_P0, REG_VG_P1,
 			REG_VG_P2, 0);
 }
 //------------------------------------
@@ -65,9 +65,9 @@ void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRan
 	float RShunt = DataTable[REG_R_SHUNT] / 1000;
 
 	if(CurrentRange)
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_OFFSET, REG_ID_K, REG_ID_P0, REG_ID_P1, REG_ID_P2, RShunt);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_R1_B, REG_ID_R1_K, REG_ID_R1_P0, REG_ID_R1_P1, REG_ID_R1_P2, RShunt);
 	else
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_IDL_OFFSET, REG_IDL_K, REG_IDL_P0, REG_IDL_P1, REG_IDL_P2, RShunt);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_R0_B, REG_ID_R0_K, REG_ID_R0_P0, REG_ID_R0_P1, REG_ID_R0_P2, RShunt);
 }
 //------------------------------------
 
@@ -79,7 +79,7 @@ float MEASURE_Vg(Int16U SampleADC)
 	float P1 = DataTable[REG_VG_P1];
 	float P0 = DataTable[REG_VG_P0];
 	float K = DataTable[REG_VG_K];
-	float B = DataTable[REG_VG_OFFSET];
+	float B = DataTable[REG_VG_B];
 
 	Voltage = SampleADC * K + B;
 	Voltage = Voltage * Voltage * P2 + Voltage * P1 + P0;

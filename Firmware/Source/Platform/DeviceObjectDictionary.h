@@ -15,6 +15,7 @@
 //
 #define ACT_START_TEST					100	// Запуск процесса измерения
 #define ACT_STOP_TEST					101	// Остановка процесса измерения
+//
 #define ACT_START_SELF_TEST				105	// Запуск самотестирования
 //
 #define ACT_SAVE_TO_ROM					200	// Сохранение пользовательских данных во FLASH процессора
@@ -26,63 +27,63 @@
 
 // Регистры
 // Сохраняемые регистры
-#define REG_R_SHUNT						0	// Сопротивление шунта (в мкОм)
-#define REG_I_LOW_RANGE_LIMIT			1	// Граница нижнего диапазона тока (в А)
+#define REG_ID_R0_P2					0	// Диапазон 0 - Коэффициент точной корректировки Id P2
+#define REG_ID_R0_P1					1	// Диапазон 0 - Коэффициент точной корректировки Id P1
+#define REG_ID_R0_P0					2	// Диапазон 0 - Коэффициент точной корректировки Id P0
+#define REG_ID_R0_K						3	// Диапазон 0 - Коэффициент пересчёта напряжения АЦП в Id
+#define REG_ID_R0_B						4	// Диапазон 0 - Смещение оцифрованного Id
+//
+#define REG_ID_R1_P2					5	// Диапазон 1 - Коэффициент точной корректировки Id P2
+#define REG_ID_R1_P1					6	// Диапазон 1 - Коэффициент точной корректировки Id P1
+#define REG_ID_R1_P0					7	// Диапазон 1 - Коэффициент точной корректировки Id P0
+#define REG_ID_R1_K						8	// Диапазон 1 - Коэффициент пересчёта напряжения АЦП в Id
+#define REG_ID_R1_B						9	// Диапазон 1 - Смещение оцифрованного Id
+//
+#define REG_VD_P2						10	// Коэффициент точной корректировки Vd P2
+#define REG_VD_P1						11	// Коэффициент точной корректировки Vd P1
+#define REG_VD_P0						12	// Коэффициент точной корректировки Vd P0
+#define REG_VD_K						13	// Коэффициент пересчёта напряжения АЦП в Vd
+#define REG_VD_B						14	// Смещение оцифрованного Vd
+//
+#define REG_VG_P2						15	// Коэффициент точной корректировки Vg P2
+#define REG_VG_P1						16	// Коэффициент точной корректировки Vg P1
+#define REG_VG_P0						17	// Коэффициент точной корректировки Vg P0
+#define REG_VG_K						18	// Коэффициент пересчёта напряжения АЦП в Vg
+#define REG_VG_B						19	// Смещение оцифрованного Vg
+//
+#define REG_VG_SET_P2					20	// Коэффициент точной корректировки Vg P2
+#define REG_VG_SET_P1					21	// Коэффициент точной корректировки Vg P1
+#define REG_VG_SET_P0					22	// Коэффициент точной корректировки Vg P0
+#define REG_VG_SET_K					23	// Коэффициент преобразованиия Vg в ЦАП
+#define REG_VG_SET_B					24	// Смещение при преобразовании Vg в ЦАП
+//
+#define REG_ISET_P2						25	// Коэффициент точной корректировки задания прямого тока P2
+#define REG_ISET_P1						26	// Коэффициент точной корректировки задания прямого тока P1
+#define REG_ISET_P0						27	// Коэффициент точной корректировки задания прямого тока P0
+//
+#define REG_REGULATOR_QP				28	// Пропорциональный коэффициент регулятора
+#define REG_REGULATOR_QI				29	// Интегральный коэффициент регулятора
+#define REG_REGULATOR_QI_MAX			30	// Максимальное значение интегрального коэффициента регулятора
+#define REG_REGULATOR_ALLOWED_ERR		31	// Максимально допустимая ошибка регулятора
+#define REG_FOLLOWING_ERR_CNT			32	// Максимальное значение счетчика FollowingError
+#define REG_FOLLOWING_ERR_MUTE			33	// Выключение слежения за FollowingError
+//
+#define REG_LCSU_MAX_CURRENT			34	// Максимальный ток с одного LCSU (в А)
+#define REG_LCSU_START_NID				35	// Стартовое значение NodeID для первого LCSU
+#define REG_LCSU_LONG_TIMEOUT			36	// Длинный таймаут по операциям с LCSU (в мс)
+#define REG_VG_EDGE_TIME				37	// Длительность фронта импульса управления (мкс)
+#define REG_LAMP_CTRL					38	// Запрет управление блоком внешнего индикатора
+#define REG_R_SHUNT						39	// Сопротивление шунта (в мкОм)
+#define REG_I_R0_THRESHOLD				40	// Граница нижнего диапазона тока (в А)
 
-#define REG_IDL_OFFSET					2	// Смещение оцифрованного Id (нижний диапазон) (в тиках)
-#define REG_IDL_K						3	// Коэффициент пересчёта напряжения АЦП (в мВ) в Id (нижний диапазон) (в А) х1000
-#define REG_IDL_P0						4	// Полином точной корректировки Id (нижний диапазон) P0 (в А)
-#define REG_IDL_P1						5	// Полином точной корректировки Id (нижний диапазон) P1 x1000
-#define REG_IDL_P2						6	// Полином точной корректировки Id (нижний диапазон) P2 x1e6
 
-#define REG_ID_OFFSET					7	// Смещение оцифрованного Id (в тиках)
-#define REG_ID_K						8	// Коэффициент пересчёта напряжения АЦП (в мВ) в Id (в А) х1000
-#define REG_ID_P0						9	// Полином точной корректировки Id P0 (в А)
-#define REG_ID_P1						10	// Полином точной корректировки Id P1 x1000
-#define REG_ID_P2						11	// Полином точной корректировки Id P2 x1e6
-
-#define REG_VD_OFFSET					12	// Смещение оцифрованного Vd (в тиках)
-#define REG_VD_K						13	// Коэффициент пересчёта напряжения АЦП (в мВ) в Vd (в мВ) х1000
-#define REG_VD_P0						14	// Полином точной корректировки Vd P0 (в мВ)
-#define REG_VD_P1						15	// Полином точной корректировки Vd P1 x1000
-#define REG_VD_P2						16	// Полином точной корректировки Vd P2 x1e6
-
-#define REG_VG_OFFSET					22	// Смещение оцифрованного Vg (в тиках)
-#define REG_VG_K						23	// Коэффициент пересчёта напряжения АЦП (в мВ) в Vg (в мВ) х1000
-#define REG_VG_P0						24	// Полином точной корректировки Vg P0 (в мВ)
-#define REG_VG_P1						25	// Полином точной корректировки Vg P1 x1000
-#define REG_VG_P2						26	// Полином точной корректировки Vg P2 x1e6
-
-#define REG_LCSU_MAX_CURRENT			31	// Максимальный ток с одной силовой ячейки (в А)
-#define REG_LCSU_START_NID				32	// Стартовое значение NodeID для первой силовой ячейки
-#define REG_LCSU_LONG_TIMEOUT			33	// Длинный таймаут по операциям с ячейками (в мс)
-
-#define REG_ISET_P0						41	// Полином точной корректировки задания прямого тока P0 (в А)
-#define REG_ISET_P1						42	// Полином точной корректировки задания прямого тока P1 х1000
-#define REG_ISET_P2						43	// Полином точной корректировки задания прямого тока P2 х1е6
-
-#define REG_VG_SET_OFFSET				50	// Смещение при преобразовании Vg -> DAC
-#define REG_VG_SET_K					51	// Коэффициент преобразованиия Vg -> DAC
-#define REG_VG_SET_P0					52	// Полином точной корректировки Vg P0 (в мВ)
-#define REG_VG_SET_P1					53	// Полином точной корректировки Vg P1 x1000
-#define REG_VG_SET_P2					54	// Полином точной корректировки Vg P2 x1e6
-
-#define REG_VG_EDGE_TIME				62
-#define REG_LAMP_CTRL					63
-
-#define REG_REGULATOR_QP				65
-#define REG_REGULATOR_QI				66
-#define REG_REGULATOR_QI_MAX			67
-#define REG_REGULATOR_ALLOWED_ERR		68
-#define REG_FOLLOWING_ERR_CNT			69
-#define REG_FOLLOWING_ERR_MUTE			70
 
 // Несохраняемы регистры чтения-записи
-#define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
-#define REG_GATE_VOLTAGE_SETPOINT		141
-#define REG_TRAPEZE_DURATION			142	// Длительность трапецеидального импульса тока (мс)
-
-#define REG_DBG							160	// Отладочный регистр
+#define REG_ID_SETPOINT					128	// Уставка силового тока (в А)
+#define REG_VG_SETPOINT					129	// Уставка напряжения управления (в В)
+#define REG_PULSE_DURATION				130	// Длительность импульса тока (мс)
+//
+#define REG_DBG							150	// Отладочный регистр
 
 // Регистры только чтение
 #define REG_DEV_STATE					192	// Регистр состояния
@@ -93,19 +94,19 @@
 #define REG_OP_RESULT					197	// Регистр результата операции
 #define REG_SELF_TEST_OP_RESULT			198	// Регистр результата самотестирования
 #define REG_SUB_STATE					199	// Регистр вспомогательного состояния
-
-#define REG_DUT_VOLTAGE					198	// Измеренное значение прямого напряжения (в мВ)
-#define REG_DUT_CURRENT					206	// Измеренное значение прямого тока (в А)
-#define REG_GATE_VOLTAGE				202	// Измеренное значение напряжения в цепи управления (в мВ)
-
+//
+#define REG_RESULT_VD					200	// Измеренное значение прямого напряжения (в мВ)
+#define REG_RESULT_ID					201	// Измеренное значение прямого тока (в А)
+#define REG_RESULT_VG					202	// Измеренное значение напряжения цепи управления (в мВ)
+//
+#define REG_LCSU_DETECTED				205	// Обнаруженное количество силовых ячеек
+#define REG_ID_MAX						206	// Максимальный ток, получаемый с установки (в А)
+//
 #define REG_BHL_ERROR_CODE				210	// Ошибка интерфейса ВУ: код ошибки
 #define REG_BHL_DEVICE					211	// Ошибка интерфейса ВУ: NID устройства
 #define REG_BHL_FUNCTION				212	// Ошибка интерфейса ВУ: код функции
 #define REG_BHL_EXT_DATA				213	// Ошибка интерфейса ВУ: расширенная информация
-
-#define REG_TOTAL_LCSU					207	// Обнаруженное количество силовых ячеек
-#define REG_CURRENT_MAX					225	// Максимальный ток, получаемый с установки (в А)
-
+//
 #define REG_FWINFO_SLAVE_NID			256	// Device CAN slave node ID
 #define REG_FWINFO_MASTER_NID			257	// Device CAN master node ID (if presented)
 // 258 - 259
@@ -146,21 +147,21 @@
 #define OPRESULT_FAIL					2	// Operation failed
 
 // Fault and disable codes
-#define DF_NONE							0
-#define DF_INTERFACE					1
-#define DF_LCSU_UNEXPECTED_STATE		2
-#define DF_LCSU_STATE_TIMEOUT			3
-#define DF_LCSU_CURRENT_CONFIG			4
-#define DF_GATE_VOLTAGE					5
-#define DF_SELFTEST_GATE				6
-#define DF_SELFTEST_VOLTAGE				7
-#define DF_SELFTEST_CURRENT				8
+#define DF_NONE							0	// Ошибок нет
+#define DF_INTERFACE					1	// Нет ответа от LCSU
+#define DF_LCSU_UNEXPECTED_STATE		2	// Не корректное состояние LCSU
+#define DF_LCSU_STATE_TIMEOUT			3	// Таймаут смены состояния LCSU
+#define DF_LCSU_CURRENT_CONFIG			4	// Ошибка конфигурации LCSU
+#define DF_GATE_VOLTAGE					5	// Ошибка формирования напряжения управления
+#define DF_SELFTEST_GATE				6	// Ошибка формирования напряжения управления в режиме самотестирования
+#define DF_SELFTEST_VOLTAGE				7	// Ошибка измерения напряжения в режиме самотестирования
+#define DF_SELFTEST_CURRENT				8	// Ошибка измерения тока в режиме самотестирования
 
 // Warning
-#define WARNING_NONE					0
-#define WARNING_VOLTAGE_OUT_OF_RANGE	1
-#define WARNING_CURRENT_OUT_OF_RANGE	2
-#define WARNING_SAFETY					3
+#define WARNING_NONE					0	// Предупреждений нет
+#define WARNING_VOLTAGE_OUT_OF_RANGE	1	// Измеренное напряжение вне рабочего диапазона
+#define WARNING_CURRENT_OUT_OF_RANGE	2	// Измеренный ток вне рабочего диапазона
+#define WARNING_SAFETY					3	// Сработала система безопасности
 
 // Problem
 #define PROBLEM_NONE					0

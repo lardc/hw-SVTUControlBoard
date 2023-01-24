@@ -36,7 +36,7 @@ void GATE_SaveToEndpoints(float Voltage, float Error);
 //
 Int16U GATE_ConvertVgToDAC(float Value)
 {
-	float Offset = DataTable[REG_VG_SET_OFFSET];
+	float Offset = DataTable[REG_VG_SET_B];
 	float K = DataTable[REG_VG_SET_K];
 	
 	float P0 = DataTable[REG_VG_SET_P0];
@@ -88,7 +88,7 @@ void GATE_CacheVariables()
 	RegulatorQp = DataTable[REG_REGULATOR_QP];
 	RegulatorQi = DataTable[REG_REGULATOR_QI];
 	RegulatorQimax = DataTable[REG_REGULATOR_QI_MAX];
-	GateVoltageSetpoint = DataTable[REG_GATE_VOLTAGE_SETPOINT];
+	GateVoltageSetpoint = DataTable[REG_VG_SETPOINT];
 	dVg = DataTable[REG_VG_EDGE_TIME] / TIMER2_uS;
 	RegulatorAlowedError = DataTable[REG_REGULATOR_ALLOWED_ERR];
 	FollowingErrorCounterMax = (Int16U)DataTable[REG_FOLLOWING_ERR_CNT];

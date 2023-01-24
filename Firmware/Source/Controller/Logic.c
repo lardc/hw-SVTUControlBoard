@@ -60,8 +60,8 @@ bool LOGIC_FindLCSU()
 			BHL_ResetError();
 	}
 	
-	DataTable[REG_TOTAL_LCSU] = ActiveLCSUCounter;
-	DataTable[REG_CURRENT_MAX] = CachedLCSUMaxCurrent * ActiveLCSUCounter;
+	DataTable[REG_LCSU_DETECTED] = ActiveLCSUCounter;
+	DataTable[REG_ID_MAX] = CachedLCSUMaxCurrent * ActiveLCSUCounter;
 	
 	return ActiveLCSUCounter;
 }
@@ -209,7 +209,7 @@ bool LOGIC_DistributeCurrent(float Current)
 			else
 				LCSU_DataArray[i].Current = Current;
 
-			LCSU_DataArray[i].PulseDuration = DataTable[REG_TRAPEZE_DURATION];
+			LCSU_DataArray[i].PulseDuration = DataTable[REG_PULSE_DURATION];
 		}
 	}
 	
@@ -223,7 +223,7 @@ float LOGIC_GetCurrentSetpoint()
 	float P1 = DataTable[REG_ISET_P1];
 	float P2 = DataTable[REG_ISET_P2];
 	
-	float current = DataTable[REG_CURRENT_SETPOINT];
+	float current = DataTable[REG_ID_SETPOINT];
 	current = current * current * P2 + current * P1 + P0;
 
 	return (current > 0) ? current : 0;
@@ -242,7 +242,7 @@ void LOGIC_ResetLCSUCurrent()
 
 void LOGIC_SelectCurrentRange(float Current)
 {
-	(Current <= DataTable[REG_I_LOW_RANGE_LIMIT]) ? LL_SetIdRange(false) : LL_SetIdRange(true);
+	(Current <= DataTable[REG_I_R0_THRESHOLD]) ? LL_SetIdRange(false) : LL_SetIdRange(true);
 }
 // ----------------------------------------
 
@@ -293,14 +293,14 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	DataTable[REG_GATE_VOLTAGE] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_EP_Vg, VALUES_x_SIZE);
-	DataTable[REG_DUT_CURRENT] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
-	DataTable[REG_DUT_VOLTAGE] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
+	DataTable[REG_RESULT_VD] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_EP_Vg, VALUES_x_SIZE);
+	DataTable[REG_RESULT_ID] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
+	DataTable[REG_RESULT_VG] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
 
-	if((DataTable[REG_DUT_VOLTAGE] > VOLTAGE_MAX_VALUE) || (DataTable[REG_DUT_VOLTAGE] < VOLTAGE_MIN_VALUE))
+	if((DataTable[REG_RESULT_VD] > VOLTAGE_MAX_VALUE) || (DataTable[REG_RESULT_VD] < VOLTAGE_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
 
-	if((DataTable[REG_DUT_CURRENT] > CURRENT_MAX_VALUE) || (DataTable[REG_DUT_CURRENT] < CURRENT_MIN_VALUE))
+	if((DataTable[REG_RESULT_ID] > CURRENT_MAX_VALUE) || (DataTable[REG_RESULT_ID] < CURRENT_MIN_VALUE))
 			DataTable[REG_WARNING] = WARNING_CURRENT_OUT_OF_RANGE;
 }
 // ----------------------------------------
