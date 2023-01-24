@@ -27,9 +27,11 @@ typedef enum __SubState
 	SS_WaitPulsePause = 4,
 	SS_ConfigPulse = 5,
 	SS_WaitConfig = 6,
-	SS_PostPulseCheck = 7,
+	SS_GateVoltageProcess = 7,
+	SS_CurrentPulseProcess = 8,
+	SS_PostPulseCheck = 9,
 
-	SS_PowerOff = 8
+	SS_PowerOff = 10
 } SubState;
 
 // Variables
@@ -122,8 +124,9 @@ void CONTROL_ResetHardware()
 	LL_SyncScope(false);
 	LL_AnalogInputsSelftTest(false);
 	LL_ExtIndication(false);
+	LL_SetIdRange(false);
 
-	GATE_SetVg(0);
+	GATE_StopProcess();
 }
 //-----------------------------------------------
 
@@ -135,7 +138,6 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 	{
 		case ACT_ENABLE_POWER:
 			{
-				LOGIC_FindLCSU();
 				if(CONTROL_State == DS_None)
 					CONTROL_SetDeviceState(DS_InProcess, SS_PowerOn);
 				else if(CONTROL_State != DS_Ready)
@@ -348,14 +350,31 @@ void CONTROL_HandlePulse()
 				{
 					if(LOGIC_AreLCSUInStateX(LCSU_PulseConfigReady))
 					{
-						LOGIC_ProcessPulse();
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+						GATE_StartProcess();
+						Timeout = CONTROL_TimeCounter + TIME_VG_STAB;
+
+						CONTROL_SetDeviceState(DS_InProcess, SS_GateVoltageProcess);
 					}
 					else
 						CONTROL_HandleFaultLCSUEvents(Timeout);
 				}
 				break;
 				
+			case SS_GateVoltageProcess:
+				if(GATE_WaitingVoltage())
+					CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseProcess);
+				else
+				{
+					if(CONTROL_TimeCounter >= Timeout)
+						CONTROL_SwitchToFault(DF_GATE_VOLTAGE);
+				}
+				break;
+
+			case SS_CurrentPulseProcess:
+				LOGIC_ProcessPulse();
+				CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+				break;
+
 			case SS_PostPulseCheck:
 				{
 					CONTROL_SaveDataToEndpoint();
