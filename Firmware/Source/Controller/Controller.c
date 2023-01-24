@@ -39,6 +39,7 @@ DeviceState CONTROL_State = DS_None;
 static Boolean CycleActive = false;
 SubState SUB_State = SS_None;
 bool IsImpulse = false;
+bool SelfTest = false;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
 volatile Int64U CONTROL_TimeCounter = 0;
@@ -57,6 +58,7 @@ void CONTROL_HandlePulse();
 void CONTROL_HandlePowerOff();
 void CONTROL_SaveDataToEndpoint();
 void CONTROL_SaveResults();
+Int16U CONTROL_CheckSelfTestResults();
 
 // Functions
 //
@@ -182,6 +184,19 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 			}
 			break;
 			
+		case ACT_START_SELF_TEST:
+			{
+				if(CONTROL_State == DS_Ready)
+				{
+					SelfTest = true;
+					DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_NONE;
+					CONTROL_SetDeviceState(DS_InProcess, SS_PulseInit);
+				}
+				else
+					*pUserError = ERR_DEVICE_NOT_READY;
+			}
+			break;
+
 		default:
 			return DIAG_HandleDiagnosticAction(ActionID, pUserError);
 	}
@@ -321,12 +336,13 @@ void CONTROL_HandlePulse()
 				
 			case SS_ConfigPulse:
 				{
-					float CurrentAmplitude = LOGIC_GetCurrentSetpoint();
+					float CurrentAmplitude = SelfTest ? DataTable[REG_CURRENT_MAX] : LOGIC_GetCurrentSetpoint();
 
 					if(LOGIC_DistributeCurrent(CurrentAmplitude))
 					{
 						bool NoError = false;
 						LOGIC_SelectCurrentRange(CurrentAmplitude);
+						LL_AnalogInputsSelftTest(SelfTest);
 						
 						if(LOGIC_WriteLCSUConfig())
 						{
@@ -373,8 +389,9 @@ void CONTROL_HandlePulse()
 
 			case SS_CurrentPulseProcess:
 				IsImpulse = true;
-
 				LOGIC_ProcessPulse();
+				IsImpulse = false;
+
 				CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
 				break;
 
@@ -382,8 +399,27 @@ void CONTROL_HandlePulse()
 				{
 					CONTROL_SaveDataToEndpoint();
 					CONTROL_SaveResults();
-					DataTable[REG_OP_RESULT] = OPRESULT_OK;
-					IsImpulse = false;
+
+					if(SelfTest)
+					{
+						SelfTest = false;
+						LL_AnalogInputsSelftTest(SelfTest);
+
+						Int16U SelfTestResult = CONTROL_CheckSelfTestResults();
+
+						if(SelfTestResult)
+						{
+							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
+							CONTROL_SwitchToFault(SelfTestResult);
+						}
+						else
+						{
+							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_OK;
+							CONTROL_SetDeviceState(DS_Ready, SS_None);
+						}
+					}
+					else
+						DataTable[REG_OP_RESULT] = OPRESULT_OK;
 
 					CONTROL_SetDeviceState(DS_Ready, SS_None);
 				}
@@ -393,6 +429,21 @@ void CONTROL_HandlePulse()
 				break;
 		}
 	}
+}
+//-----------------------------------------------
+
+Int16U CONTROL_CheckSelfTestResults()
+{
+	if(DataTable[REG_GATE_VOLTAGE] / DataTable[REG_GATE_VOLTAGE_SETPOINT] * 100 > SELFTEST_ALLOWED_ERROR)
+		return DF_SELFTEST_GATE;
+
+	if(DataTable[REG_DUT_CURRENT] / DataTable[REG_CURRENT_MAX] * 100 > SELFTEST_ALLOWED_ERROR)
+		return DF_SELFTEST_CURRENT;
+
+	if(DataTable[REG_DUT_VOLTAGE] / (DataTable[REG_DUT_CURRENT] * DataTable[REG_R_SHUNT]) * 100 > SELFTEST_ALLOWED_ERROR)
+		return DF_SELFTEST_VOLTAGE;
+
+	return 0;
 }
 //-----------------------------------------------
 

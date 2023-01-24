@@ -15,6 +15,7 @@
 //
 #define ACT_START_TEST					100	// Запуск процесса измерения
 #define ACT_STOP_TEST					101	// Остановка процесса измерения
+#define ACT_START_SELF_TEST				105	// Запуск самотестирования
 //
 #define ACT_SAVE_TO_ROM					200	// Сохранение пользовательских данных во FLASH процессора
 #define ACT_RESTORE_FROM_ROM			201	// Восстановление данных из FLASH
@@ -171,6 +172,9 @@
 #define DF_LCSU_STATE_TIMEOUT			3
 #define DF_LCSU_CURRENT_CONFIG			4
 #define DF_GATE_VOLTAGE					5
+#define DF_SELFTEST_GATE				6
+#define DF_SELFTEST_VOLTAGE				7
+#define DF_SELFTEST_CURRENT				8
 
 // Warning
 #define WARNING_NONE					0

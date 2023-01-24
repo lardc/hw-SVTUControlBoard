@@ -38,6 +38,9 @@
 #define CURRENT_MIN_VALUE			30				// Минимальное измеряемое значение тока
 #define CURRENT_MAX_VALUE			1800			// Максимальное измеряемое значение тока
 
+// Различные параметры
+#define SELFTEST_ALLOWED_ERROR		10				// Допустимое отключение параметров режима самотестирования
+
 // Параметры DMA
 #define VALUES_POWER_DMA_SIZE		1000
 

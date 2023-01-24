@@ -269,6 +269,7 @@ void LOGIC_ProcessPulse()
 
 	LL_SyncLCSU(false);
 	LL_SyncScope(false);
+	GATE_StopProcess();
 
 	// Пересчёт значений
 	MEASURE_ConvertVd((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
