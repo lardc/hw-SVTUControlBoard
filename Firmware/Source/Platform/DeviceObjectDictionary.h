@@ -153,9 +153,8 @@
 #define DF_LCSU_STATE_TIMEOUT			3	// Таймаут смены состояния LCSU
 #define DF_LCSU_CURRENT_CONFIG			4	// Ошибка конфигурации LCSU
 #define DF_GATE_VOLTAGE					5	// Ошибка формирования напряжения управления
-#define DF_SELFTEST_GATE				6	// Ошибка формирования напряжения управления в режиме самотестирования
-#define DF_SELFTEST_VOLTAGE				7	// Ошибка измерения напряжения в режиме самотестирования
-#define DF_SELFTEST_CURRENT				8	// Ошибка измерения тока в режиме самотестирования
+#define DF_SELFTEST_VD					6	// Ошибка измерения напряжения в режиме самотестирования
+#define DF_SELFTEST_ID					7	// Ошибка измерения тока в режиме самотестирования
 
 // Warning
 #define WARNING_NONE					0	// Предупреждений нет

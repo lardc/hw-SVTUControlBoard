@@ -439,14 +439,11 @@ void CONTROL_HandlePulse()
 
 Int16U CONTROL_CheckSelfTestResults()
 {
-	if(DataTable[REG_RESULT_VG] / DataTable[REG_VG_SETPOINT] * 100 > SELFTEST_ALLOWED_ERROR)
-		return DF_SELFTEST_GATE;
-
 	if(DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX] * 100 > SELFTEST_ALLOWED_ERROR)
-		return DF_SELFTEST_CURRENT;
+		return DF_SELFTEST_ID;
 
 	if(DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT]) * 100 > SELFTEST_ALLOWED_ERROR)
-		return DF_SELFTEST_VOLTAGE;
+		return DF_SELFTEST_VD;
 
 	return 0;
 }
