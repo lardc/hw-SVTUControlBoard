@@ -24,8 +24,6 @@ void INITCFG_ConfigGPIO()
 	RCC_GPIO_Clk_EN(PORTB);
 	
 	// Аналоговые входы
-	GPIO_InitAnalog(GPIO_MSR_THYRISTOR_UG);
-	GPIO_InitAnalog(GPIO_MSR_THYRISTOR_IG);
 	GPIO_InitAnalog(GPIO_MSR_IGBT_UG);
 	GPIO_InitAnalog(GPIO_MSR_UD);
 	GPIO_InitAnalog(GPIO_MSR_ID);
@@ -51,8 +49,6 @@ void INITCFG_ConfigGPIO()
 	GPIO_InitAltFunction(GPIO_ALT_CAN_TX, AltFn_9);
 	GPIO_InitAltFunction(GPIO_ALT_UART_RX, AltFn_7);
 	GPIO_InitAltFunction(GPIO_ALT_UART_TX, AltFn_7);
-	GPIO_InitAltFunction(GPIO_ALT_SPI1_CLK, AltFn_5);
-	GPIO_InitAltFunction(GPIO_ALT_SPI1_MOSI, AltFn_5);
 }
 //------------------------------------
 
