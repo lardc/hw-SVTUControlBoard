@@ -32,10 +32,11 @@
 
 // Предельный измеряемые значения
 #define VOLTAGE_MIN_VALUE			500				// Минимальное измеряемое напряжение
-#define VOLTAGE_MAX_VALUE			5000				// Максимальное измеряемое напряжение
+#define VOLTAGE_MAX_VALUE			5000			// Максимальное измеряемое напряжение
+#define CURRENT_MIN_VALUE			30				// Минимальное измеряемое значение тока
+#define CURRENT_MAX_VALUE			1800			// Максимальное измеряемое значение тока
 
 // Параметры DMA
 #define VALUES_POWER_DMA_SIZE		1000
-#define VALUES_GATE_DMA_SIZE		3
 
 #endif // __GLOBAL_H

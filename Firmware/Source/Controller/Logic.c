@@ -224,7 +224,6 @@ float LOGIC_GetCurrentSetpoint()
 	float P2 = DataTable[REG_ISET_P2];
 	
 	float current = DataTable[REG_CURRENT_SETPOINT];
-	current = current * (100 + DataTable[REG_CURRENT_OVERSHOOT]) / 100;
 	current = current * current * P2 + current * P1 + P0;
 
 	return (current > 0) ? current : 0;
@@ -251,10 +250,8 @@ void LOGIC_ProcessPulse()
 {
 	// Подготовка оцифровки
 	IT_DMAFlagsReset();
-	DMA_ChannelReload(DMA_ADC_IGBT_GATE_CH, VALUES_GATE_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_ID_CH, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_VD_CH, VALUES_POWER_DMA_SIZE);
-	DMA_ChannelEnable(DMA_ADC_IGBT_GATE_CH, true);
 	DMA_ChannelEnable(DMA_ADC_ID_CH, true);
 	DMA_ChannelEnable(DMA_ADC_VD_CH, true);
 
@@ -271,11 +268,11 @@ void LOGIC_ProcessPulse()
 	TIM_Stop(TIM1);
 
 	LL_SyncLCSU(false);
+	LL_SyncScope(false);
 
 	// Пересчёт значений
 	MEASURE_ConvertVd((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
-	MEASURE_ConvertIdLow((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
-	MEASURE_ConvertVg((pFloat32)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
+	MEASURE_ConvertId((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE, LL_IdGetRange());
 }
 // ----------------------------------------
 
@@ -295,20 +292,14 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	float Current;
-
-	DataTable[REG_GATE_VOLTAGE] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
-	//
-	Current = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
-
-	if(DataTable[REG_CURRENT_OVERSHOOT])
-		Current = Current / ((float)(100 + DataTable[REG_CURRENT_OVERSHOOT]) / 100);
-
-	DataTable[REG_DUT_CURRENT] = Current;
-	//
-	DataTable[REG_DUT_VOLTAGE] = MEASURE_ExtractVoltage((pFloat32)MEMBUF_DMA_Vd, (pFloat32)MEMBUF_DMA_Id, Current, VALUES_POWER_DMA_SIZE);
+	DataTable[REG_GATE_VOLTAGE] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_EP_Vg, VALUES_x_SIZE);
+	DataTable[REG_DUT_CURRENT] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
+	DataTable[REG_DUT_VOLTAGE] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
 
 	if((DataTable[REG_DUT_VOLTAGE] > VOLTAGE_MAX_VALUE) || (DataTable[REG_DUT_VOLTAGE] < VOLTAGE_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
+
+	if((DataTable[REG_DUT_CURRENT] > CURRENT_MAX_VALUE) || (DataTable[REG_DUT_CURRENT] < CURRENT_MIN_VALUE))
+			DataTable[REG_WARNING] = WARNING_CURRENT_OUT_OF_RANGE;
 }
 // ----------------------------------------

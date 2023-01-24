@@ -25,12 +25,6 @@ void LL_SyncScope(bool State)
 }
 //------------------------------------
 
-bool LL_SyncScopeGetState()
-{
-	return GPIO_GetState(GPIO_SYNC_OSC);
-}
-//------------------------------------
-
 void LL_AnalogInputsSelftTest(bool State)
 {
 	GPIO_SetState(GPIO_AIN_ST, State);
@@ -64,5 +58,11 @@ bool LL_SafetyIsActive()
 void LL_SetIdRange(bool Range)
 {
 	GPIO_SetState(GPIO_ID_RANGE, Range);
+}
+//------------------------------------
+
+bool LL_IdGetRange()
+{
+	return GPIO_GetState(GPIO_SYNC_OSC);
 }
 //------------------------------------
