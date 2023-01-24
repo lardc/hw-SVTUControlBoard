@@ -4,7 +4,7 @@
 #include "stdinc.h"
 
 // Flash loader options
-#define BOOT_LOADER_VARIABLE			(*((volatile uint32_t *)0x20000000))
+#define BOOT_LOADER_VARIABLE			(*((volatile Int32U *)0x20000000))
 #define BOOT_LOADER_REQUEST				0x12345678
 #define BOOT_LOADER_MAIN_PR_ADDR		0x08008000
 //-----------------------------------------------

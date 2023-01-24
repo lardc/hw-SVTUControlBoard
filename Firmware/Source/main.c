@@ -5,7 +5,7 @@
 int main()
 {
 	__disable_irq();
-	SCB->VTOR = (uint32_t)BOOT_LOADER_MAIN_PR_ADDR;
+	SCB->VTOR = (Int32U)BOOT_LOADER_MAIN_PR_ADDR;
 	__enable_irq();
 	
 	// Настройка аппаратной периферии

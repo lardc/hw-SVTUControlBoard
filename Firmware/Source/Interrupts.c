@@ -80,7 +80,7 @@ void USB_LP_CAN_RX0_IRQHandler()
 
 void TIM3_IRQHandler()
 {
-	static uint16_t LED_BlinkTimeCounter = 0;
+	static Int16U LED_BlinkTimeCounter = 0;
 	
 	if(TIM_StatusCheck(TIM3))
 	{

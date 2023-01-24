@@ -259,7 +259,7 @@ void CONTROL_WatchDogUpdate()
 
 void CONTROL_LCSUStateUpdate()
 {
-	static uint64_t NextUpdate = 0;
+	static Int64U NextUpdate = 0;
 	
 	if(SUB_State != SS_None)
 	{

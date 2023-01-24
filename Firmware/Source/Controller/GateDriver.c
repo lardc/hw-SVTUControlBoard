@@ -29,12 +29,12 @@ Int16U RegulatorCounter = 0;
 Int16U GateValues_Counter = 0;
 
 // Forward functions
-uint16_t GATE_ConvertVgToDAC(float Value);
+Int16U GATE_ConvertVgToDAC(float Value);
 void GATE_SaveToEndpoints(float Voltage, float Error);
 
 // Functions
 //
-uint16_t GATE_ConvertVgToDAC(float Value)
+Int16U GATE_ConvertVgToDAC(float Value)
 {
 	float Offset = DataTable[REG_VG_SET_OFFSET];
 	float K = DataTable[REG_VG_SET_K];
@@ -54,7 +54,7 @@ uint16_t GATE_ConvertVgToDAC(float Value)
 	if(tmp > DAC_RESOLUTION)
 		tmp = DAC_RESOLUTION;
 
-	return (tmp > 0) ? (uint16_t)tmp : 0;
+	return (tmp > 0) ? (Int16U)tmp : 0;
 }
 //------------------------------------
 
