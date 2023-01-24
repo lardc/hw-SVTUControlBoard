@@ -183,6 +183,8 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 				LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS);
 				CONTROL_ResetToDefaults();
 
+				DataTable[REG_PROBLEM] = PROBLEM_FORCED_STOP;
+
 				CONTROL_SetDeviceState(DS_Ready, SS_None);
 			}
 			break;
@@ -496,7 +498,7 @@ void CONTROL_SafetyProcess()
 		CONTROL_ResetData();
 		CONTROL_ResetHardware();
 
-		DataTable[REG_WARNING] = WARNING_SAFETY;
+		DataTable[REG_PROBLEM] = PROBLEM_SAFETY;
 
 		CONTROL_SetDeviceState(DS_Ready, SS_None);
 	}

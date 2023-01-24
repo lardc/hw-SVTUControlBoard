@@ -97,7 +97,7 @@
 //
 #define REG_RESULT_VD					200	// Измеренное значение прямого напряжения (в мВ)
 #define REG_RESULT_ID					201	// Измеренное значение прямого тока (в А)
-#define REG_RESULT_VG					202	// Измеренное значение напряжения цепи управления (в мВ)
+#define REG_RESULT_VG					202	// Измеренное значение напряжения цепи управления (в В)
 //
 #define REG_LCSU_DETECTED				205	// Обнаруженное количество силовых ячеек
 #define REG_ID_MAX						206	// Максимальный ток, получаемый с установки (в А)
@@ -161,10 +161,11 @@
 #define WARNING_NONE					0	// Предупреждений нет
 #define WARNING_VOLTAGE_OUT_OF_RANGE	1	// Измеренное напряжение вне рабочего диапазона
 #define WARNING_CURRENT_OUT_OF_RANGE	2	// Измеренный ток вне рабочего диапазона
-#define WARNING_SAFETY					3	// Сработала система безопасности
 
 // Problem
 #define PROBLEM_NONE					0
+#define PROBLEM_FORCED_STOP				1	// Принудительная остановка процесса
+#define PROBLEM_SAFETY					1	// Сработала система безопасности
 
 // User Errors
 #define ERR_NONE						0
