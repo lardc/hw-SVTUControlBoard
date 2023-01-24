@@ -3,6 +3,10 @@
 
 #include "stdinc.h"
 
+// Variables
+//
+extern Int16U GateValues_Counter;
+
 // Functions
 //
 void GATE_SetVg(float Value);

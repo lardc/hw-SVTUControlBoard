@@ -40,7 +40,6 @@ static Boolean CycleActive = false;
 SubState SUB_State = SS_None;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
-volatile Int16U CONTROL_GateValues_Counter = 0;
 volatile Int64U CONTROL_TimeCounter = 0;
 
 // Forward functions
@@ -66,7 +65,7 @@ void CONTROL_Init()
 	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR};
 	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
 	pInt16U FEPCounters[FEP_COUNT] = {(pInt16U)&CONTROL_PowerValues_Counter, (pInt16U)&CONTROL_PowerValues_Counter,
-														(pInt16U)&CONTROL_GateValues_Counter, (pInt16U)&CONTROL_GateValues_Counter};
+														(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter};
 	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_Id, (pFloat32)MEMBUF_EP_Vd, (pFloat32)MEMBUF_EP_Vg,
 			(pFloat32)MEMBUF_EP_VgErr};
 	

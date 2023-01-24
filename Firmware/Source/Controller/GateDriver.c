@@ -10,6 +10,7 @@
 #include "LowLevel.h"
 #include "Delay.h"
 #include "math.h"
+#include "MemBuffers.h"
 
 // Variables
 //
@@ -25,9 +26,11 @@ float GateVoltage = 0;
 Int16U FollowingErrorCounterMax = 0;
 Int16U FollowingErrorCounter = 0;
 Int16U RegulatorCounter = 0;
+Int16U GateValues_Counter = 0;
 
 // Forward functions
 uint16_t GATE_ConvertVgToDAC(float Value);
+void GATE_SaveToEndpoints(float Voltage, float Error);
 
 // Functions
 //
@@ -95,6 +98,7 @@ void GATE_CacheVariables()
 	GateVoltage = 0;
 	RegulatorCounter = 0;
 	FollowingErrorCounter = 0;
+	GateValues_Counter = 0;
 }
 //------------------------------------
 
@@ -141,8 +145,21 @@ void GATE_RegulatorProcess(float GateVoltageSample)
 	GATE_SetVg(RegulatorOut);
 
 	RegulatorCounter++;
+
+	GATE_SaveToEndpoints(GateVoltageSample, RegulatorError);
 }
 //------------------------------------
+
+void GATE_SaveToEndpoints(float Voltage, float Error)
+{
+	if(GateValues_Counter < VALUES_x_SIZE)
+	{
+		MEMBUF_EP_Vg[GateValues_Counter] = Voltage;
+		MEMBUF_EP_VgErr[GateValues_Counter] = Error;
+
+		GateValues_Counter++;
+	}
+}
 
 bool GATE_FollowingErrorCheck()
 {
