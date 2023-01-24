@@ -297,10 +297,10 @@ void LOGIC_SaveResults()
 	DataTable[REG_RESULT_ID] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
 	DataTable[REG_RESULT_VG] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
 
-	if((DataTable[REG_RESULT_VD] > VOLTAGE_MAX_VALUE) || (DataTable[REG_RESULT_VD] < VOLTAGE_MIN_VALUE))
+	if((DataTable[REG_RESULT_VD] > VD_MAX_VALUE) || (DataTable[REG_RESULT_VD] < VD_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
 
-	if((DataTable[REG_RESULT_ID] > CURRENT_MAX_VALUE) || (DataTable[REG_RESULT_ID] < CURRENT_MIN_VALUE))
+	if((DataTable[REG_RESULT_ID] > ID_MAX_VALUE) || (DataTable[REG_RESULT_ID] < ID_MIN_VALUE))
 			DataTable[REG_WARNING] = WARNING_CURRENT_OUT_OF_RANGE;
 }
 // ----------------------------------------
