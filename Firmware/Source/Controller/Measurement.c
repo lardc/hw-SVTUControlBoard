@@ -15,14 +15,14 @@
 #define MAX_SAMPLES_CUTOFF_NUM		10
 
 // Forward functions
-void MEASURE_ConvertADCtoValx(pFloat32 InputArray, uint16_t DataLength, uint16_t RegisterOffset,
-		uint16_t RegisterK, uint16_t RegisterP0, uint16_t RegisterP1, uint16_t RegisterP2, float RShunt);
+void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U RegisterOffset,
+		Int16U RegisterK, Int16U RegisterP0, Int16U RegisterP1, Int16U RegisterP2, float RShunt);
 int MEASURE_SortCondition(const void *A, const void *B);
 
 // Functions
 //
-void MEASURE_ConvertADCtoValx(pFloat32 InputArray, uint16_t DataLength, uint16_t RegisterOffset,
-		uint16_t RegisterK, uint16_t RegisterP0, uint16_t RegisterP1, uint16_t RegisterP2, float RShunt)
+void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U RegisterOffset,
+		Int16U RegisterK, Int16U RegisterP0, Int16U RegisterP1, Int16U RegisterP2, float RShunt)
 {
 	float Offset = DataTable[RegisterOffset];
 	float K = DataTable[RegisterK];
@@ -31,7 +31,7 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, uint16_t DataLength, uint16_t
 	float P1 = DataTable[RegisterP1];
 	float P2 = DataTable[RegisterP2];
 	
-	for(uint16_t i = 0; i < DataLength; i++)
+	for(Int16U i = 0; i < DataLength; i++)
 	{
 		float tmp = (InputArray[i] + Offset) * ADC_REF_VOLTAGE / ADC_RESOLUTION * K;
 
@@ -46,39 +46,32 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, uint16_t DataLength, uint16_t
 }
 //------------------------------------
 
-void MEASURE_ConvertVd(pFloat32 InputArray, uint16_t DataLength)
+void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength)
 {
 	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_OFFSET, REG_VD_K, REG_VD_P0, REG_VD_P1,
 			REG_VD_P2, 0);
 }
 //------------------------------------
 
-void MEASURE_ConvertVg(pFloat32 InputArray, uint16_t DataLength)
+void MEASURE_ConvertVg(pFloat32 InputArray, Int16U DataLength)
 {
 	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VG_OFFSET, REG_VG_K, REG_VG_P0, REG_VG_P1,
 			REG_VG_P2, 0);
 }
 //------------------------------------
 
-void MEASURE_ConvertId(pFloat32 InputArray, uint16_t DataLength)
+void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange)
 {
 	float RShunt = DataTable[REG_R_SHUNT] / 1000;
 
-	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_OFFSET, REG_ID_K, REG_ID_P0, REG_ID_P1,
-			REG_ID_P2, RShunt);
+	if(CurrentRange)
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_OFFSET, REG_ID_K, REG_ID_P0, REG_ID_P1, REG_ID_P2, RShunt);
+	else
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_IDL_OFFSET, REG_IDL_K, REG_IDL_P0, REG_IDL_P1, REG_IDL_P2, RShunt);
 }
 //------------------------------------
 
-void MEASURE_ConvertIdLow(pFloat32 InputArray, uint16_t DataLength)
-{
-	float RShunt = DataTable[REG_R_SHUNT] / 1000;
-
-	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_IDL_OFFSET, REG_IDL_K, REG_IDL_P0, REG_IDL_P1,
-			REG_IDL_P2, RShunt);
-}
-//------------------------------------
-
-float MEASURE_Vg(uint16_t SampleADC)
+float MEASURE_Vg(Int16U SampleADC)
 {
 	float Voltage = 0;
 
@@ -118,52 +111,15 @@ float MEASURE_ExtractMaxValues(pFloat32 InputArray, Int16U Size)
 }
 //------------------------------------
 
-Int16U MEASURE_ExtractVoltage(pFloat32 VoltageArray, pFloat32 CurrentArray, Int16U CurrentPoint, Int16U Size)
-{
-	Int32U AverageValue = 0;
-	Int16U Index = 0, IndexMax = 0;
-	Int16U CurrentMax = 0;
-
-	// Поиск значения CurrentPoint в массиве CurrentArray
-	for(int i = (Size / 3); i < Size; i++)
-	{
-		if(CurrentMax < *(CurrentArray + i))
-		{
-			CurrentMax = *(CurrentArray + i);
-			IndexMax = i;
-		}
-
-		if(*(CurrentArray + i) <= CurrentPoint)
-		{
-			if(!Index)
-				Index = i;
-		}
-		else
-			Index = 0;
-	}
-
-	if(Index <= (Size / 3))
-			Index = IndexMax;
-
-	DataTable[100] = AverageValue;
-
-	// Усредение в точке измерения
-	for (int i = Index; i < (Index + SAMPLING_AVG_NUM); i++)
-		AverageValue += *(VoltageArray + i);
-
-	return (AverageValue / SAMPLING_AVG_NUM);
-}
-//------------------------------------
-
 int MEASURE_SortCondition(const void *A, const void *B)
 {
-	return (int)(*(uint16_t *)A) - (int)(*(uint16_t *)B);
+	return (int)(*(Int16U *)A) - (int)(*(Int16U *)B);
 }
 //-----------------------------------------
 
-void MEASURE_ArrayEMA(pFloat32 InputArray, uint16_t DataLength)
+void MEASURE_ArrayEMA(pFloat32 InputArray, Int16U DataLength)
 {
-	for(uint16_t i = 1; i < DataLength; ++i)
+	for(Int16U i = 1; i < DataLength; ++i)
 		InputArray[i] = InputArray[i] * ADC_EMA_FACTOR + (1 - ADC_EMA_FACTOR) * InputArray[i - 1];
 }
 //------------------------------------
