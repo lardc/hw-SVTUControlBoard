@@ -17,8 +17,6 @@
 #include "ZwNFLASH.h"
 
 // Определения для аналоговых портов
-GPIO_PortPinSettingMacro GPIO_MSR_THYRISTOR_UG 		= {GPIOA, Pin_1};
-GPIO_PortPinSettingMacro GPIO_MSR_THYRISTOR_IG 		= {GPIOA, Pin_2};
 GPIO_PortPinSettingMacro GPIO_MSR_IGBT_UG 			= {GPIOA, Pin_7};
 GPIO_PortPinSettingMacro GPIO_MSR_UD 				= {GPIOB, Pin_13};
 GPIO_PortPinSettingMacro GPIO_MSR_ID				= {GPIOB, Pin_12};
@@ -41,7 +39,5 @@ GPIO_PortPinSettingMacro GPIO_ALT_CAN_RX 			= {GPIOA, Pin_11};
 GPIO_PortPinSettingMacro GPIO_ALT_CAN_TX 			= {GPIOA, Pin_12};
 GPIO_PortPinSettingMacro GPIO_ALT_UART_RX 			= {GPIOA, Pin_10};
 GPIO_PortPinSettingMacro GPIO_ALT_UART_TX 			= {GPIOA, Pin_9};
-GPIO_PortPinSettingMacro GPIO_ALT_SPI1_CLK 			= {GPIOA, Pin_5};
-GPIO_PortPinSettingMacro GPIO_ALT_SPI1_MOSI 		= {GPIOA, Pin_7};
 
 #endif // __BOARD_H

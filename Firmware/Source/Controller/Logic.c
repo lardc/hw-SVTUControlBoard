@@ -29,7 +29,7 @@ typedef struct __LCSUStructData
 	bool IsActive;
 	LCSUState State;
 	float Current;
-	Int16U PulseShape;
+	float PulseDuration;
 } LCSUData, *pLCSUData;
 
 // Variables
@@ -154,7 +154,7 @@ bool LOGIC_WriteLCSUConfig()
 			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
 				return false;
 
-			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_PULSE_SHAPE, LCSU_DataArray[i].PulseShape))
+			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, LCSU_DataArray[i].PulseDuration))
 				return false;
 		}
 	}
@@ -209,7 +209,7 @@ bool LOGIC_DistributeCurrent(float Current)
 			else
 				LCSU_DataArray[i].Current = Current;
 
-			LCSU_DataArray[i].PulseShape = (Int16U)DataTable[REG_PULSE_SHAPE];
+			LCSU_DataArray[i].PulseDuration = DataTable[REG_TRAPEZE_DURATION];
 		}
 	}
 	

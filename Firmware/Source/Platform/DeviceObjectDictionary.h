@@ -47,12 +47,6 @@
 #define REG_VD_P1						15	// Полином точной корректировки Vd P1 x1000
 #define REG_VD_P2						16	// Полином точной корректировки Vd P2 x1e6
 
-#define REG_IG_OFFSET					17	// Смещение оцифрованного Ig (в тиках)
-#define REG_IG_K						18	// Коэффициент пересчёта напряжения АЦП (в мВ) в Ig (в мА) х1000
-#define REG_IG_P0						19	// Полином точной корректировки Ig P0 (в мА)
-#define REG_IG_P1						20	// Полином точной корректировки Ig P1 x1000
-#define REG_IG_P2						21	// Полином точной корректировки Ig P2 x1e6
-
 #define REG_VG_OFFSET					22	// Смещение оцифрованного Vg (в тиках)
 #define REG_VG_K						23	// Коэффициент пересчёта напряжения АЦП (в мВ) в Vg (в мВ) х1000
 #define REG_VG_P0						24	// Полином точной корректировки Vg P0 (в мВ)
@@ -73,14 +67,6 @@
 #define REG_VG_SET_P1					53	// Полином точной корректировки Vg P1 x1000
 #define REG_VG_SET_P2					54	// Полином точной корректировки Vg P2 x1e6
 
-#define REG_IG_SET_OFFSET				55	// Смещение при преобразовании Ig -> DAC
-#define REG_IG_SET_K					56	// Коэффициент преобразованиия Ig -> DAC
-#define REG_IG_SET_P0					57	// Полином точной корректировки Ig P0 (в мA)
-#define REG_IG_SET_P1					58	// Полином точной корректировки Ig P1 x1000
-#define REG_IG_SET_P2					59	// Полином точной корректировки Ig P2 x1e6
-
-#define REG_OSC_SYNC_TUNE_DELAY			60	// Подстройка импульса синхронизации под вершину синуса (мкс)
-#define REG_TRAPEZE_DURATION			61	// Длительность трапецеидального импульса тока (мс)
 #define REG_VG_EDGE_TIME				62
 #define REG_LAMP_CTRL					63
 
@@ -94,14 +80,9 @@
 // Несохраняемы регистры чтения-записи
 #define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
 #define REG_GATE_VOLTAGE_SETPOINT		141
-
-#define REG_VG_VALUE					151	// Напряжение цепи управления (в мВ)
-#define REG_IG_VALUE					152	// Ток цепи управления (в мА)
+#define REG_TRAPEZE_DURATION			142	// Длительность трапецеидального импульса тока (мс)
 
 #define REG_DBG							160	// Отладочный регистр
-
-#define REG_COMATIBILITY_1				162
-#define REG_PULSE_SHAPE					163	// Тип сигнала тока: 0 - sin, 1 - mod sin
 
 // Регистры только чтение
 #define REG_DEV_STATE					192	// Регистр состояния
@@ -144,7 +125,6 @@
 
 // Регистры LCSU
 #define REG_LCSU_PULSE_VALUE			128	// Значение амплитуды импульса тока (в А)
-#define REG_LCSU_PULSE_SHAPE			129	// Регистр формы импульса
 #define REG_LCSU_TRAPEZE_DURATION		130	// Регистр длительности импульса трапеции
 
 #define REG_LCSU_DEV_STATE				192	// Состояние блока

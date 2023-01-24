@@ -31,15 +31,12 @@
 // ----------------------------------------------
 
 // DMA
-#define DMA_ADC_THYRISTOR_GATE_CH		DMA1_Channel1	// Канал DMA для АЦП Vg, Ig тиристора
 #define DMA_ADC_IGBT_GATE_CH			DMA2_Channel1	// Канал DMA для АЦП Vg IGBT
 #define DMA_ADC_ID_CH					DMA2_Channel2	// Канал DMA для АЦП Id
 #define DMA_ADC_VD_CH					DMA2_Channel5	// Канал DMA для АЦП Vd
 // ----------------------------------------------
 
 // ADC
-#define ADC1_THYRISTOR_UG_CH			2			// АЦП1 номер канала измерения Ug тиристора
-#define ADC1_THYRISTOR_IG_CH			3			// АЦП1 номер канала измерения Ig тиристора
 #define ADC2_IGBT_UG_CH					4			// АЦП2 номер канала измерения Ug IGBT
 #define ADC3_UD_CH						5			// АЦП3 номер канала измерения Ud
 #define ADC4_ID_CH						3			// АЦП4 номер канала измерения Id
