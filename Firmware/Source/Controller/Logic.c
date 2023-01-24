@@ -22,10 +22,6 @@
 #include "Global.h"
 #include "math.h"
 
-// Definitions
-//
-#define ARR_START_INDEX_SHIFT			700
-
 // Types
 //
 typedef struct __LCSUStructData
@@ -253,9 +249,6 @@ void LOGIC_SelectCurrentRange(float Current)
 
 void LOGIC_ProcessPulse()
 {
-	// Задание напряжения в цепи управления
-	GATE_SetVg(DataTable[REG_VG_VALUE]);
-
 	// Подготовка оцифровки
 	IT_DMAFlagsReset();
 	DMA_ChannelReload(DMA_ADC_IGBT_GATE_CH, VALUES_GATE_DMA_SIZE);
@@ -272,15 +265,6 @@ void LOGIC_ProcessPulse()
 	LL_SyncScope(true);
 	LL_SyncLCSU(true);
 
-	// Синхронизация по вершине
-	DELAY_US(TIME_PULSE_WIDTH / 2 + (Int16U)DataTable[REG_OSC_SYNC_TUNE_DELAY]);
-
-	// Синхронизация осциллографа, если не задано превышение уставки
-	if(!DataTable[REG_CURRENT_OVERSHOOT])
-		LL_SyncScope(false);
-	else
-		TIM_Start(TIM6);	// Запуск таймера определения момента синхронизации
-
 	// Завершение оцифровки
 	while(!IT_DMASampleCompleted()){}
 
@@ -289,9 +273,9 @@ void LOGIC_ProcessPulse()
 	LL_SyncLCSU(false);
 
 	// Пересчёт значений
-	MEASURE_ConvertVd((Int16U *)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
-	MEASURE_ConvertIdLow((Int16U *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
-	MEASURE_ConvertVg((Int16U *)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
+	MEASURE_ConvertVd((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
+	MEASURE_ConvertIdLow((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
+	MEASURE_ConvertVg((pFloat32)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
 }
 // ----------------------------------------
 
@@ -313,9 +297,9 @@ void LOGIC_SaveResults()
 {
 	float Current;
 
-	DataTable[REG_GATE_VOLTAGE] = MEASURE_ExtractMaxValues((Int16U *)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
+	DataTable[REG_GATE_VOLTAGE] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Vg, VALUES_GATE_DMA_SIZE);
 	//
-	Current = MEASURE_ExtractMaxValues((Int16U *)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
+	Current = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
 
 	if(DataTable[REG_CURRENT_OVERSHOOT])
 		Current = Current / ((float)(100 + DataTable[REG_CURRENT_OVERSHOOT]) / 100);

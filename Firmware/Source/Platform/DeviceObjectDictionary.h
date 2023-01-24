@@ -80,6 +80,7 @@
 #define REG_IG_SET_P2					59	// Полином точной корректировки Ig P2 x1e6
 
 #define REG_OSC_SYNC_TUNE_DELAY			60	// Подстройка импульса синхронизации под вершину синуса (мкс)
+#define REG_TRAPEZE_DURATION			61	// Длительность трапецеидального импульса тока (мс)
 
 // Несохраняемы регистры чтения-записи
 #define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
@@ -90,7 +91,7 @@
 #define REG_DBG							160	// Отладочный регистр
 
 #define REG_COMATIBILITY_1				162
-#define REG_PULSE_MODE					163	// Тип сигнала тока: 0 - sin, 1 - mod sin
+#define REG_PULSE_SHAPE					163	// Тип сигнала тока: 0 - sin, 1 - mod sin
 
 // Регистры только чтение
 #define REG_DEV_STATE					192	// Регистр состояния
@@ -127,15 +128,17 @@
 #define ACT_LCSU_WARNING_CLEAR			4	// Очистка warning
 //
 #define ACT_LCSU_PULSE_CONFIG			100	// Команда на конфигурацию значения тока
+#define ACT_LCSU_STOP_PROCESS			102	// Команда на на остановку процесса
 // -----------------------------
 
 // Регистры LCSU
 #define REG_LCSU_PULSE_VALUE			128	// Значение амплитуды импульса тока (в А)
-#define REG_LCSU_PULSE_MODE			130	// Формирование модицифированного синус сигнала
+#define REG_LCSU_PULSE_SHAPE			129	// Регистр формы импульса
+#define REG_LCSU_TRAPEZE_DURATION		130	// Регистр длительности импульса трапеции
 
 #define REG_LCSU_DEV_STATE				192	// Состояние блока
 #define REG_LCSU_FAULT_REASON			193
-#define REG_LCSU_DISABLE_REASON		194
+#define REG_LCSU_DISABLE_REASON			194
 #define REG_LCSU_WARNING				195
 #define REG_LCSU_PROBLEM				196
 // -----------------------------
@@ -157,6 +160,7 @@
 #define DF_LCSU_UNEXPECTED_STATE		2
 #define DF_LCSU_STATE_TIMEOUT			3
 #define DF_LCSU_CURRENT_CONFIG			4
+#define DF_GATE_VOLTAGE					5
 
 // Warning
 #define WARNING_NONE					0
