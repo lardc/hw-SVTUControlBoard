@@ -431,3 +431,17 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 		CONTROL_SwitchToFault(DF_LCSU_STATE_TIMEOUT);
 }
 //-----------------------------------------------
+
+void CONTROL_SafetyProcess()
+{
+	if(!LL_SafetyIsActive())
+	{
+		CONTROL_ResetData();
+		CONTROL_ResetHardware();
+
+		DataTable[REG_WARNING] = WARNING_SAFETY;
+
+		CONTROL_SetDeviceState(DS_Ready, SS_None);
+	}
+}
+// ----------------------------------------

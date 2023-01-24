@@ -32,5 +32,6 @@ extern volatile Int64U CONTROL_TimeCounter;
 void CONTROL_Init();
 void CONTROL_Idle();
 void CONTROL_SwitchToFault(Int16U Reason);
+void CONTROL_SafetyProcess();
 
 #endif // __CONTROLLER_H

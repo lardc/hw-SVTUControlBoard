@@ -175,6 +175,7 @@
 #define WARNING_NONE					0
 #define WARNING_VOLTAGE_OUT_OF_RANGE	1
 #define WARNING_CURRENT_OUT_OF_RANGE	2
+#define WARNING_SAFETY					3
 
 // Problem
 #define PROBLEM_NONE					0
