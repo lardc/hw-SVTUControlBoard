@@ -396,8 +396,7 @@ void CONTROL_SaveDataToEndpoint()
 {
 	LOGIC_SaveToEndpoint((pFloat32)MEMBUF_DMA_Vd, (pFloat32)MEMBUF_EP_Vd, VALUES_POWER_DMA_SIZE);
 	LOGIC_SaveToEndpoint((pFloat32)MEMBUF_DMA_Id, (pFloat32)MEMBUF_EP_Id, VALUES_POWER_DMA_SIZE);
-	LOGIC_SaveToEndpoint((pFloat32)MEMBUF_DMA_Vg, (pFloat32)MEMBUF_EP_Vg, VALUES_GATE_DMA_SIZE);
-	CONTROL_GateValues_Counter = CONTROL_PowerValues_Counter = VALUES_x_SIZE;
+	CONTROL_PowerValues_Counter = VALUES_x_SIZE;
 }
 //-----------------------------------------------
 
