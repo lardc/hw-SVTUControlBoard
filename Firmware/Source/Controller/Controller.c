@@ -180,7 +180,9 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 		case ACT_STOP_TEST:
 			if(CONTROL_State == DS_InProcess)
 			{
+				LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS);
 				CONTROL_ResetToDefaults();
+
 				CONTROL_SetDeviceState(DS_Ready, SS_None);
 			}
 			break;
