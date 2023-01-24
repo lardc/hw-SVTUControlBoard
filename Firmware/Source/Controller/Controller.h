@@ -27,11 +27,13 @@ typedef enum __LCSUState
 // Variables
 extern DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
+extern bool IsImpulse;
 
 // Functions
 void CONTROL_Init();
 void CONTROL_Idle();
 void CONTROL_SwitchToFault(Int16U Reason);
 void CONTROL_SafetyProcess();
+void CONTROL_HandleExternalLamp(bool IsImpulse);
 
 #endif // __CONTROLLER_H

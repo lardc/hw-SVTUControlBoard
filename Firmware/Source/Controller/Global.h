@@ -22,6 +22,8 @@
 #define TIME_VG_STAB				2000			// Время стабилизации Vg (в мкс)
 #define TIME_PULSE_WIDTH			10000			// Длительность импульса (в мкс)
 #define TIMEOUT_LCSU_SHORT			1000			// Короткий таймаут по операциям с LCSU (в мс)
+#define TIME_FAULT_LED_BLINK		250				//
+#define TIME_EXT_LAMP_ON_STATE		500				//
 
 // Параметры аналоговой подсистемы
 #define ADC_REF_VOLTAGE				3300.0f			// Опорное напряжение (в мВ)

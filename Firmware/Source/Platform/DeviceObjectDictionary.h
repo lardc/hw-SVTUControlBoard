@@ -81,6 +81,7 @@
 #define REG_OSC_SYNC_TUNE_DELAY			60	// Подстройка импульса синхронизации под вершину синуса (мкс)
 #define REG_TRAPEZE_DURATION			61	// Длительность трапецеидального импульса тока (мс)
 #define REG_VG_EDGE_TIME				62
+#define REG_LAMP_CTRL					63
 
 #define REG_REGULATOR_QP				65
 #define REG_REGULATOR_QI				66
@@ -108,12 +109,13 @@
 #define REG_WARNING						195	// Регистр Warning
 #define REG_PROBLEM						196	// Регистр Problem
 #define REG_OP_RESULT					197	// Регистр результата операции
+#define REG_SELF_TEST_OP_RESULT			198	// Регистр результата самотестирования
+#define REG_SUB_STATE					199	// Регистр вспомогательного состояния
 
 #define REG_DUT_VOLTAGE					198	// Измеренное значение прямого напряжения (в мВ)
 #define REG_DUT_CURRENT					206	// Измеренное значение прямого тока (в А)
 #define REG_GATE_VOLTAGE				202	// Измеренное значение напряжения в цепи управления (в мВ)
 
-#define REG_DEV_SUB_STATE				209	// Регистр вспомогательного состояния
 #define REG_BHL_ERROR_CODE				210	// Ошибка интерфейса ВУ: код ошибки
 #define REG_BHL_DEVICE					211	// Ошибка интерфейса ВУ: NID устройства
 #define REG_BHL_FUNCTION				212	// Ошибка интерфейса ВУ: код функции

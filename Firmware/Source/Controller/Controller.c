@@ -38,6 +38,7 @@ typedef enum __SubState
 DeviceState CONTROL_State = DS_None;
 static Boolean CycleActive = false;
 SubState SUB_State = SS_None;
+bool IsImpulse = false;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
 volatile Int64U CONTROL_TimeCounter = 0;
@@ -230,7 +231,7 @@ void CONTROL_SetDeviceState(DeviceState NewState, SubState NewSubState)
 	DataTable[REG_DEV_STATE] = NewState;
 	
 	SUB_State = NewSubState;
-	DataTable[REG_DEV_SUB_STATE] = NewSubState;
+	DataTable[REG_SUB_STATE] = NewSubState;
 }
 //-----------------------------------------------
 
@@ -371,6 +372,8 @@ void CONTROL_HandlePulse()
 				break;
 
 			case SS_CurrentPulseProcess:
+				IsImpulse = true;
+
 				LOGIC_ProcessPulse();
 				CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
 				break;
@@ -380,6 +383,8 @@ void CONTROL_HandlePulse()
 					CONTROL_SaveDataToEndpoint();
 					CONTROL_SaveResults();
 					DataTable[REG_OP_RESULT] = OPRESULT_OK;
+					IsImpulse = false;
+
 					CONTROL_SetDeviceState(DS_Ready, SS_None);
 				}
 				break;
@@ -443,3 +448,34 @@ void CONTROL_SafetyProcess()
 	}
 }
 // ----------------------------------------
+
+void CONTROL_HandleExternalLamp(bool IsImpulse)
+{
+	static Int64U ExternalLampCounter = 0;
+
+	if(DataTable[REG_LAMP_CTRL])
+	{
+		if(CONTROL_State == DS_Fault)
+		{
+			if(++ExternalLampCounter > TIME_FAULT_LED_BLINK)
+			{
+				LL_ExtIndicationToggle();
+				ExternalLampCounter = 0;
+			}
+		}
+		else
+			{
+				if(IsImpulse)
+				{
+					LL_ExtIndication(true);
+					ExternalLampCounter = CONTROL_TimeCounter + TIME_EXT_LAMP_ON_STATE;
+				}
+				else
+				{
+					if(CONTROL_TimeCounter >= ExternalLampCounter)
+						LL_ExtIndication(false);
+				}
+			}
+	}
+}
+//-----------------------------------------------

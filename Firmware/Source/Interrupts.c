@@ -91,6 +91,8 @@ void TIM3_IRQHandler()
 			LED_BlinkTimeCounter = 0;
 		}
 		
+		CONTROL_HandleExternalLamp(IsImpulse);
+
 		TIM_StatusClear(TIM3);
 	}
 }
