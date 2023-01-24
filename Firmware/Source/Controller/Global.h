@@ -19,10 +19,9 @@
 // Временные параметры
 #define TIME_LED_BLINK				500				// Период моргания светодиода на плате (в мс)
 #define TIME_LCSU_UPDATE			500				// Период опроса силовых ячеек (в мс)
-#define TIME_VG_STAB				100				// Время стабилизации Vg (в мкс)
+#define TIME_VG_STAB				2000			// Время стабилизации Vg (в мкс)
 #define TIME_PULSE_WIDTH			10000			// Длительность импульса (в мкс)
 #define TIMEOUT_LCSU_SHORT			1000			// Короткий таймаут по операциям с LCSU (в мс)
-#define TIME_GATE_PULSE_MAX			1000			// Максимальная длительность импульса тока управления
 
 // Параметры аналоговой подсистемы
 #define ADC_REF_VOLTAGE				3300.0f			// Опорное напряжение (в мВ)
@@ -36,7 +35,7 @@
 #define VOLTAGE_MAX_VALUE			5000				// Максимальное измеряемое напряжение
 
 // Параметры DMA
-#define VALUES_POWER_DMA_SIZE		2000
+#define VALUES_POWER_DMA_SIZE		1000
 #define VALUES_GATE_DMA_SIZE		3
 
 #endif // __GLOBAL_H

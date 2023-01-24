@@ -15,25 +15,25 @@
 #define MAX_SAMPLES_CUTOFF_NUM		10
 
 // Forward functions
-void MEASURE_ConvertADCtoValx(uint16_t *InputArray, uint16_t DataLength, uint16_t RegisterOffset,
+void MEASURE_ConvertADCtoValx(pFloat32 InputArray, uint16_t DataLength, uint16_t RegisterOffset,
 		uint16_t RegisterK, uint16_t RegisterP0, uint16_t RegisterP1, uint16_t RegisterP2, float RShunt);
 int MEASURE_SortCondition(const void *A, const void *B);
 
 // Functions
 //
-void MEASURE_ConvertADCtoValx(uint16_t *InputArray, uint16_t DataLength, uint16_t RegisterOffset,
+void MEASURE_ConvertADCtoValx(pFloat32 InputArray, uint16_t DataLength, uint16_t RegisterOffset,
 		uint16_t RegisterK, uint16_t RegisterP0, uint16_t RegisterP1, uint16_t RegisterP2, float RShunt)
 {
-	float Offset = (float)((int16_t)DataTable[RegisterOffset]);
-	float K = (float)DataTable[RegisterK] / 1000;
+	float Offset = DataTable[RegisterOffset];
+	float K = DataTable[RegisterK];
 	
-	float P0 = (float)((int16_t)DataTable[RegisterP0]);
-	float P1 = (float)DataTable[RegisterP1] / 1000;
-	float P2 = (float)((int16_t)DataTable[RegisterP2]) / 1e6;
+	float P0 = DataTable[RegisterP0];
+	float P1 = DataTable[RegisterP1];
+	float P2 = DataTable[RegisterP2];
 	
 	for(uint16_t i = 0; i < DataLength; i++)
 	{
-		float tmp = ((float)InputArray[i] + Offset) * ADC_REF_VOLTAGE / ADC_RESOLUTION * K;
+		float tmp = (InputArray[i] + Offset) * ADC_REF_VOLTAGE / ADC_RESOLUTION * K;
 
 		if(RShunt)
 			tmp = tmp / RShunt;
@@ -41,47 +41,64 @@ void MEASURE_ConvertADCtoValx(uint16_t *InputArray, uint16_t DataLength, uint16_
 		tmp = tmp * tmp * P2 + tmp * P1 + P0;
 		tmp = (tmp > 0) ? tmp : 0;
 
-		InputArray[i] = (uint16_t)tmp;
+		InputArray[i] = tmp;
 	}
 }
 //------------------------------------
 
-void MEASURE_ConvertVd(uint16_t *InputArray, uint16_t DataLength)
+void MEASURE_ConvertVd(pFloat32 InputArray, uint16_t DataLength)
 {
 	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_OFFSET, REG_VD_K, REG_VD_P0, REG_VD_P1,
 			REG_VD_P2, 0);
 }
 //------------------------------------
 
-void MEASURE_ConvertId(uint16_t *InputArray, uint16_t DataLength)
+void MEASURE_ConvertVg(pFloat32 InputArray, uint16_t DataLength)
 {
-	float RShunt = (float)DataTable[REG_R_SHUNT] / 1000;
+	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VG_OFFSET, REG_VG_K, REG_VG_P0, REG_VG_P1,
+			REG_VG_P2, 0);
+}
+//------------------------------------
+
+void MEASURE_ConvertId(pFloat32 InputArray, uint16_t DataLength)
+{
+	float RShunt = DataTable[REG_R_SHUNT] / 1000;
 
 	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_OFFSET, REG_ID_K, REG_ID_P0, REG_ID_P1,
 			REG_ID_P2, RShunt);
 }
 //------------------------------------
 
-void MEASURE_ConvertIdLow(uint16_t *InputArray, uint16_t DataLength)
+void MEASURE_ConvertIdLow(pFloat32 InputArray, uint16_t DataLength)
 {
-	float RShunt = (float)DataTable[REG_R_SHUNT] / 1000;
+	float RShunt = DataTable[REG_R_SHUNT] / 1000;
 
 	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_IDL_OFFSET, REG_IDL_K, REG_IDL_P0, REG_IDL_P1,
 			REG_IDL_P2, RShunt);
 }
 //------------------------------------
 
-void MEASURE_ConvertVg(uint16_t *InputArray, uint16_t DataLength)
+float MEASURE_Vg(uint16_t SampleADC)
 {
-	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VG_OFFSET, REG_VG_K, REG_VG_P0, REG_VG_P1,
-			REG_VG_P2 , 0);
+	float Voltage = 0;
+
+	float P2 = DataTable[REG_VG_P2];
+	float P1 = DataTable[REG_VG_P1];
+	float P0 = DataTable[REG_VG_P0];
+	float K = DataTable[REG_VG_K];
+	float B = DataTable[REG_VG_OFFSET];
+
+	Voltage = SampleADC * K + B;
+	Voltage = Voltage * Voltage * P2 + Voltage * P1 + P0;
+
+	return (Voltage > 0) ? Voltage : 0;
 }
 //------------------------------------
 
-float MEASURE_ExtractMaxValues(Int16U *InputArray, Int16U Size)
+float MEASURE_ExtractMaxValues(pFloat32 InputArray, Int16U Size)
 {
 	float AverageValue = 0;
-	static Int16U InputArrayCopy[VALUES_POWER_DMA_SIZE];
+	static float InputArrayCopy[VALUES_POWER_DMA_SIZE];
 
 	for (int i = 0; i < Size; i++)
 		{
@@ -144,9 +161,9 @@ int MEASURE_SortCondition(const void *A, const void *B)
 }
 //-----------------------------------------
 
-void MEASURE_ArrayEMA(uint16_t *InputArray, uint16_t DataLength)
+void MEASURE_ArrayEMA(pFloat32 InputArray, uint16_t DataLength)
 {
 	for(uint16_t i = 1; i < DataLength; ++i)
-		InputArray[i] = (uint16_t)(InputArray[i] * ADC_EMA_FACTOR + (1 - ADC_EMA_FACTOR) * InputArray[i - 1]);
+		InputArray[i] = InputArray[i] * ADC_EMA_FACTOR + (1 - ADC_EMA_FACTOR) * InputArray[i - 1];
 }
 //------------------------------------

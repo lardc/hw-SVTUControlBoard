@@ -9,39 +9,29 @@
 #include "DataTable.h"
 #include "Measurement.h"
 #include "MemBuffers.h"
+#include "GateDriver.h"
 
 // Variables
 //
-static volatile bool VgCompleted, IdCompleted, VdCompleted;
+static volatile bool IdCompleted, VdCompleted;
 
 // Functions
 //
 void ADC1_2_IRQHandler()
 {
-	GATE_RegulatorProcess(MEASURE_ConvertVg(&ADC2->DR));
+	GATE_RegulatorProcess(MEASURE_Vg(ADC2->DR));
 }
 //-----------------------------------------
 
 bool IT_DMASampleCompleted()
 {
-	return VgCompleted && IdCompleted && VdCompleted;
+	return IdCompleted && VdCompleted;
 }
 //-----------------------------------------
 
 void IT_DMAFlagsReset()
 {
-	VgCompleted = IdCompleted = VdCompleted = false;
-}
-//-----------------------------------------
-
-void DMA2_Channel1_IRQHandler()
-{
-	// Vg
-	if(DMA_IsTransferComplete(DMA2, DMA_ISR_TCIF1))
-	{
-		VgCompleted = true;
-		DMA_TransferCompleteReset(DMA2, DMA_IFCR_CTCIF1);
-	}
+	IdCompleted = VdCompleted = false;
 }
 //-----------------------------------------
 
