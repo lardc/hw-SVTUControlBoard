@@ -81,9 +81,18 @@
 
 #define REG_OSC_SYNC_TUNE_DELAY			60	// Подстройка импульса синхронизации под вершину синуса (мкс)
 #define REG_TRAPEZE_DURATION			61	// Длительность трапецеидального импульса тока (мс)
+#define REG_VG_EDGE_TIME				62
+
+#define REG_REGULATOR_QP				65
+#define REG_REGULATOR_QI				66
+#define REG_REGULATOR_QI_MAX			67
+#define REG_REGULATOR_ALLOWED_ERR		68
+#define REG_FOLLOWING_ERR_CNT			69
+#define REG_FOLLOWING_ERR_MUTE			70
 
 // Несохраняемы регистры чтения-записи
 #define REG_CURRENT_SETPOINT			140	// Уставка тока (в А)
+#define REG_GATE_VOLTAGE_SETPOINT		141
 
 #define REG_VG_VALUE					151	// Напряжение цепи управления (в мВ)
 #define REG_IG_VALUE					152	// Ток цепи управления (в мА)

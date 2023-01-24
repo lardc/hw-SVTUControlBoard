@@ -350,6 +350,7 @@ void CONTROL_HandlePulse()
 				{
 					if(LOGIC_AreLCSUInStateX(LCSU_PulseConfigReady))
 					{
+						GATE_CacheVariables();
 						GATE_StartProcess();
 						Timeout = CONTROL_TimeCounter + TIME_VG_STAB;
 
@@ -365,7 +366,7 @@ void CONTROL_HandlePulse()
 					CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseProcess);
 				else
 				{
-					if(CONTROL_TimeCounter >= Timeout)
+					if(CONTROL_TimeCounter >= Timeout || GATE_FollowingErrorCheck())
 						CONTROL_SwitchToFault(DF_GATE_VOLTAGE);
 				}
 				break;
