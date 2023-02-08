@@ -388,7 +388,10 @@ void CONTROL_HandlePulse()
 				else
 				{
 					if(CONTROL_TimeCounter >= Timeout || GATE_FollowingErrorCheck())
-						CONTROL_SwitchToFault(DF_GATE_VOLTAGE);
+					{
+						DataTable[REG_PROBLEM] = PROBLEM_GATE_VOLTAGE;
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
 				}
 				break;
 
