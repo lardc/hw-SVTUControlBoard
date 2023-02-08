@@ -9,7 +9,7 @@
 // Definitions
 //
 #define COEF_P2_MIN					-INT16S_MAX
-#define COEF_P2_MAX					-INT16S_MAX
+#define COEF_P2_MAX					INT16S_MAX
 #define COEF_P2_DEF					0
 //
 #define COEF_K_MIN					-INT16S_MAX
