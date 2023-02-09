@@ -19,7 +19,11 @@ static volatile bool IdCompleted, VdCompleted;
 //
 void ADC1_2_IRQHandler()
 {
-	GATE_RegulatorProcess(MEASURE_Vg(ADC2->DR));
+	float GateVoltage = MEASURE_Vg(ADC_Read(ADC2));
+	float GateCurrent = MEASURE_Ig(ADC_Read(ADC1));
+
+	GATE_RegulatorProcess(GateVoltage, GateCurrent);
+
 	CONTROL_SafetyProcess();
 }
 //-----------------------------------------

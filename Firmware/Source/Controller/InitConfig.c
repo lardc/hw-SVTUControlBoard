@@ -80,6 +80,10 @@ void INITCFG_ConfigADC()
 	// ADC1
 	ADC_Calibration(ADC1);
 	ADC_TrigConfig(ADC1, ADC12_TIM2_TRGO, RISE);
+	ADC_ChannelSeqReset(ADC1);
+	ADC_ChannelSet_Sequence(ADC1, ADC1_IGBT_IG_CH, 1);
+	ADC_ChannelSeqLen(ADC1, 1);
+	ADC_Interrupt(ADC1, EOCIE, 0, true);
 	ADC_Enable(ADC1);
 
 	// ADC2
@@ -87,7 +91,6 @@ void INITCFG_ConfigADC()
 	ADC_ChannelSeqReset(ADC2);
 	ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
 	ADC_ChannelSeqLen(ADC2, 1);
-	ADC_Interrupt(ADC2, EOCIE, 0, true);
 	ADC_Enable(ADC2);
 
 	// ADC3
