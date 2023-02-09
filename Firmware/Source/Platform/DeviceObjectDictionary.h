@@ -57,26 +57,32 @@
 #define REG_VG_SET_K					23	// Коэффициент преобразованиия Vg в ЦАП
 #define REG_VG_SET_B					24	// Смещение при преобразовании Vg в ЦАП
 //
-#define REG_ISET_P2						25	// Коэффициент точной корректировки задания прямого тока P2
-#define REG_ISET_P1						26	// Коэффициент точной корректировки задания прямого тока P1
-#define REG_ISET_P0						27	// Коэффициент точной корректировки задания прямого тока P0
+#define REG_IG_P2						25	// Коэффициент точной корректировки Ig P2
+#define REG_IG_P1						26	// Коэффициент точной корректировки Ig P1
+#define REG_IG_P0						27	// Коэффициент точной корректировки Ig P0
+#define REG_IG_K						28	// Коэффициент пересчёта напряжения АЦП в Ig
+#define REG_IG_B						29	// Смещение оцифрованного Ig
 //
-#define REG_REGULATOR_QP				28	// Пропорциональный коэффициент регулятора
-#define REG_REGULATOR_QI				29	// Интегральный коэффициент регулятора
-#define REG_REGULATOR_QI_MAX			30	// Максимальное значение интегрального коэффициента регулятора
-#define REG_REGULATOR_ALLOWED_ERR		31	// Максимально допустимая ошибка регулятора
-#define REG_FOLLOWING_ERR_CNT			32	// Максимальное значение счетчика FollowingError
-#define REG_FOLLOWING_ERR_MUTE			33	// Выключение слежения за FollowingError
+#define REG_ISET_P2						30	// Коэффициент точной корректировки задания прямого тока P2
+#define REG_ISET_P1						31	// Коэффициент точной корректировки задания прямого тока P1
+#define REG_ISET_P0						32	// Коэффициент точной корректировки задания прямого тока P0
 //
-#define REG_LCSU_MAX_CURRENT			34	// Максимальный ток с одного LCSU (в А)
-#define REG_LCSU_START_NID				35	// Стартовое значение NodeID для первого LCSU
-#define REG_LCSU_LONG_TIMEOUT			36	// Длинный таймаут по операциям с LCSU (в мс)
-#define REG_VG_EDGE_TIME				37	// Длительность фронта импульса управления (мкс)
-#define REG_LAMP_CTRL					38	// Запрет управление блоком внешнего индикатора
-#define REG_R_SHUNT						39	// Сопротивление шунта (в мкОм)
-#define REG_I_R0_THRESHOLD				40	// Граница нижнего диапазона тока (в А)
-
-
+#define REG_REGULATOR_QP				33	// Пропорциональный коэффициент регулятора
+#define REG_REGULATOR_QI				34	// Интегральный коэффициент регулятора
+#define REG_REGULATOR_QI_MAX			35	// Максимальное значение интегрального коэффициента регулятора
+#define REG_REGULATOR_ALLOWED_ERR		36	// Максимально допустимая ошибка регулятора
+#define REG_FOLLOWING_ERR_CNT			37	// Максимальное значение счетчика FollowingError
+#define REG_FOLLOWING_ERR_MUTE			38	// Выключение слежения за FollowingError
+//
+#define REG_LCSU_MAX_CURRENT			39	// Максимальный ток с одного LCSU (в А)
+#define REG_LCSU_START_NID				40	// Стартовое значение NodeID для первого LCSU
+#define REG_LCSU_LONG_TIMEOUT			41	// Длинный таймаут по операциям с LCSU (в мс)
+#define REG_VG_EDGE_TIME				42	// Длительность фронта импульса управления (мкс)
+#define REG_LAMP_CTRL					43	// Запрет управление блоком внешнего индикатора
+#define REG_R_SHUNT						44	// Сопротивление шунта (в мкОм)
+#define REG_I_R0_THRESHOLD				45	// Граница нижнего диапазона тока (в А)
+#define REG_IG_THRESHOLD				46	// Значчение тока Ig при выставлении PROBLEM_GATE_SHORT
+//
 
 // Несохраняемы регистры чтения-записи
 #define REG_ID_SETPOINT					128	// Уставка силового тока (в А)
@@ -140,6 +146,7 @@
 #define EP_VD							2	// Оцифрованные данные Vd
 #define EP_VG							3	// Оцифрованные данные Vg
 #define EP_VG_ERR						4	// Ошибка регулятора Vg
+#define EP_IG							5	// Оцифрованные данные Ig
 
 // Operation results
 #define OPRESULT_NONE					0	// No information or not finished
@@ -154,6 +161,7 @@
 #define DF_LCSU_CURRENT_CONFIG			4	// Ошибка конфигурации LCSU
 #define DF_SELFTEST_VD					5	// Ошибка измерения напряжения в режиме самотестирования
 #define DF_SELFTEST_ID					6	// Ошибка измерения тока в режиме самотестирования
+#define DF_GATE_VOLTAGE					7	// Проблема с формирователем напряжения управления
 
 // Warning
 #define WARNING_NONE					0	// Предупреждений нет
@@ -164,7 +172,7 @@
 #define PROBLEM_NONE					0
 #define PROBLEM_FORCED_STOP				1	// Принудительная остановка процесса
 #define PROBLEM_SAFETY					2	// Сработала система безопасности
-#define PROBLEM_GATE_VOLTAGE			3	// Неудалось сформировать напряжение управления
+#define PROBLEM_GATE_SHORT				3	// КЗ в цепи управления
 
 // User Errors
 #define ERR_NONE						0

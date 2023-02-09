@@ -12,13 +12,19 @@
 #define COEF_P2_MAX					INT16S_MAX
 #define COEF_P2_DEF					0
 //
+#define COEF_P1_MIN					-INT16S_MAX
+#define COEF_P1_MAX					INT16S_MAX
+#define COEF_P1_DEF					1
+//
+#define COEF_P0_MIN					-INT16S_MAX
+#define COEF_P0_MAX					INT16S_MAX
+#define COEF_P0_DEF					0
+//
 #define COEF_K_MIN					-INT16S_MAX
 #define COEF_K_MAX					INT16S_MAX
-#define COEF_K_DEF					1
 //
 #define COEF_B_MIN					-INT16S_MAX
 #define COEF_B_MAX					INT16S_MAX
-#define COEF_B_DEF					0
 //
 #define REGULATOR_QP_MIN			0
 #define REGULATOR_QP_MAX			10
@@ -78,6 +84,24 @@
 #define PULSE_DURATION_MIN			5
 #define PULSE_DURATION_MAX			10
 #define PULSE_DURATION_DEF			10
+//
+#define IG_THRESHOLD_MIN			10
+#define IG_THRESHOLD_MAX			100
+#define IG_THRESHOLD_DEF			30
+//
+#define COEF_ID_R0_K_DEF			1
+#define COEF_ID_R1_K_DEF			1
+#define COEF_VD_K_DEF				1
+#define COEF_VG_K_DEF				1
+#define COEF_VG_SET_K_DEF			1
+#define COEF_IG_K_DEF				1
+//
+#define COEF_ID_R0_B_DEF			1
+#define COEF_ID_R1_B_DEF			1
+#define COEF_VD_B_DEF				1
+#define COEF_VG_B_DEF				1
+#define COEF_VG_SET_B_DEF			1
+#define COEF_IG_B_DEF				1
 
 
 // Types
