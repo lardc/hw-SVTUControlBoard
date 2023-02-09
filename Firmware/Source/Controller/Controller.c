@@ -65,12 +65,12 @@ Int16U CONTROL_CheckSelfTestResults();
 void CONTROL_Init()
 {
 	// Переменные для конфигурации EndPoint
-	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR};
-	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
+	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR, EP_IG};
+	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
 	pInt16U FEPCounters[FEP_COUNT] = {(pInt16U)&CONTROL_PowerValues_Counter, (pInt16U)&CONTROL_PowerValues_Counter,
-														(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter};
+										(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter};
 	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_Id, (pFloat32)MEMBUF_EP_Vd, (pFloat32)MEMBUF_EP_Vg,
-			(pFloat32)MEMBUF_EP_VgErr};
+			(pFloat32)MEMBUF_EP_VgErr, (pFloat32)MEMBUF_EP_Ig};
 	
 	// Конфигурация сервиса работы Data-table и EPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
@@ -373,7 +373,7 @@ void CONTROL_HandlePulse()
 					{
 						GATE_CacheVariables();
 						GATE_StartProcess();
-						Timeout = CONTROL_TimeCounter + TIME_VG_STAB;
+						Timeout = 0;
 
 						CONTROL_SetDeviceState(DS_InProcess, SS_GateVoltageProcess);
 					}
@@ -383,13 +383,22 @@ void CONTROL_HandlePulse()
 				break;
 				
 			case SS_GateVoltageProcess:
-				if(GATE_WaitingVoltage())
-					CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseProcess);
+				if(GATE_RegulatorStatusCheck(RS_InProcess))
+					Timeout = CONTROL_TimeCounter + TIME_VG_STAB;
+
+				if(GATE_RegulatorStatusCheck(RS_TargetReached))
+				{
+					if(CONTROL_TimeCounter >= Timeout)
+						CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseProcess);
+				}
 				else
 				{
-					if(CONTROL_TimeCounter >= Timeout || GATE_FollowingErrorCheck())
+					if(GATE_RegulatorStatusCheck(RS_FollowingError))
+						CONTROL_SwitchToFault(DF_GATE_VOLTAGE);
+
+					if(GATE_RegulatorStatusCheck(RS_GateShort))
 					{
-						DataTable[REG_PROBLEM] = PROBLEM_GATE_VOLTAGE;
+						DataTable[REG_PROBLEM] = PROBLEM_GATE_SHORT;
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					}
 				}

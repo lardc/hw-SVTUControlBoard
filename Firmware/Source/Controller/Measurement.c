@@ -18,6 +18,7 @@
 void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U RegisterOffset,
 		Int16U RegisterK, Int16U RegisterP0, Int16U RegisterP1, Int16U RegisterP2, float RShunt);
 int MEASURE_SortCondition(const void *A, const void *B);
+float MEASURE_ConvertX(Int16U SampleADC, Int16U P2reg, Int16U P1reg, Int16U P0reg, Int16U Kreg, Int16U Breg);
 
 // Functions
 //
@@ -71,20 +72,26 @@ void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRan
 }
 //------------------------------------
 
+float MEASURE_ConvertX(Int16U SampleADC, Int16U P2reg, Int16U P1reg, Int16U P0reg, Int16U Kreg, Int16U Breg)
+{
+	float Result = 0;
+
+	Result = SampleADC * DataTable[Kreg] + DataTable[Breg];
+	Result = Result * Result * DataTable[P2reg] + Result * DataTable[P1reg] + DataTable[P0reg];
+
+	return (Result > 0) ? Result : 0;
+}
+//------------------------------------
+
 float MEASURE_Vg(Int16U SampleADC)
 {
-	float Voltage = 0;
+	return MEASURE_ConvertX(SampleADC, REG_VG_P2, REG_VG_P1, REG_VG_P0, REG_VG_K, REG_VG_B);
+}
+//------------------------------------
 
-	float P2 = DataTable[REG_VG_P2];
-	float P1 = DataTable[REG_VG_P1];
-	float P0 = DataTable[REG_VG_P0];
-	float K = DataTable[REG_VG_K];
-	float B = DataTable[REG_VG_B];
-
-	Voltage = SampleADC * K + B;
-	Voltage = Voltage * Voltage * P2 + Voltage * P1 + P0;
-
-	return (Voltage > 0) ? Voltage : 0;
+float MEASURE_Ig(Int16U SampleADC)
+{
+	return MEASURE_ConvertX(SampleADC, REG_IG_P2, REG_IG_P1, REG_IG_P0, REG_IG_K, REG_IG_B);
 }
 //------------------------------------
 

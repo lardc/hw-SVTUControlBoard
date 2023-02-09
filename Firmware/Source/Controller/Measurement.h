@@ -10,6 +10,7 @@ void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRan
 void MEASURE_ConvertVg(pFloat32 InputArray, Int16U DataLength);
 //
 float MEASURE_Vg(Int16U SampleADC);
+float MEASURE_Ig(Int16U SampleADC);
 //
 float MEASURE_ExtractMaxValues(pFloat32 InputArray, Int16U Size);
 //

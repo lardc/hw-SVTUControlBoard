@@ -14,8 +14,8 @@
 
 // Variables
 //
-bool GateVoltageReched = false;
-bool FollowingErrorFlag = false;
+RegulatorState GATE_RegulatorState = RS_None;
+//
 float RegulatorQp = 0;
 float RegulatorQi = 0;
 float RegulatorQimax = 0;
@@ -30,7 +30,7 @@ Int16U GateValues_Counter = 0;
 
 // Forward functions
 Int16U GATE_ConvertVgToDAC(float Value);
-void GATE_SaveToEndpoints(float Voltage, float Error);
+void GATE_SaveToEndpoints(float Voltage, float Current, float Error);
 
 // Functions
 //
@@ -64,12 +64,6 @@ void GATE_SetVg(float Value)
 }
 //------------------------------------
 
-bool GATE_WaitingVoltage()
-{
-	return GateVoltageReched;
-}
-//------------------------------------
-
 void GATE_StartProcess()
 {
 	TIM_Start(TIM2);
@@ -93,29 +87,32 @@ void GATE_CacheVariables()
 	RegulatorAlowedError = DataTable[REG_REGULATOR_ALLOWED_ERR];
 	FollowingErrorCounterMax = (Int16U)DataTable[REG_FOLLOWING_ERR_CNT];
 	//
-	GateVoltageReched = false;
-	FollowingErrorFlag = false;
 	GateVoltage = 0;
 	RegulatorCounter = 0;
 	FollowingErrorCounter = 0;
 	GateValues_Counter = 0;
+
+	GATE_RegulatorState = RS_None;
 }
 //------------------------------------
 
-void GATE_RegulatorProcess(float GateVoltageSample)
+void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 {
 	float RegulatorError, RegulatorOut, Qp, Qi = 0;
 
 	// Формирование линейно нарастающего фронта импульса напряжения
 	if(GateVoltage < GateVoltageSetpoint)
+	{
 		GateVoltage += dVg;
+		GATE_RegulatorState = RS_InProcess;
+	}
 	else
 	{
 		GateVoltage = GateVoltageSetpoint;
-		GateVoltageReched = true;
+		GATE_RegulatorState = RS_TargetReached;
 	}
 
-	RegulatorError = (RegulatorCounter == 0) ? 0 : (GateVoltage - GateVoltageSample);
+	RegulatorError = (RegulatorCounter == 0) ? 0 : (GateVoltage - VoltageSample);
 
 	if(fabsf(RegulatorError / GateVoltage * 100) < RegulatorAlowedError)
 	{
@@ -127,7 +124,12 @@ void GATE_RegulatorProcess(float GateVoltageSample)
 		FollowingErrorCounter++;
 
 		if(FollowingErrorCounter >= FollowingErrorCounterMax && !DataTable[REG_FOLLOWING_ERR_MUTE])
-			FollowingErrorFlag = true;
+		{
+			if(CurrentSample >= DataTable[REG_IG_THRESHOLD])
+				GATE_RegulatorState = RS_GateShort;
+			else
+				GATE_RegulatorState = RS_FollowingError;
+		}
 	}
 
 	Qi += RegulatorError * RegulatorQi;
@@ -146,23 +148,25 @@ void GATE_RegulatorProcess(float GateVoltageSample)
 
 	RegulatorCounter++;
 
-	GATE_SaveToEndpoints(GateVoltageSample, RegulatorError);
+	GATE_SaveToEndpoints(VoltageSample, CurrentSample, RegulatorError);
 }
 //------------------------------------
 
-void GATE_SaveToEndpoints(float Voltage, float Error)
+void GATE_SaveToEndpoints(float Voltage, float Current, float Error)
 {
 	if(GateValues_Counter < VALUES_x_SIZE)
 	{
 		MEMBUF_EP_Vg[GateValues_Counter] = Voltage;
+		MEMBUF_EP_Ig[GateValues_Counter] = Current;
 		MEMBUF_EP_VgErr[GateValues_Counter] = Error;
 
 		GateValues_Counter++;
 	}
 }
+//------------------------------------
 
-bool GATE_FollowingErrorCheck()
+bool GATE_RegulatorStatusCheck(RegulatorState State)
 {
-	return FollowingErrorFlag;
+	return (GATE_RegulatorState == State) ? true : false;
 }
 //------------------------------------
