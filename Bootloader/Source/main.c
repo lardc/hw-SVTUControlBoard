@@ -57,35 +57,20 @@ void IO_Config()
 	RCC_GPIO_Clk_EN(PORTA);
 	RCC_GPIO_Clk_EN(PORTB);
 
-	// Выходы
-	GPIO_Config (GPIOA, Pin_1, Output, PushPull, HighSpeed, NoPull);				// PA1 - DAC_CS
-	GPIO_Bit_Rst(GPIOA, Pin_1);
-	GPIO_Config (GPIOA, Pin_2, Output, PushPull, HighSpeed, NoPull);				// PA2 - DAC_LDAC
-	GPIO_Bit_Rst(GPIOA, Pin_2);
-	GPIO_Config (GPIOA, Pin_3, Output, PushPull, HighSpeed, NoPull);				// PA1 - IFB_EN
-	GPIO_Bit_Rst(GPIOA, Pin_3);
-	GPIO_Config (GPIOA, Pin_8, Output, PushPull, HighSpeed, Pull_Up);				// PA8 - RangeSelect
-	GPIO_Bit_Set(GPIOA, Pin_8);
-	GPIO_Config (GPIOA, Pin_15, Output, PushPull, HighSpeed, NoPull);			 	// PA15 - SYNC_SCPC
-	GPIO_Bit_Rst(GPIOA, Pin_15);
-	GPIO_Config (GPIOB, Pin_0, Output, OpenDrain, HighSpeed, NoPull);				// PB0 - GATE_EN
-	GPIO_Bit_Set(GPIOB, Pin_0);
-	GPIO_Config (GPIOB, Pin_6, Output, PushPull, HighSpeed, NoPull);				// PB6 - SYNC_OSC
-	GPIO_Bit_Rst(GPIOB, Pin_6);
-	GPIO_Config (GPIOB, Pin_7, Output, PushPull, HighSpeed, NoPull);				// PB7 - LED
-	GPIO_Bit_Rst(GPIOB, Pin_7);
+	//Выходы
+	GPIO_Config(LED_BLINK_PORT, LED_BLINK_PIN, Output, PushPull, HighSpeed, NoPull);
 
-	// Альтернативные функции портов
-	GPIO_Config(GPIOA, Pin_9, AltFn, PushPull, HighSpeed, NoPull);		// PA9(USART1 TX)
+	//Альтернативные функции портов
+	GPIO_Config(GPIOA, Pin_9, AltFn, PushPull, HighSpeed, NoPull); //PA9(USART1 TX)
 	GPIO_AltFn(GPIOA, Pin_9, AltFn_7);
 
-	GPIO_Config(GPIOA, Pin_10, AltFn, PushPull, HighSpeed, NoPull);		// PA10(USART1 RX)
+	GPIO_Config(GPIOA, Pin_10, AltFn, PushPull, HighSpeed, NoPull); //PA10(USART1 RX)
 	GPIO_AltFn(GPIOA, Pin_10, AltFn_7);
 
-	GPIO_Config(GPIOA, Pin_11, AltFn, PushPull, HighSpeed, NoPull);		// PA11(CAN RX)
+	GPIO_Config(GPIOA, Pin_11, AltFn, PushPull, HighSpeed, NoPull); //PA11(CAN RX)
 	GPIO_AltFn(GPIOA, Pin_11, AltFn_9);
 
-	GPIO_Config(GPIOA, Pin_12, AltFn, PushPull, HighSpeed, NoPull);		// PA12(CAN TX)
+	GPIO_Config(GPIOA, Pin_12, AltFn, PushPull, HighSpeed, NoPull); //PA12(CAN TX)
 	GPIO_AltFn(GPIOA, Pin_12, AltFn_9);
 }
 //--------------------------------------------

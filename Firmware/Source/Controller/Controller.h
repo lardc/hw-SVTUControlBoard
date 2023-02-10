@@ -14,23 +14,26 @@ typedef enum __DeviceState
 	DS_Ready			= 4,
 	DS_InProcess		= 5
 } DeviceState;
-typedef enum __PCDeviceState
+typedef enum __LCSUState
 {
-	PCDS_None = 0,
-	PCDS_Fault = 1,
-	PCDS_Disabled = 2,
-	PCDS_Ready = 3,
-	PCDS_PulseConfigReady = 4,
-	PCDS_InProcess = 5
-} PCDeviceState;
+	LCSU_None = 0,
+	LCSU_Fault = 1,
+	LCSU_Disabled = 2,
+	LCSU_Ready = 3,
+	LCSU_PulseConfigReady = 4,
+	LCSU_InProcess = 5
+} LCSUState;
 
 // Variables
 extern DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
+extern bool IsImpulse;
 
 // Functions
 void CONTROL_Init();
 void CONTROL_Idle();
 void CONTROL_SwitchToFault(Int16U Reason);
+void CONTROL_SafetyProcess();
+void CONTROL_HandleExternalLamp(bool IsImpulse);
 
 #endif // __CONTROLLER_H

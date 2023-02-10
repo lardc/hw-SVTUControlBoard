@@ -3,11 +3,27 @@
 
 #include "stdinc.h"
 
+typedef enum __RegulatorState
+{
+	RS_None				= 0,
+	RS_InProcess		= 1,
+	RS_TargetReached	= 2,
+	RS_FollowingError	= 3,
+	RS_GateShort		= 4
+} RegulatorState;
+
+// Variables
+//
+extern Int16U GateValues_Counter;
+extern RegulatorState GATE_RegulatorState;
+
 // Functions
 //
-void GATE_PulseOutput(bool State);
-void GATE_SetVg(uint16_t Value);
-void GATE_SetIg(uint16_t Value);
-void GATE_IgPulse(uint16_t Value, uint16_t PulseWidth);
+void GATE_SetVg(float Value);
+void GATE_StartProcess();
+void GATE_RegulatorProcess(float GateVoltageSample, float CurrentSample);
+void GATE_StopProcess();
+void GATE_CacheVariables();
+bool GATE_RegulatorStatusCheck(RegulatorState State);
 
 #endif // __GATE_DRIVER_H

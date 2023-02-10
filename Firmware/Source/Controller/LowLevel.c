@@ -5,12 +5,6 @@
 #include "Board.h"
 #include "Delay.h"
 
-// Definitions
-#define DAC_CHANNEL_B		BIT15
-
-// Forward functions
-void LL_WriteDACx(uint16_t Data);
-
 // Functions
 //
 void LL_ToggleBoardLED()
@@ -19,64 +13,56 @@ void LL_ToggleBoardLED()
 }
 //------------------------------------
 
-void LL_IdLowRange(bool State)
+void LL_SyncLCSU(bool State)
 {
-	GPIO_SetState(GPIO_ID_LOW_RANGE, !State);
-}
-//------------------------------------
-
-bool LL_IsIdLowRange()
-{
-	return !GPIO_GetState(GPIO_ID_LOW_RANGE);
-}
-//------------------------------------
-
-void LL_SyncPowerCell(bool State)
-{
-	GPIO_SetState(GPIO_SYNC_POWER_CELL, State);
+	GPIO_SetState(GPIO_SYNC_LCSU, State);
 }
 //------------------------------------
 
 void LL_SyncScope(bool State)
 {
-	GPIO_SetState(GPIO_SYNC_SCOPE, State);
+	GPIO_SetState(GPIO_SYNC_OSC, State);
 }
 //------------------------------------
 
-bool LL_SyncScopeGetState()
+void LL_AnalogInputsSelftTest(bool State)
 {
-	return GPIO_GetState(GPIO_SYNC_SCOPE);
+	GPIO_SetState(GPIO_AIN_ST, State);
 }
 //------------------------------------
 
-void LL_PulseIg(bool State)
+void LL_ExtIndication(bool State)
 {
-	GPIO_SetState(GPIO_IG_PULSE, !State);
+	GPIO_SetState(GPIO_IND_CTRL, State);
 }
 //------------------------------------
 
-void LL_WriteDACx(uint16_t Data)
+void LL_ExtIndicationToggle()
 {
-	GPIO_SetState(GPIO_DAC_CS, false);
-	SPI_WriteByte(SPI1, Data);
-	GPIO_SetState(GPIO_DAC_CS, true);
-	DELAY_US(1);
+	GPIO_Toggle(GPIO_IND_CTRL);
+}
+//------------------------------------
 
-	GPIO_SetState(GPIO_DAC_LDAC, false);
-	DELAY_US(1);
-	GPIO_SetState(GPIO_DAC_LDAC, true);
-	DELAY_US(1);
+void LL_WriteDAC(Int16U Data)
+{
+	DAC_SetValueCh2(DAC1, Data);
 }
 //-----------------------------
 
-void LL_WriteDAC_ChA(uint16_t Data)
+bool LL_SafetyIsActive()
 {
-	LL_WriteDACx(Data & (~DAC_CHANNEL_B));
+	return !GPIO_GetState(GPIO_SAFETY);
 }
-//-----------------------------
+//------------------------------------
 
-void LL_WriteDAC_ChB(uint16_t Data)
+void LL_SetIdRange(bool Range)
 {
-	LL_WriteDACx(Data | DAC_CHANNEL_B);
+	GPIO_SetState(GPIO_ID_RANGE, Range);
 }
-//-----------------------------
+//------------------------------------
+
+bool LL_IdGetRange()
+{
+	return GPIO_GetState(GPIO_SYNC_OSC);
+}
+//------------------------------------

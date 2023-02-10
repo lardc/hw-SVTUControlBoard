@@ -27,17 +27,21 @@ typedef enum __SubState
 	SS_WaitPulsePause = 4,
 	SS_ConfigPulse = 5,
 	SS_WaitConfig = 6,
-	SS_PostPulseCheck = 7,
+	SS_GateVoltageProcess = 7,
+	SS_CurrentPulseProcess = 8,
+	SS_PostPulseCheck = 9,
 
-	SS_PowerOff = 8
+	SS_PowerOff = 10
 } SubState;
 
 // Variables
 DeviceState CONTROL_State = DS_None;
 static Boolean CycleActive = false;
 SubState SUB_State = SS_None;
+bool IsImpulse = false;
+bool SelfTest = false;
 
-volatile Int16U CONTROL_Values_Counter = 0;
+volatile Int16U CONTROL_PowerValues_Counter = 0;
 volatile Int64U CONTROL_TimeCounter = 0;
 
 // Forward functions
@@ -47,25 +51,26 @@ void CONTROL_ResetToDefaults();
 void CONTROL_ResetData();
 void CONTROL_ResetHardware();
 void CONTROL_WatchDogUpdate();
-void CONTROL_CellsStateUpdate();
-void CONTROL_HandleFaultCellsEvents(Int64U Timeout);
+void CONTROL_LCSUStateUpdate();
+void CONTROL_HandleFaultLCSUEvents(Int64U Timeout);
 void CONTROL_HandlePowerOn();
 void CONTROL_HandlePulse();
 void CONTROL_HandlePowerOff();
 void CONTROL_SaveDataToEndpoint();
 void CONTROL_SaveResults();
+Int16U CONTROL_CheckSelfTestResults();
 
 // Functions
 //
 void CONTROL_Init()
 {
-	pInt16U cnt = (pInt16U)&CONTROL_Values_Counter;
 	// Переменные для конфигурации EndPoint
-	Int16U EPIndexes[EP_COUNT] = {EP16_DATA_ID, EP16_DATA_VD, EP16_DATA_IG, EP16_DATA_VG};
-	Int16U EPSized[EP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
-	pInt16U EPCounters[EP_COUNT] = {cnt, cnt, cnt, cnt};
-	pInt16U EPDatas[EP_COUNT] = {(pInt16U)MEMBUF_EP_Id, (pInt16U)MEMBUF_EP_Vd, (pInt16U)MEMBUF_EP_Ig,
-			(pInt16U)MEMBUF_EP_Vg};
+	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR, EP_IG};
+	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
+	pInt16U FEPCounters[FEP_COUNT] = {(pInt16U)&CONTROL_PowerValues_Counter, (pInt16U)&CONTROL_PowerValues_Counter,
+										(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter};
+	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_Id, (pFloat32)MEMBUF_EP_Vd, (pFloat32)MEMBUF_EP_Vg,
+			(pFloat32)MEMBUF_EP_VgErr, (pFloat32)MEMBUF_EP_Ig};
 	
 	// Конфигурация сервиса работы Data-table и EPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
@@ -76,13 +81,13 @@ void CONTROL_Init()
 	
 	// Инициализация device profile
 	DEVPROFILE_Init(&CONTROL_DispatchAction, &CycleActive);
-	DEVPROFILE_InitEPService(EPIndexes, EPSized, EPCounters, EPDatas);
+	DEVPROFILE_InitFEPService(FEPIndexes, FEPSized, FEPCounters, FEPDatas);
 	
 	// Сброс значений
 	DEVPROFILE_ResetControlSection();
 	CONTROL_ResetToDefaults();
 
-	LOGIC_FindCells();
+	LOGIC_FindLCSU();
 }
 //-----------------------------------------------
 
@@ -102,8 +107,9 @@ void CONTROL_ResetData()
 	DataTable[REG_PROBLEM] = PROBLEM_NONE;
 	DataTable[REG_OP_RESULT] = OPRESULT_NONE;
 
-	DataTable[REG_DUT_VOLTAGE] = 0;
-	DataTable[REG_DUT_CURRENT] = 0;
+	DataTable[REG_RESULT_VD] = 0;
+	DataTable[REG_RESULT_ID] = 0;
+	DataTable[REG_RESULT_VG] = 0;
 
 	DataTable[REG_BHL_ERROR_CODE] = 0;
 	DataTable[REG_BHL_DEVICE] = 0;
@@ -117,13 +123,13 @@ void CONTROL_ResetData()
 
 void CONTROL_ResetHardware()
 {
-	GATE_PulseOutput(false);
-	LL_SyncPowerCell(false);
+	LL_SyncLCSU(false);
 	LL_SyncScope(false);
-	LL_IdLowRange(false);
+	LL_AnalogInputsSelftTest(false);
+	LL_ExtIndication(false);
+	LL_SetIdRange(false);
 
-	GATE_SetVg(0);
-	GATE_SetIg(0);
+	GATE_StopProcess();
 }
 //-----------------------------------------------
 
@@ -135,7 +141,6 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 	{
 		case ACT_ENABLE_POWER:
 			{
-				LOGIC_FindCells();
 				if(CONTROL_State == DS_None)
 					CONTROL_SetDeviceState(DS_InProcess, SS_PowerOn);
 				else if(CONTROL_State != DS_Ready)
@@ -175,11 +180,28 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 		case ACT_STOP_TEST:
 			if(CONTROL_State == DS_InProcess)
 			{
+				LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS);
 				CONTROL_ResetToDefaults();
+
+				DataTable[REG_PROBLEM] = PROBLEM_FORCED_STOP;
+
 				CONTROL_SetDeviceState(DS_Ready, SS_None);
 			}
 			break;
 			
+		case ACT_START_SELF_TEST:
+			{
+				if(CONTROL_State == DS_Ready)
+				{
+					SelfTest = true;
+					DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_NONE;
+					CONTROL_SetDeviceState(DS_InProcess, SS_PulseInit);
+				}
+				else
+					*pUserError = ERR_DEVICE_NOT_READY;
+			}
+			break;
+
 		default:
 			return DIAG_HandleDiagnosticAction(ActionID, pUserError);
 	}
@@ -193,8 +215,8 @@ void CONTROL_Idle()
 	// Обработка мастер-запросов по интерфейсу
 	DEVPROFILE_ProcessRequests();
 	
-	// Считывание состояний силовых ячеек
-	CONTROL_CellsStateUpdate();
+	// Считывание состояний блоков LCSU
+	CONTROL_LCSUStateUpdate();
 	
 	// Обработка логики мастер-команд
 	CONTROL_HandlePowerOn();
@@ -220,6 +242,7 @@ void CONTROL_SwitchToFault(Int16U Reason)
 	
 	CONTROL_SetDeviceState(DS_Fault, SS_None);
 	DataTable[REG_FAULT_REASON] = Reason;
+	DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
 }
 //-----------------------------------------------
 
@@ -229,7 +252,7 @@ void CONTROL_SetDeviceState(DeviceState NewState, SubState NewSubState)
 	DataTable[REG_DEV_STATE] = NewState;
 	
 	SUB_State = NewSubState;
-	DataTable[REG_DEV_SUB_STATE] = NewSubState;
+	DataTable[REG_SUB_STATE] = NewSubState;
 }
 //-----------------------------------------------
 
@@ -240,16 +263,16 @@ void CONTROL_WatchDogUpdate()
 }
 //-----------------------------------------------
 
-void CONTROL_CellsStateUpdate()
+void CONTROL_LCSUStateUpdate()
 {
-	static uint64_t NextUpdate = 0;
+	static Int64U NextUpdate = 0;
 	
 	if(SUB_State != SS_None)
 	{
 		if(CONTROL_TimeCounter > NextUpdate)
 		{
-			NextUpdate = CONTROL_TimeCounter + TIME_PC_UPDATE;
-			if(!LOGIC_UpdateCellsState())
+			NextUpdate = CONTROL_TimeCounter + TIME_LCSU_UPDATE;
+			if(!LOGIC_UpdateLCSUState())
 				CONTROL_SwitchToFault(DF_INTERFACE);
 		}
 	}
@@ -266,9 +289,9 @@ void CONTROL_HandlePowerOn()
 		{
 			case SS_PowerOn:
 				{
-					if(LOGIC_PowerEnableCells())
+					if(LOGIC_PowerEnableLCSU())
 					{
-						Timeout = CONTROL_TimeCounter + DataTable[REG_PC_LONG_TIMEOUT];
+						Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 						CONTROL_SetDeviceState(DS_InProcess, SS_WaitCharge);
 					}
 					else
@@ -278,10 +301,10 @@ void CONTROL_HandlePowerOn()
 				
 			case SS_WaitCharge:
 				{
-					if(LOGIC_AreCellsInStateX(PCDS_Ready))
+					if(LOGIC_AreLCSUInStateX(LCSU_Ready))
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					else
-						CONTROL_HandleFaultCellsEvents(Timeout);
+						CONTROL_HandleFaultLCSUEvents(Timeout);
 				}
 				break;
 				
@@ -303,35 +326,36 @@ void CONTROL_HandlePulse()
 			case SS_PulseInit:
 				{
 					CONTROL_ResetData();
-					Timeout = CONTROL_TimeCounter + DataTable[REG_PC_LONG_TIMEOUT];
+					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
 				}
 				break;
 				
 			case SS_WaitPulsePause:
 				{
-					if(LOGIC_AreCellsInStateX(PCDS_Ready))
+					if(LOGIC_AreLCSUInStateX(LCSU_Ready))
 						CONTROL_SetDeviceState(DS_InProcess, SS_ConfigPulse);
 					else
-						CONTROL_HandleFaultCellsEvents(Timeout);
+						CONTROL_HandleFaultLCSUEvents(Timeout);
 				}
 				break;
 				
 			case SS_ConfigPulse:
 				{
-					float CurrentAmplitude = LOGIC_GetCurrentSetpoint();
+					float CurrentAmplitude = SelfTest ? DataTable[REG_ID_MAX] : LOGIC_GetCurrentSetpoint();
 
 					if(LOGIC_DistributeCurrent(CurrentAmplitude))
 					{
 						bool NoError = false;
 						LOGIC_SelectCurrentRange(CurrentAmplitude);
+						LL_AnalogInputsSelftTest(SelfTest);
 						
-						if(LOGIC_WriteCellsConfig())
+						if(LOGIC_WriteLCSUConfig())
 						{
-							if(LOGIC_CallCommandForCells(ACT_LSLPC_PULSE_CONFIG))
+							if(LOGIC_CallCommandForLCSU(ACT_LCSU_PULSE_CONFIG))
 							{
 								NoError = true;
-								Timeout = CONTROL_TimeCounter + TIMEOUT_PC_SHORT;
+								Timeout = CONTROL_TimeCounter + TIMEOUT_LCSU_SHORT;
 								CONTROL_SetDeviceState(DS_InProcess, SS_WaitConfig);
 							}
 						}
@@ -340,27 +364,82 @@ void CONTROL_HandlePulse()
 							CONTROL_SwitchToFault(DF_INTERFACE);
 					}
 					else
-						CONTROL_SwitchToFault(DF_PC_CURRENT_CONFIG);
+						CONTROL_SwitchToFault(DF_LCSU_CURRENT_CONFIG);
 				}
 				break;
 				
 			case SS_WaitConfig:
 				{
-					if(LOGIC_AreCellsInStateX(PCDS_PulseConfigReady))
+					if(LOGIC_AreLCSUInStateX(LCSU_PulseConfigReady))
 					{
-						LOGIC_ProcessPulse();
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+						GATE_CacheVariables();
+						GATE_StartProcess();
+						Timeout = 0;
+
+						CONTROL_SetDeviceState(DS_InProcess, SS_GateVoltageProcess);
 					}
 					else
-						CONTROL_HandleFaultCellsEvents(Timeout);
+						CONTROL_HandleFaultLCSUEvents(Timeout);
 				}
 				break;
 				
+			case SS_GateVoltageProcess:
+				if(GATE_RegulatorStatusCheck(RS_InProcess))
+					Timeout = CONTROL_TimeCounter + TIME_VG_STAB;
+
+				if(GATE_RegulatorStatusCheck(RS_TargetReached))
+				{
+					if(CONTROL_TimeCounter >= Timeout)
+						CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseProcess);
+				}
+				else
+				{
+					if(GATE_RegulatorStatusCheck(RS_FollowingError))
+						CONTROL_SwitchToFault(DF_GATE_VOLTAGE);
+
+					if(GATE_RegulatorStatusCheck(RS_GateShort))
+					{
+						DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
+						DataTable[REG_PROBLEM] = PROBLEM_GATE_SHORT;
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+				}
+				break;
+
+			case SS_CurrentPulseProcess:
+				IsImpulse = true;
+				LOGIC_ProcessPulse();
+				IsImpulse = false;
+
+				CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+				break;
+
 			case SS_PostPulseCheck:
 				{
 					CONTROL_SaveDataToEndpoint();
 					CONTROL_SaveResults();
-					DataTable[REG_OP_RESULT] = OPRESULT_OK;
+
+					if(SelfTest)
+					{
+						SelfTest = false;
+						LL_AnalogInputsSelftTest(SelfTest);
+
+						Int16U SelfTestResult = CONTROL_CheckSelfTestResults();
+
+						if(SelfTestResult)
+						{
+							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
+							CONTROL_SwitchToFault(SelfTestResult);
+						}
+						else
+						{
+							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_OK;
+							CONTROL_SetDeviceState(DS_Ready, SS_None);
+						}
+					}
+					else
+						DataTable[REG_OP_RESULT] = OPRESULT_OK;
+
 					CONTROL_SetDeviceState(DS_Ready, SS_None);
 				}
 				break;
@@ -372,13 +451,23 @@ void CONTROL_HandlePulse()
 }
 //-----------------------------------------------
 
+Int16U CONTROL_CheckSelfTestResults()
+{
+	if(DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX] * 100 > SELFTEST_ALLOWED_ERROR)
+		return DF_SELFTEST_ID;
+
+	if(DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT]) * 100 > SELFTEST_ALLOWED_ERROR)
+		return DF_SELFTEST_VD;
+
+	return 0;
+}
+//-----------------------------------------------
+
 void CONTROL_SaveDataToEndpoint()
 {
-	LOGIC_SaveToEndpoint((uint16_t *)MEMBUF_DMA_Vd, (uint16_t *)MEMBUF_EP_Vd, VALUES_POWER_DMA_SIZE);
-	LOGIC_SaveToEndpoint((uint16_t *)MEMBUF_DMA_Id, (uint16_t *)MEMBUF_EP_Id, VALUES_POWER_DMA_SIZE);
-	LOGIC_SaveToEndpoint((uint16_t *)MEMBUF_DMA_Vg, (uint16_t *)MEMBUF_EP_Vg, VALUES_GATE_DMA_SIZE);
-	LOGIC_SaveToEndpoint((uint16_t *)MEMBUF_DMA_Ig, (uint16_t *)MEMBUF_EP_Ig, VALUES_GATE_DMA_SIZE);
-	CONTROL_Values_Counter = VALUES_x_SIZE;
+	LOGIC_SaveToEndpoint((pFloat32)MEMBUF_DMA_Vd, (pFloat32)MEMBUF_EP_Vd, VALUES_POWER_DMA_SIZE);
+	LOGIC_SaveToEndpoint((pFloat32)MEMBUF_DMA_Id, (pFloat32)MEMBUF_EP_Id, VALUES_POWER_DMA_SIZE);
+	CONTROL_PowerValues_Counter = VALUES_x_SIZE;
 }
 //-----------------------------------------------
 
@@ -394,7 +483,7 @@ void CONTROL_HandlePowerOff()
 	{
 		CONTROL_ResetToDefaults();
 
-		if(LOGIC_CallCommandForCells(ACT_LSLPC_DISABLE_POWER))
+		if(LOGIC_CallCommandForLCSU(ACT_LCSU_DISABLE_POWER))
 			CONTROL_SetDeviceState(DS_None, SS_None);
 		else
 			CONTROL_SwitchToFault(DF_INTERFACE);
@@ -402,13 +491,58 @@ void CONTROL_HandlePowerOff()
 }
 //-----------------------------------------------
 
-void CONTROL_HandleFaultCellsEvents(Int64U Timeout)
+void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 {
-	if(LOGIC_IsCellInFaultOrDisabled(PCDS_Fault, PCDS_Disabled))
+	if(LOGIC_IsLCSUInFaultOrDisabled(LCSU_Fault, LCSU_Disabled))
 	{
-		CONTROL_SwitchToFault(DF_PC_UNEXPECTED_STATE);
+		CONTROL_SwitchToFault(DF_LCSU_UNEXPECTED_STATE);
 	}
 	else if(CONTROL_TimeCounter > Timeout)
-		CONTROL_SwitchToFault(DF_PC_STATE_TIMEOUT);
+		CONTROL_SwitchToFault(DF_LCSU_STATE_TIMEOUT);
+}
+//-----------------------------------------------
+
+void CONTROL_SafetyProcess()
+{
+	if(!LL_SafetyIsActive())
+	{
+		CONTROL_ResetData();
+		CONTROL_ResetHardware();
+
+		DataTable[REG_PROBLEM] = PROBLEM_SAFETY;
+
+		CONTROL_SetDeviceState(DS_Ready, SS_None);
+	}
+}
+// ----------------------------------------
+
+void CONTROL_HandleExternalLamp(bool IsImpulse)
+{
+	static Int64U ExternalLampCounter = 0;
+
+	if(DataTable[REG_LAMP_CTRL])
+	{
+		if(CONTROL_State == DS_Fault)
+		{
+			if(++ExternalLampCounter > TIME_FAULT_LED_BLINK)
+			{
+				LL_ExtIndicationToggle();
+				ExternalLampCounter = 0;
+			}
+		}
+		else
+			{
+				if(IsImpulse)
+				{
+					LL_ExtIndication(true);
+					ExternalLampCounter = CONTROL_TimeCounter + TIME_EXT_LAMP_ON_STATE;
+				}
+				else
+				{
+					if(CONTROL_TimeCounter >= ExternalLampCounter)
+						LL_ExtIndication(false);
+				}
+			}
+	}
 }
 //-----------------------------------------------

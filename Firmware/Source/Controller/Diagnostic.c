@@ -11,48 +11,37 @@
 
 // Functions
 //
-bool DIAG_HandleDiagnosticAction(uint16_t ActionID, uint16_t *pUserError)
+bool DIAG_HandleDiagnosticAction(Int16U ActionID, Int16U *pUserError)
 {
 	switch (ActionID)
 	{
-		case ACT_DBG_PULSE_ID_LOW_RANGE:
-			if(CONTROL_State == DS_None)
-			{
-				LL_IdLowRange(DataTable[REG_DBG]);
-			}
-			break;
-			
-		case ACT_DBG_PULSE_SYNC_SCPC:
-			if(CONTROL_State == DS_None)
-			{
-				LL_SyncPowerCell(true);
-				DELAY_MS(10);
-				LL_SyncPowerCell(false);
-			}
-			break;
-			
-		case ACT_DBG_PULSE_IG:
-			if(CONTROL_State == DS_None)
-			{
-				GATE_SetVg(DataTable[REG_VG_VALUE]);
-				GATE_SetIg(DataTable[REG_IG_VALUE]);
-				LL_SyncScope(true);
-				GATE_PulseOutput(true);
-				DELAY_US(DataTable[REG_GATE_PULSE_TIME] / 2);
-				LL_SyncScope(false);
-				DELAY_US(DataTable[REG_GATE_PULSE_TIME] / 2);
-				GATE_PulseOutput(false);
-			}
-			break;
-			
-		case ACT_DBG_PULSE_SYNC_SCOPE:
-			if(CONTROL_State == DS_None)
-			{
-				LL_SyncScope(true);
-				DELAY_MS(1000);
-				LL_SyncScope(false);
-			}
-			break;
+	case ACT_DBG_PULSE_V_GATE:
+		LL_WriteDAC(DataTable[REG_DBG]);
+		DELAY_MS(10);
+		LL_WriteDAC(0);
+		break;
+
+	case ACT_DBG_PULSE_SYNC_OSC:
+		LL_SyncScope(true);
+		DELAY_MS(10);
+		LL_SyncScope(false);
+		break;
+
+	case ACT_DBG_VIN_ST:
+		LL_AnalogInputsSelftTest(DataTable[REG_DBG]);
+		break;
+
+	case ACT_DBG_PULSE_SYNC_LCSU:
+		LL_SyncLCSU(true);
+		DELAY_MS(10);
+		LL_SyncLCSU(false);
+		break;
+
+	case ACT_DBG_EXT_INDICATION:
+		LL_ExtIndication(true);
+		DELAY_MS(500);
+		LL_ExtIndication(false);
+		break;
 			
 		default:
 			return false;

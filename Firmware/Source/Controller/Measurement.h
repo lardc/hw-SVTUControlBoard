@@ -5,16 +5,15 @@
 
 // Functions
 //
-void MEASURE_ConvertVd(uint16_t *InputArray, uint16_t DataLength);
-void MEASURE_ConvertId(uint16_t *InputArray, uint16_t DataLength);
-void MEASURE_ConvertIdLow(uint16_t *InputArray, uint16_t DataLength);
+void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength);
+void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange);
+void MEASURE_ConvertVg(pFloat32 InputArray, Int16U DataLength);
 //
-void MEASURE_ConvertVg(uint16_t *InputArray, uint16_t DataLength);
-void MEASURE_ConvertIg(uint16_t *InputArray, uint16_t DataLength);
+float MEASURE_Vg(Int16U SampleADC);
+float MEASURE_Ig(Int16U SampleADC);
 //
-float MEASURE_ExtractMaxValues(Int16U *InputArray, Int16U Size);
-Int16U MEASURE_ExtractVoltage(Int16U *VoltageArray, Int16U *CurrentArray, Int16U CurrentPoint, Int16U Size);
+float MEASURE_ExtractMaxValues(pFloat32 InputArray, Int16U Size);
 //
-void MEASURE_ArrayEMA(uint16_t *InputArray, uint16_t DataLength);
+void MEASURE_ArrayEMA(pFloat32 InputArray, Int16U DataLength);
 
 #endif // __MEASUREMENT_H

@@ -9,30 +9,39 @@
 #include "DeviceObjectDictionary.h"
 #include "LowLevel.h"
 #include "Delay.h"
+#include "math.h"
+#include "MemBuffers.h"
+
+// Variables
+//
+RegulatorState GATE_RegulatorState = RS_None;
+//
+float RegulatorQp = 0;
+float RegulatorQi = 0;
+float RegulatorQimax = 0;
+float GateVoltageSetpoint = 0;
+float dVg = 0;
+float RegulatorAlowedError = 0;
+float GateVoltage = 0;
+Int16U FollowingErrorCounterMax = 0;
+Int16U FollowingErrorCounter = 0;
+Int16U RegulatorCounter = 0;
+Int16U GateValues_Counter = 0;
 
 // Forward functions
-uint16_t GATE_ConvertValueToDAC(uint16_t Value, uint16_t RegisterOffset, uint16_t RegisterK, uint16_t RegisterP0,
-		uint16_t RegisterP1, uint16_t RegisterP2);
-uint16_t GATE_ConvertVgToDAC(uint16_t Value);
-uint16_t GATE_ConvertIgToDAC(uint16_t Value);
+Int16U GATE_ConvertVgToDAC(float Value);
+void GATE_SaveToEndpoints(float Voltage, float Current, float Error);
 
 // Functions
 //
-void GATE_PulseOutput(bool State)
+Int16U GATE_ConvertVgToDAC(float Value)
 {
-	GPIO_SetState(GPIO_IG_PULSE, !State);
-}
-//------------------------------------
-
-uint16_t GATE_ConvertValueToDAC(uint16_t Value, uint16_t RegisterOffset, uint16_t RegisterK, uint16_t RegisterP0,
-		uint16_t RegisterP1, uint16_t RegisterP2)
-{
-	float Offset = (float)((int16_t)DataTable[RegisterOffset]);
-	float K = (float)DataTable[RegisterK] / 1000;
+	float Offset = DataTable[REG_VG_SET_B];
+	float K = DataTable[REG_VG_SET_K];
 	
-	float P0 = (float)((int16_t)DataTable[RegisterP0]);
-	float P1 = (float)DataTable[RegisterP1] / 1000;
-	float P2 = (float)((int16_t)DataTable[RegisterP2]) / 1e6;
+	float P0 = DataTable[REG_VG_SET_P0];
+	float P1 = DataTable[REG_VG_SET_P1];
+	float P2 = DataTable[REG_VG_SET_P2];
 	
 	// Квадратичная корректировка
 	float tmp = (float)Value;
@@ -45,40 +54,119 @@ uint16_t GATE_ConvertValueToDAC(uint16_t Value, uint16_t RegisterOffset, uint16_
 	if(tmp > DAC_RESOLUTION)
 		tmp = DAC_RESOLUTION;
 
-	return (tmp > 0) ? (uint16_t)tmp : 0;
+	return (tmp > 0) ? (Int16U)tmp : 0;
 }
 //------------------------------------
 
-uint16_t GATE_ConvertVgToDAC(uint16_t Value)
+void GATE_SetVg(float Value)
 {
-	return GATE_ConvertValueToDAC(Value, REG_VG_SET_OFFSET, REG_VG_SET_K, REG_VG_SET_P0, REG_VG_SET_P1, REG_VG_SET_P2);
+	Value ? LL_WriteDAC(GATE_ConvertVgToDAC(Value)) : LL_WriteDAC(0);
 }
 //------------------------------------
 
-uint16_t GATE_ConvertIgToDAC(uint16_t Value)
+void GATE_StartProcess()
 {
-	return GATE_ConvertValueToDAC(Value, REG_IG_SET_OFFSET, REG_IG_SET_K, REG_IG_SET_P0, REG_IG_SET_P1, REG_IG_SET_P2);
+	TIM_Start(TIM2);
 }
 //------------------------------------
 
-void GATE_SetVg(uint16_t Value)
+void GATE_StopProcess()
 {
-	LL_WriteDAC_ChB(GATE_ConvertVgToDAC(Value));
+	TIM_Stop(TIM2);
+	GATE_SetVg(0);
 }
 //------------------------------------
 
-void GATE_SetIg(uint16_t Value)
+void GATE_CacheVariables()
 {
-	LL_WriteDAC_ChA(GATE_ConvertIgToDAC(Value));
+	RegulatorQp = DataTable[REG_REGULATOR_QP];
+	RegulatorQi = DataTable[REG_REGULATOR_QI];
+	RegulatorQimax = DataTable[REG_REGULATOR_QI_MAX];
+	GateVoltageSetpoint = DataTable[REG_VG_SETPOINT];
+	dVg = DataTable[REG_VG_EDGE_TIME] / TIMER2_uS;
+	RegulatorAlowedError = DataTable[REG_REGULATOR_ALLOWED_ERR];
+	FollowingErrorCounterMax = (Int16U)DataTable[REG_FOLLOWING_ERR_CNT];
+	//
+	GateVoltage = 0;
+	RegulatorCounter = 0;
+	FollowingErrorCounter = 0;
+	GateValues_Counter = 0;
+
+	GATE_RegulatorState = RS_None;
 }
 //------------------------------------
 
-void GATE_IgPulse(uint16_t Value, uint16_t PulseWidth)
+void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 {
-	GATE_SetIg(Value);
+	float RegulatorError, RegulatorOut, Qp, Qi = 0;
 
-	LL_PulseIg(true);
-	DELAY_US(PulseWidth);
-	LL_PulseIg(false);
+	// Формирование линейно нарастающего фронта импульса напряжения
+	if(GateVoltage < GateVoltageSetpoint)
+	{
+		GateVoltage += dVg;
+		GATE_RegulatorState = RS_InProcess;
+	}
+	else
+	{
+		GateVoltage = GateVoltageSetpoint;
+		GATE_RegulatorState = RS_TargetReached;
+	}
+
+	RegulatorError = (RegulatorCounter == 0) ? 0 : (GateVoltage - VoltageSample);
+
+	if(fabsf(RegulatorError / GateVoltage * 100) < RegulatorAlowedError)
+	{
+		if(FollowingErrorCounter)
+			FollowingErrorCounter--;
+	}
+	else
+	{
+		FollowingErrorCounter++;
+
+		if(FollowingErrorCounter >= FollowingErrorCounterMax && !DataTable[REG_FOLLOWING_ERR_MUTE])
+		{
+			if(CurrentSample >= DataTable[REG_IG_THRESHOLD])
+				GATE_RegulatorState = RS_GateShort;
+			else
+				GATE_RegulatorState = RS_FollowingError;
+		}
+	}
+
+	Qi += RegulatorError * RegulatorQi;
+
+	if(Qi > RegulatorQimax)
+		Qi = RegulatorQimax;
+
+	if(Qi < (-1) * RegulatorQimax)
+		Qi = (-1) * RegulatorQimax;
+
+	Qp = RegulatorError * RegulatorQp;
+
+	RegulatorOut = GateVoltage + Qp +Qi;
+
+	GATE_SetVg(RegulatorOut);
+
+	RegulatorCounter++;
+
+	GATE_SaveToEndpoints(VoltageSample, CurrentSample, RegulatorError);
+}
+//------------------------------------
+
+void GATE_SaveToEndpoints(float Voltage, float Current, float Error)
+{
+	if(GateValues_Counter < VALUES_x_SIZE)
+	{
+		MEMBUF_EP_Vg[GateValues_Counter] = Voltage;
+		MEMBUF_EP_Ig[GateValues_Counter] = Current;
+		MEMBUF_EP_VgErr[GateValues_Counter] = Error;
+
+		GateValues_Counter++;
+	}
+}
+//------------------------------------
+
+bool GATE_RegulatorStatusCheck(RegulatorState State)
+{
+	return (GATE_RegulatorState == State) ? true : false;
 }
 //------------------------------------
