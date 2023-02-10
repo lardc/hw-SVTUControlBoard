@@ -242,6 +242,7 @@ void CONTROL_SwitchToFault(Int16U Reason)
 	
 	CONTROL_SetDeviceState(DS_Fault, SS_None);
 	DataTable[REG_FAULT_REASON] = Reason;
+	DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
 }
 //-----------------------------------------------
 
@@ -398,6 +399,7 @@ void CONTROL_HandlePulse()
 
 					if(GATE_RegulatorStatusCheck(RS_GateShort))
 					{
+						DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
 						DataTable[REG_PROBLEM] = PROBLEM_GATE_SHORT;
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					}
