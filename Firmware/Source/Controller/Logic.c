@@ -153,9 +153,6 @@ bool LOGIC_WriteLCSUConfig()
 		{
 			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
 				return false;
-
-			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, LCSU_DataArray[i].PulseDuration))
-				return false;
 		}
 	}
 	

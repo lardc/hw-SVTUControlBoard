@@ -132,7 +132,6 @@
 
 // Регистры LCSU
 #define REG_LCSU_PULSE_VALUE			128	// Значение амплитуды импульса тока (в А)
-#define REG_LCSU_TRAPEZE_DURATION		18	// Регистр длительности импульса трапеции
 
 #define REG_LCSU_DEV_STATE				192	// Состояние блока
 #define REG_LCSU_FAULT_REASON			193
