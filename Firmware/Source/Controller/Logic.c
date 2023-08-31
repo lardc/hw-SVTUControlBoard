@@ -239,7 +239,7 @@ void LOGIC_ResetLCSUCurrent()
 
 void LOGIC_SelectCurrentRange(float Current)
 {
-	(Current <= DataTable[REG_I_R0_THRESHOLD]) ? LL_SetIdRange(false) : LL_SetIdRange(true);
+	(Current <= DataTable[REG_I_R0_THRESHOLD]) ? LL_SetIdRange(true) : LL_SetIdRange(false);
 }
 // ----------------------------------------
 
