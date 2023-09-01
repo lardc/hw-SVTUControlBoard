@@ -34,7 +34,7 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U Reg
 	
 	for(Int16U i = 0; i < DataLength; i++)
 	{
-		float tmp = (InputArray[i] + Offset) * ADC_REF_VOLTAGE / ADC_RESOLUTION * K;
+		float tmp = *(InputArray + i) * K + Offset;
 
 		if(RShunt)
 			tmp = tmp / RShunt;
