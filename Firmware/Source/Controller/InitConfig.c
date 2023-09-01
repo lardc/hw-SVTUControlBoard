@@ -99,7 +99,7 @@ void INITCFG_ConfigADC()
 	ADC_ChannelSeqReset(ADC3);
 	ADC_ChannelSet_Sequence(ADC3, ADC3_UD_CH, 1);
 	ADC_ChannelSeqLen(ADC3, 1);
-	ADC_DMAConfig(ADC3);
+	ADC_DMAEnable(ADC3, true);
 	ADC_Enable(ADC3);
 
 	// ADC4
@@ -107,7 +107,7 @@ void INITCFG_ConfigADC()
 	ADC_ChannelSeqReset(ADC4);
 	ADC_ChannelSet_Sequence(ADC4, ADC4_ID_CH, 1);
 	ADC_ChannelSeqLen(ADC4, 1);
-	ADC_DMAConfig(ADC4);
+	ADC_DMAEnable(ADC4, true);
 	ADC_Enable(ADC4);
 
 	ADC_SamplingStart(ADC1);

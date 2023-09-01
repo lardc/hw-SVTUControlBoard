@@ -269,8 +269,8 @@ void LOGIC_ProcessPulse()
 	GATE_StopProcess();
 
 	// Пересчёт значений
-	MEASURE_ConvertVd((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
-	MEASURE_ConvertId((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE, LL_IdGetRange());
+	MEASURE_ConvertVd(&MEMBUF_DMA_Vd[0], VALUES_POWER_DMA_SIZE);
+	MEASURE_ConvertId(&MEMBUF_DMA_Id[0], VALUES_POWER_DMA_SIZE, LL_IdGetRange());
 }
 // ----------------------------------------
 

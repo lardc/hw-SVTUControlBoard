@@ -42,6 +42,6 @@
 #define LCSU_COUNT_MAX				1				// Максимальное количество блоков LCSU в установке
 
 // Параметры DMA
-#define VALUES_POWER_DMA_SIZE		1000
+#define VALUES_POWER_DMA_SIZE		700
 
 #endif // __GLOBAL_H
