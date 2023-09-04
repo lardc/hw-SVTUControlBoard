@@ -465,8 +465,8 @@ Int16U CONTROL_CheckSelfTestResults()
 
 void CONTROL_SaveDataToEndpoint()
 {
-	LOGIC_SaveToEndpoint((pFloat32)MEMBUF_DMA_Vd, (pFloat32)MEMBUF_EP_Vd, VALUES_POWER_DMA_SIZE);
-	LOGIC_SaveToEndpoint((pFloat32)MEMBUF_DMA_Id, (pFloat32)MEMBUF_EP_Id, VALUES_POWER_DMA_SIZE);
+	LOGIC_SaveToEndpoint(&MEMBUF_DMA_Vd[0], &MEMBUF_EP_Vd[0], VALUES_POWER_DMA_SIZE);
+	LOGIC_SaveToEndpoint(&MEMBUF_DMA_Id[0], &MEMBUF_EP_Id[0], VALUES_POWER_DMA_SIZE);
 	CONTROL_PowerValues_Counter = VALUES_x_SIZE;
 }
 //-----------------------------------------------

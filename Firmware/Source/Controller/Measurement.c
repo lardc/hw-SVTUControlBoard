@@ -34,7 +34,7 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U Reg
 	
 	for(Int16U i = 0; i < DataLength; i++)
 	{
-		float tmp = *(InputArray + i) * K + Offset;
+		float tmp = (float)(*((pInt32U)(InputArray + i))) * K + Offset;
 
 		if(RShunt)
 			tmp = tmp / RShunt;
