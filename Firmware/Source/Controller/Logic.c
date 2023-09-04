@@ -291,9 +291,9 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	DataTable[REG_RESULT_VD] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_EP_Vg, VALUES_x_SIZE);
+	DataTable[REG_RESULT_VD] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
 	DataTable[REG_RESULT_ID] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
-	DataTable[REG_RESULT_VG] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
+	DataTable[REG_RESULT_VG] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_EP_Vg, VALUES_x_SIZE);
 
 	if((DataTable[REG_RESULT_VD] > VD_MAX_VALUE) || (DataTable[REG_RESULT_VD] < VD_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
