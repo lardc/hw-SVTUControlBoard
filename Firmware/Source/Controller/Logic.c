@@ -260,7 +260,8 @@ void LOGIC_ProcessPulse()
 	LL_SyncLCSU(true);
 
 	// Завершение оцифровки
-	while(!IT_DMASampleCompleted()){}
+	DELAY_US(5000);
+	//while(!IT_DMASampleCompleted()){}
 
 	TIM_Stop(TIM1);
 

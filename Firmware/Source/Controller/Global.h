@@ -14,7 +14,7 @@
 #define EP_COUNT					0				// Количество массивов для чтения
 #define FEP_COUNT					5				// Количество массивов для чтения типа float
 #define ENABLE_LOCKING				FALSE			// Защита паролем
-#define VALUES_x_SIZE				1000			// Размер выходных массивов
+#define VALUES_x_SIZE				300				// Размер выходных массивов
 
 // Временные параметры
 #define TIME_LED_BLINK				500				// Период моргания светодиода на плате (в мс)
@@ -42,6 +42,6 @@
 #define LCSU_COUNT_MAX				1				// Максимальное количество блоков LCSU в установке
 
 // Параметры DMA
-#define VALUES_POWER_DMA_SIZE		700
+#define VALUES_POWER_DMA_SIZE		VALUES_x_SIZE * 5
 
 #endif // __GLOBAL_H
