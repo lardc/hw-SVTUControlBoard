@@ -29,7 +29,6 @@ typedef struct __LCSUStructData
 	bool IsActive;
 	LCSUState State;
 	float Current;
-	float PulseDuration;
 } LCSUData, *pLCSUData;
 
 // Variables
@@ -205,8 +204,6 @@ bool LOGIC_DistributeCurrent(float Current)
 			}
 			else
 				LCSU_DataArray[i].Current = Current;
-
-			LCSU_DataArray[i].PulseDuration = DataTable[REG_PULSE_DURATION];
 		}
 	}
 	
@@ -253,20 +250,24 @@ void LOGIC_ProcessPulse()
 	DMA_ChannelEnable(DMA_ADC_VD_CH, true);
 
 	// Запуск оцифровки импульса тока и напряжения в силовой цепи
+	ADC_SamplingStart(ADC3);
 	TIM_Start(TIM1);
 
 	// Запуск импульса тока в силовой цепи
-	LL_SyncScope(true);
 	LL_SyncLCSU(true);
 
+	DELAY_US(DataTable[REG_OSC_SYNC_DELAY]);
+	LL_SyncScope(true);
+
+	DELAY_US(DataTable[REG_OSC_SYNC_TIME]);
+	LL_SyncScope(false);
+
 	// Завершение оцифровки
-	DELAY_US(5000);
-	//while(!IT_DMASampleCompleted()){}
+	while(!IT_DMASampleCompleted()){}
 
 	TIM_Stop(TIM1);
 
 	LL_SyncLCSU(false);
-	LL_SyncScope(false);
 	GATE_StopProcess();
 
 	// Пересчёт значений

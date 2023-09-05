@@ -66,6 +66,7 @@ void GATE_SetVg(float Value)
 
 void GATE_StartProcess()
 {
+	ADC_SamplingStart(ADC1);
 	TIM_Start(TIM2);
 }
 //------------------------------------

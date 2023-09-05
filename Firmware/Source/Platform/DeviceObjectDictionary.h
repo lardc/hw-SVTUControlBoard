@@ -82,12 +82,13 @@
 #define REG_R_SHUNT						44	// Сопротивление шунта (в мкОм)
 #define REG_I_R0_THRESHOLD				45	// Граница нижнего диапазона тока (в А)
 #define REG_IG_THRESHOLD				46	// Значчение тока Ig при выставлении PROBLEM_GATE_SHORT
+#define REG_OSC_SYNC_TIME				47	// Длительность импульса синхронизации для осциллографа (в мкс)
+#define REG_OSC_SYNC_DELAY				48	// Задержка формирования импульса синхронизации для осциллографа (мкс)
 //
 
 // Несохраняемы регистры чтения-записи
 #define REG_ID_SETPOINT					128	// Уставка силового тока (в А)
 #define REG_VG_SETPOINT					129	// Уставка напряжения управления (в В)
-#define REG_PULSE_DURATION				130	// Длительность импульса тока (мс)
 //
 #define REG_DBG							150	// Отладочный регистр
 

@@ -50,8 +50,8 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{R_SHUNT_MIN, R_SHUNT_MAX, R_SHUNT_DEF},								// 44
 		{I_THRESHOLD_MIN, I_THRESHOLD_MAX, I_THRESHOLD_DEF},					// 45
 		{IG_THRESHOLD_MIN, IG_THRESHOLD_MAX, IG_THRESHOLD_DEF},					// 46
-		{0, 0, 0},																// 47
-		{0, 0, 0},																// 48
+		{OSC_SYNC_TIME_MIN, OSC_SYNC_TIME_MAX, OSC_SYNC_TIME_DEF},				// 47
+		{OSC_SYNC_DELAY_MIN, OSC_SYNC_DELAY_MAX, OSC_SYNC_DELAY_MAX},			// 48
 		{0, 0, 0},																// 49
 		{0, 0, 0},																// 50
 		{0, 0, 0},																// 51
@@ -133,7 +133,7 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 127
 		{ID_SETPOINT_MIN, ID_SETPOINT_MAX, ID_SETPOINT_DEF},					// 128
 		{VG_SETPOINT_MIN, VG_SETPOINT_MAX, VG_SETPOINT_DEF},					// 129
-		{PULSE_DURATION_MIN, PULSE_DURATION_MAX, PULSE_DURATION_DEF},			// 130
+		{0, 0, 0},																// 130
 		{0, 0, 0},																// 131
 		{0, 0, 0},																// 132
 		{0, 0, 0},																// 133
