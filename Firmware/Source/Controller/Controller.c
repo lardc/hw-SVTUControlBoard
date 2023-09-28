@@ -12,7 +12,7 @@
 #include "GateDriver.h"
 #include "LowLevel.h"
 #include "BCCIxParams.h"
-
+#include "math.h"
 // Types
 //
 typedef void (*FUNC_AsyncDelegate)();
@@ -123,13 +123,12 @@ void CONTROL_ResetData()
 
 void CONTROL_ResetHardware()
 {
+	GATE_StopProcess();
 	LL_SyncLCSU(false);
 	LL_SyncScope(false);
 	LL_AnalogInputsSelftTest(false);
 	LL_ExtIndication(false);
 	LL_SetIdRange(false);
-
-	GATE_StopProcess();
 }
 //-----------------------------------------------
 
@@ -395,13 +394,35 @@ void CONTROL_HandlePulse()
 				else
 				{
 					if(GATE_RegulatorStatusCheck(RS_FollowingError))
-						CONTROL_SwitchToFault(DF_GATE_VOLTAGE);
+					{
+						if (SelfTest)
+						{
+							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
+							CONTROL_SwitchToFault(DF_SELFTEST_GATE);
+						}
+						else
+						{
+							CONTROL_ResetData();
+							CONTROL_ResetHardware();
+							DataTable[REG_PROBLEM] = PROBLEM_GATE_VOLTAGE;
+							CONTROL_SetDeviceState(DS_Ready, SS_None);
+						}
+					}
 
 					if(GATE_RegulatorStatusCheck(RS_GateShort))
 					{
-						DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
-						DataTable[REG_PROBLEM] = PROBLEM_GATE_SHORT;
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
+						if (SelfTest)
+						{
+							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
+							CONTROL_SwitchToFault(DF_SELFTEST_GATE);
+						}
+						else
+						{
+							GATE_StopProcess();
+							DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
+							DataTable[REG_PROBLEM] = PROBLEM_GATE_SHORT;
+							CONTROL_SetDeviceState(DS_Ready, SS_None);
+						}
 					}
 				}
 				break;
@@ -430,6 +451,7 @@ void CONTROL_HandlePulse()
 						{
 							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
 							CONTROL_SwitchToFault(SelfTestResult);
+							break;
 						}
 						else
 						{
@@ -453,10 +475,10 @@ void CONTROL_HandlePulse()
 
 Int16U CONTROL_CheckSelfTestResults()
 {
-	if(DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX] * 100 > SELFTEST_ALLOWED_ERROR)
+	if(fabs((1-DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX]) * 100) > SELFTEST_ALLOWED_ERROR)
 		return DF_SELFTEST_ID;
 
-	if(DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT]) * 100 > SELFTEST_ALLOWED_ERROR)
+	if(fabs(1-(DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT]/1000)))*100 > SELFTEST_ALLOWED_ERROR)
 		return DF_SELFTEST_VD;
 
 	return 0;
@@ -507,11 +529,12 @@ void CONTROL_SafetyProcess()
 	if(!LL_SafetyIsActive())
 	{
 		CONTROL_ResetData();
+
 		CONTROL_ResetHardware();
 
 		DataTable[REG_PROBLEM] = PROBLEM_SAFETY;
 
-		CONTROL_SetDeviceState(DS_Ready, SS_None);
+		CONTROL_SetDeviceState(DS_None, SS_None);
 	}
 }
 // ----------------------------------------

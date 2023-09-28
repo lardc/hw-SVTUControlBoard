@@ -19,7 +19,7 @@
 // Временные параметры
 #define TIME_LED_BLINK				500				// Период моргания светодиода на плате (в мс)
 #define TIME_LCSU_UPDATE			10				// Период опроса силовых ячеек (в мс)
-#define TIME_VG_STAB				1000			// Время стабилизации Vg (в мкс)
+#define TIME_VG_STAB				3				// Время стабилизации Vg (в мс)
 #define TIMEOUT_LCSU_SHORT			1000			// Короткий таймаут по операциям с LCSU (в мс)
 #define TIME_FAULT_LED_BLINK		250				//
 #define TIME_EXT_LAMP_ON_STATE		500				//

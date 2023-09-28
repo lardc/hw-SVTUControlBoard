@@ -65,7 +65,7 @@ void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRan
 {
 	float RShunt = DataTable[REG_R_SHUNT] / 1000;
 
-	if(CurrentRange)
+	if(!CurrentRange)
 		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_R1_B, REG_ID_R1_K, REG_ID_R1_P0, REG_ID_R1_P1, REG_ID_R1_P2, RShunt);
 	else
 		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_R0_B, REG_ID_R0_K, REG_ID_R0_P0, REG_ID_R0_P1, REG_ID_R0_P2, RShunt);
@@ -114,7 +114,8 @@ float MEASURE_ExtractMaxValues(pFloat32 InputArray, Int16U Size)
 	for (int i = Size - SAMPLING_AVG_NUM - MAX_SAMPLES_CUTOFF_NUM; i < Size - MAX_SAMPLES_CUTOFF_NUM; ++i)
 		AverageValue += *(InputArrayCopy + i);
 
-	return (AverageValue / SAMPLING_AVG_NUM);
+	//return (AverageValue / SAMPLING_AVG_NUM);
+	return (InputArray[Size/2]);
 }
 //------------------------------------
 

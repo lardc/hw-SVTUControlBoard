@@ -161,7 +161,7 @@
 #define DF_LCSU_CURRENT_CONFIG			4	// Ошибка конфигурации LCSU
 #define DF_SELFTEST_VD					5	// Ошибка измерения напряжения в режиме самотестирования
 #define DF_SELFTEST_ID					6	// Ошибка измерения тока в режиме самотестирования
-#define DF_GATE_VOLTAGE					7	// Проблема с формирователем напряжения управления
+#define DF_SELFTEST_GATE				7	// Ошибка формирования управления в режиме самотестирования
 
 // Warning
 #define WARNING_NONE					0	// Предупреждений нет
@@ -173,6 +173,7 @@
 #define PROBLEM_FORCED_STOP				1	// Принудительная остановка процесса
 #define PROBLEM_SAFETY					2	// Сработала система безопасности
 #define PROBLEM_GATE_SHORT				3	// КЗ в цепи управления
+#define PROBLEM_GATE_VOLTAGE			4	// Проблема с формирователем напряжения управления
 
 // User Errors
 #define ERR_NONE						0

@@ -84,7 +84,7 @@ void GATE_CacheVariables()
 	RegulatorQi = DataTable[REG_REGULATOR_QI];
 	RegulatorQimax = DataTable[REG_REGULATOR_QI_MAX];
 	GateVoltageSetpoint = DataTable[REG_VG_SETPOINT];
-	dVg = DataTable[REG_VG_EDGE_TIME] / TIMER2_uS;
+	dVg = DataTable[REG_VG_SETPOINT]/(DataTable[REG_VG_EDGE_TIME] / TIMER2_uS);
 	RegulatorAlowedError = DataTable[REG_REGULATOR_ALLOWED_ERR];
 	FollowingErrorCounterMax = (Int16U)DataTable[REG_FOLLOWING_ERR_CNT];
 	//
@@ -125,12 +125,10 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 		FollowingErrorCounter++;
 
 		if(FollowingErrorCounter >= FollowingErrorCounterMax && !DataTable[REG_FOLLOWING_ERR_MUTE])
-		{
-			if(CurrentSample >= DataTable[REG_IG_THRESHOLD])
-				GATE_RegulatorState = RS_GateShort;
-			else
 				GATE_RegulatorState = RS_FollowingError;
-		}
+
+		if(CurrentSample >= DataTable[REG_IG_THRESHOLD])
+				GATE_RegulatorState = RS_GateShort;
 	}
 
 	Qi += RegulatorError * RegulatorQi;

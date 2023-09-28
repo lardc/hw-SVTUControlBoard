@@ -255,9 +255,10 @@ void LOGIC_ProcessPulse()
 
 	// Запуск импульса тока в силовой цепи
 	LL_SyncLCSU(true);
+	LL_SyncScope(true);
+
 
 	DELAY_US(DataTable[REG_OSC_SYNC_DELAY]);
-	LL_SyncScope(true);
 
 	DELAY_US(DataTable[REG_OSC_SYNC_TIME]);
 	LL_SyncScope(false);
