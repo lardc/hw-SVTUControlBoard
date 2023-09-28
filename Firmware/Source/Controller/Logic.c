@@ -269,7 +269,7 @@ bool LOGIC_FinishProcess()
 	if(IT_DMASampleCompleted())
 	{
 		TIM_Stop(TIM1);
-		TIM_Stop(TIM6);
+
 		TIM_Stop(TIM7);
 
 		IsImpulse = false;

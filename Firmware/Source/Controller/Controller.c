@@ -17,24 +17,7 @@
 // Types
 //
 typedef void (*FUNC_AsyncDelegate)();
-typedef enum __SubState
-{
-	SS_None = 0,
-	
-	SS_PowerOn = 1,
-	SS_WaitCharge = 2,
-	
-	SS_PulseInit = 3,
-	SS_WaitPulsePause = 4,
-	SS_ConfigPulse = 5,
-	SS_WaitConfig = 6,
-	SS_GateVoltageProcess = 7,
-	SS_CurrentPulseStart = 8,
-	SS_WaitFinishProcess = 9,
-	SS_PostPulseCheck = 10,
 
-	SS_PowerOff = 11
-} SubState;
 
 // Variables
 DeviceState CONTROL_State = DS_None;
@@ -126,16 +109,15 @@ void CONTROL_ResetData()
 
 void CONTROL_ResetHardware()
 {
-	TIM_Stop(TIM1);
-	TIM_Stop(TIM6);
-	TIM_Stop(TIM7);
-
-	GATE_StopProcess();
 	LL_SyncLCSU(false);
 	LL_SyncScope(false);
 	LL_AnalogInputsSelftTest(false);
 	LL_ExtIndication(false);
 	LL_SetIdRange(false);
+	GATE_StopProcess();
+	TIM_Stop(TIM1);
+	TIM_Stop(TIM6);
+	TIM_Stop(TIM7);
 }
 //-----------------------------------------------
 
@@ -336,7 +318,7 @@ void CONTROL_HandlePulse()
 				{
 					CONTROL_ResetData();
 					INITCFG_ConfigTimer6(DataTable[REG_OSC_SYNC_DELAY]);
-					INITCFG_ConfigTimer7(DataTable[REG_OSC_SYNC_TIME]);
+					INITCFG_ConfigTimer7(DataTable[REG_OSC_SYNC_TIME] + DataTable[REG_OSC_SYNC_DELAY]);
 
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
@@ -553,13 +535,13 @@ void CONTROL_SafetyProcess()
 {
 	if(!LL_SafetyIsActive())
 	{
-		CONTROL_ResetData();
-
 		CONTROL_ResetHardware();
+
+		CONTROL_ResetData();
 
 		DataTable[REG_PROBLEM] = PROBLEM_SAFETY;
 
-		CONTROL_SetDeviceState(DS_None, SS_None);
+		CONTROL_SetDeviceState(DS_Ready, SS_None);
 	}
 }
 // ----------------------------------------

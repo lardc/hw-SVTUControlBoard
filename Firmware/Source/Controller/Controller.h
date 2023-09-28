@@ -14,6 +14,7 @@ typedef enum __DeviceState
 	DS_Ready			= 4,
 	DS_InProcess		= 5
 } DeviceState;
+
 typedef enum __LCSUState
 {
 	LCSU_None = 0,
@@ -24,10 +25,30 @@ typedef enum __LCSUState
 	LCSU_InProcess = 5
 } LCSUState;
 
+typedef enum __SubState
+{
+	SS_None = 0,
+
+	SS_PowerOn = 1,
+	SS_WaitCharge = 2,
+
+	SS_PulseInit = 3,
+	SS_WaitPulsePause = 4,
+	SS_ConfigPulse = 5,
+	SS_WaitConfig = 6,
+	SS_GateVoltageProcess = 7,
+	SS_CurrentPulseStart = 8,
+	SS_WaitFinishProcess = 9,
+	SS_PostPulseCheck = 10,
+
+	SS_PowerOff = 11
+} SubState;
+
 // Variables
 extern DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
 extern bool IsImpulse;
+extern SubState SUB_State;
 
 // Functions
 void CONTROL_Init();
