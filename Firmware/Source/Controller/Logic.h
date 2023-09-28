@@ -22,7 +22,8 @@ bool LOGIC_DistributeCurrent(float Current);
 float LOGIC_GetCurrentSetpoint();
 void LOGIC_SelectCurrentRange(float Current);
 
-void LOGIC_ProcessPulse();
+void LOGIC_StartPulse();
+bool LOGIC_FinishProcess();
 
 void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, Int16U InputArraySize);
 void LOGIC_SaveResults();

@@ -40,6 +40,7 @@
 // Различные параметры
 #define SELFTEST_ALLOWED_ERROR		10				// Допустимое отключение параметров режима самотестирования
 #define LCSU_COUNT_MAX				1				// Максимальное количество блоков LCSU в установке
+#define SVTU_WAIT_FINISH_TIME		10				// Время ожидания завершения процесса (в мс)
 
 // Параметры DMA
 #define VALUES_POWER_DMA_SIZE		VALUES_x_SIZE * 5

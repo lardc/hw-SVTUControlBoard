@@ -240,7 +240,7 @@ void LOGIC_SelectCurrentRange(float Current)
 }
 // ----------------------------------------
 
-void LOGIC_ProcessPulse()
+void LOGIC_StartPulse()
 {
 	// Подготовка оцифровки
 	IT_DMAFlagsReset();
@@ -253,27 +253,37 @@ void LOGIC_ProcessPulse()
 	ADC_SamplingStart(ADC3);
 	TIM_Start(TIM1);
 
+	// Запуск процесса формирования синхронизации для осциллографа
+	TIM_Start(TIM6);
+	TIM_Start(TIM7);
+
 	// Запуск импульса тока в силовой цепи
 	LL_SyncLCSU(true);
-	LL_SyncScope(true);
+	IsImpulse = true;
+}
+// ----------------------------------------
 
-
-	DELAY_US(DataTable[REG_OSC_SYNC_DELAY]);
-
-	DELAY_US(DataTable[REG_OSC_SYNC_TIME]);
-	LL_SyncScope(false);
-
+bool LOGIC_FinishProcess()
+{
 	// Завершение оцифровки
-	while(!IT_DMASampleCompleted()){}
+	if(IT_DMASampleCompleted())
+	{
+		TIM_Stop(TIM1);
+		TIM_Stop(TIM6);
+		TIM_Stop(TIM7);
 
-	TIM_Stop(TIM1);
+		IsImpulse = false;
+		LL_SyncLCSU(false);
+		GATE_StopProcess();
 
-	LL_SyncLCSU(false);
-	GATE_StopProcess();
+		// Пересчёт значений
+		MEASURE_ConvertVd(&MEMBUF_DMA_Vd[0], VALUES_POWER_DMA_SIZE);
+		MEASURE_ConvertId(&MEMBUF_DMA_Id[0], VALUES_POWER_DMA_SIZE, LL_IdGetRange());
 
-	// Пересчёт значений
-	MEASURE_ConvertVd(&MEMBUF_DMA_Vd[0], VALUES_POWER_DMA_SIZE);
-	MEASURE_ConvertId(&MEMBUF_DMA_Id[0], VALUES_POWER_DMA_SIZE, LL_IdGetRange());
+		return true;
+	}
+	else
+		return false;
 }
 // ----------------------------------------
 

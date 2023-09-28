@@ -13,6 +13,7 @@
 #include "LowLevel.h"
 #include "BCCIxParams.h"
 #include "math.h"
+#include "InitConfig.h"
 // Types
 //
 typedef void (*FUNC_AsyncDelegate)();
@@ -28,10 +29,11 @@ typedef enum __SubState
 	SS_ConfigPulse = 5,
 	SS_WaitConfig = 6,
 	SS_GateVoltageProcess = 7,
-	SS_CurrentPulseProcess = 8,
-	SS_PostPulseCheck = 9,
+	SS_CurrentPulseStart = 8,
+	SS_WaitFinishProcess = 9,
+	SS_PostPulseCheck = 10,
 
-	SS_PowerOff = 10
+	SS_PowerOff = 11
 } SubState;
 
 // Variables
@@ -43,6 +45,7 @@ bool SelfTest = false;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
 volatile Int64U CONTROL_TimeCounter = 0;
+volatile Int64U CONTROL_Timeout = 0;
 
 // Forward functions
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
@@ -123,6 +126,10 @@ void CONTROL_ResetData()
 
 void CONTROL_ResetHardware()
 {
+	TIM_Stop(TIM1);
+	TIM_Stop(TIM6);
+	TIM_Stop(TIM7);
+
 	GATE_StopProcess();
 	LL_SyncLCSU(false);
 	LL_SyncScope(false);
@@ -222,6 +229,9 @@ void CONTROL_Idle()
 	CONTROL_HandlePulse();
 	CONTROL_HandlePowerOff();
 	
+	// Обработка сигнала безопасности
+	CONTROL_SafetyProcess();
+
 	CONTROL_WatchDogUpdate();
 }
 //-----------------------------------------------
@@ -325,6 +335,9 @@ void CONTROL_HandlePulse()
 			case SS_PulseInit:
 				{
 					CONTROL_ResetData();
+					INITCFG_ConfigTimer6(DataTable[REG_OSC_SYNC_DELAY]);
+					INITCFG_ConfigTimer7(DataTable[REG_OSC_SYNC_TIME]);
+
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
 				}
@@ -389,7 +402,7 @@ void CONTROL_HandlePulse()
 				if(GATE_RegulatorStatusCheck(RS_TargetReached))
 				{
 					if(CONTROL_TimeCounter >= Timeout)
-						CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseProcess);
+						CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
 				}
 				else
 				{
@@ -427,12 +440,24 @@ void CONTROL_HandlePulse()
 				}
 				break;
 
-			case SS_CurrentPulseProcess:
-				IsImpulse = true;
-				LOGIC_ProcessPulse();
-				IsImpulse = false;
+			case SS_CurrentPulseStart:
+				LOGIC_StartPulse();
 
-				CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+				CONTROL_Timeout = CONTROL_TimeCounter + SVTU_WAIT_FINISH_TIME;
+				CONTROL_SetDeviceState(DS_InProcess, SS_WaitFinishProcess);
+				break;
+
+			case SS_WaitFinishProcess:
+				if(CONTROL_TimeCounter < CONTROL_Timeout)
+				{
+					if(LOGIC_FinishProcess())
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+				}
+				else
+				{
+					DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
+					CONTROL_SwitchToFault(DF_SVTU_WAIT_TIMEOUT);
+				}
 				break;
 
 			case SS_PostPulseCheck:

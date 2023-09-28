@@ -23,8 +23,6 @@ void ADC1_2_IRQHandler()
 	float GateCurrent = MEASURE_Ig(ADC_Read(ADC1));
 
 	GATE_RegulatorProcess(GateVoltage, GateCurrent);
-
-	CONTROL_SafetyProcess();
 }
 //-----------------------------------------
 
@@ -98,6 +96,28 @@ void TIM3_IRQHandler()
 		CONTROL_HandleExternalLamp(IsImpulse);
 
 		TIM_StatusClear(TIM3);
+	}
+}
+//-----------------------------------------
+
+void TIM6_DAC_IRQHandler()
+{
+	if(TIM_StatusCheck(TIM6))
+	{
+		LL_SyncScope(true);
+
+		TIM_StatusClear(TIM6);
+	}
+}
+//-----------------------------------------
+
+void TIM7_IRQHandler()
+{
+	if(TIM_StatusCheck(TIM7))
+	{
+		LL_SyncScope(false);
+
+		TIM_StatusClear(TIM7);
 	}
 }
 //-----------------------------------------
