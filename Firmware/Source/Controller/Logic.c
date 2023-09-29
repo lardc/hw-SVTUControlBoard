@@ -113,6 +113,9 @@ bool LOGIC_PowerEnableLCSU()
 			}
 		}
 	}
+
+	if(!DataTable[REG_LCSU_DETECTED])
+		return false;
 	
 	return true;
 }

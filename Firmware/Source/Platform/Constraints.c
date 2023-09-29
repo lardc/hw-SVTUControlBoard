@@ -52,7 +52,7 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{IG_THRESHOLD_MIN, IG_THRESHOLD_MAX, IG_THRESHOLD_DEF},					// 46
 		{OSC_SYNC_TIME_MIN, OSC_SYNC_TIME_MAX, OSC_SYNC_TIME_DEF},				// 47
 		{OSC_SYNC_DELAY_MIN, OSC_SYNC_DELAY_MAX, OSC_SYNC_DELAY_DEF},			// 48
-		{0, 0, 0},																// 49
+		{0, 1, 0},																// 49
 		{0, 0, 0},																// 50
 		{0, 0, 0},																// 51
 		{0, 0, 0},																// 52

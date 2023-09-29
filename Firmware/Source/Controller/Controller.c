@@ -280,7 +280,7 @@ void CONTROL_HandlePowerOn()
 		{
 			case SS_PowerOn:
 				{
-					if(LOGIC_PowerEnableLCSU())
+					if(LOGIC_PowerEnableLCSU() || DataTable[REG_EMULATION])
 					{
 						Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 						CONTROL_SetDeviceState(DS_InProcess, SS_WaitCharge);
@@ -292,7 +292,7 @@ void CONTROL_HandlePowerOn()
 				
 			case SS_WaitCharge:
 				{
-					if(LOGIC_AreLCSUInStateX(LCSU_Ready))
+					if(LOGIC_AreLCSUInStateX(LCSU_Ready) || DataTable[REG_EMULATION])
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					else
 						CONTROL_HandleFaultLCSUEvents(Timeout);
@@ -338,7 +338,7 @@ void CONTROL_HandlePulse()
 				{
 					float CurrentAmplitude = SelfTest ? DataTable[REG_ID_MAX] : LOGIC_GetCurrentSetpoint();
 
-					if(LOGIC_DistributeCurrent(CurrentAmplitude))
+					if(LOGIC_DistributeCurrent(CurrentAmplitude)||DataTable[REG_EMULATION])
 					{
 						bool NoError = false;
 						LOGIC_SelectCurrentRange(CurrentAmplitude);
@@ -533,7 +533,7 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 
 void CONTROL_SafetyProcess()
 {
-	if(!LL_SafetyIsActive())
+	if(!LL_SafetyIsActive() && CONTROL_State == LCSU_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge && SUB_State != SS_PowerOff)
 	{
 		CONTROL_ResetHardware();
 
