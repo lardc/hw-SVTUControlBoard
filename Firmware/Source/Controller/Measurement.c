@@ -95,27 +95,18 @@ float MEASURE_Ig(Int16U SampleADC)
 }
 //------------------------------------
 
-float MEASURE_ExtractMaxValues(pFloat32 InputArray, Int16U Size)
+float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U Size, Int16U ADCPeriod)
 {
-	float AverageValue = 0;
-	static float InputArrayCopy[VALUES_POWER_DMA_SIZE];
+	Int16U StartIndex = DataTable[REG_OSC_SYNC_DELAY]/ADCPeriod;
+	Int16U StopIndex = (DataTable[REG_OSC_SYNC_DELAY] + DataTable[REG_OSC_SYNC_TIME])/ADCPeriod;
+	Int16U SizeSample = StopIndex - StartIndex;
 
-	for (int i = 0; i < Size; i++)
-		{
-			// Из-за процесса отпирания прибора 1/3 массива содержит ненужные данные, которые необходимо обнулить
-			if(i < (Size / 3))
-				InputArrayCopy[i] = 0;
-			else
-				InputArrayCopy[i] = *(InputArray + i);
-		}
+	float SumArray = 0;
 
-	qsort(InputArrayCopy, Size, sizeof(*InputArrayCopy), MEASURE_SortCondition);
+	for (int i = 0; i < SizeSample; i++)
+		SumArray += *(InputArray + StartIndex + i);
 
-	for (int i = Size - SAMPLING_AVG_NUM - MAX_SAMPLES_CUTOFF_NUM; i < Size - MAX_SAMPLES_CUTOFF_NUM; ++i)
-		AverageValue += *(InputArrayCopy + i);
-
-	//return (AverageValue / SAMPLING_AVG_NUM);
-	return (InputArray[Size/2]);
+	return (SumArray/SizeSample);
 }
 //------------------------------------
 
