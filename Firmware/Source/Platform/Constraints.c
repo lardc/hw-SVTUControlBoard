@@ -53,9 +53,9 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{OSC_SYNC_TIME_MIN, OSC_SYNC_TIME_MAX, OSC_SYNC_TIME_DEF},				// 47
 		{OSC_SYNC_DELAY_MIN, OSC_SYNC_DELAY_MAX, OSC_SYNC_DELAY_DEF},			// 48
 		{0, 1, 0},																// 49
-		{0, 0, 0},																// 50
-		{0, 0, 0},																// 51
-		{0, 0, 0},																// 52
+		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 50
+		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 51
+		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 52
 		{0, 0, 0},																// 53
 		{0, 0, 0},																// 54
 		{0, 0, 0},																// 55

@@ -216,11 +216,22 @@ bool LOGIC_DistributeCurrent(float Current)
 
 float LOGIC_GetCurrentSetpoint()
 {
-	float P0 = DataTable[REG_ISET_P0];
-	float P1 = DataTable[REG_ISET_P1];
-	float P2 = DataTable[REG_ISET_P2];
-	
+	float P0, P1, P2;
 	float current = DataTable[REG_ID_SETPOINT];
+
+	if (current <= DataTable[REG_I_R0_THRESHOLD])
+	{
+		P0 = DataTable[REG_ISET_R0_P0];
+		P1 = DataTable[REG_ISET_R0_P1];
+		P2 = DataTable[REG_ISET_R0_P2];
+	}
+	else
+	{
+		P0 = DataTable[REG_ISET_R1_P0];
+		P1 = DataTable[REG_ISET_R1_P1];
+		P2 = DataTable[REG_ISET_R1_P2];
+	}
+	
 	current = current * current * P2 + current * P1 + P0;
 
 	return (current > 0) ? current : 0;

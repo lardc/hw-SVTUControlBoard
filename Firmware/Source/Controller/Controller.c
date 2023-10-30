@@ -533,7 +533,7 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 
 void CONTROL_SafetyProcess()
 {
-	if(!LL_SafetyIsActive() && CONTROL_State == LCSU_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge && SUB_State != SS_PowerOff)
+	if(!LL_SafetyIsActive() && CONTROL_State == DS_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge && SUB_State != SS_PowerOff)
 	{
 		CONTROL_ResetHardware();
 
