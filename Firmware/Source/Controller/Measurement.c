@@ -20,6 +20,7 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U Reg
 int MEASURE_SortCondition(const void *A, const void *B);
 float MEASURE_ConvertX(Int16U SampleADC, Int16U P2reg, Int16U P1reg, Int16U P0reg, Int16U Kreg, Int16U Breg);
 
+
 // Functions
 //
 void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U RegisterOffset,
@@ -95,9 +96,14 @@ float MEASURE_Ig(Int16U SampleADC)
 }
 //------------------------------------
 
-float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U Size, Int16U ADCPeriod)
+float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U Size, Int16U ADCPeriod, bool Gate)
 {
-	Int16U StartIndex = DataTable[REG_OSC_SYNC_DELAY]/ADCPeriod;
+	Int16U StartIndex = 0;
+	if(Gate)
+		StartIndex = DataTable[REG_VG_EDGE_TIME]/ADCPeriod;
+	else
+		StartIndex = DataTable[REG_OSC_SYNC_DELAY]/ADCPeriod;
+
 	Int16U StopIndex = (DataTable[REG_OSC_SYNC_DELAY] + DataTable[REG_OSC_SYNC_TIME])/ADCPeriod;
 	Int16U SizeSample = StopIndex - StartIndex;
 

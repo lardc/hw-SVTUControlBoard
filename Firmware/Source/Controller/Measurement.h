@@ -12,7 +12,7 @@ void MEASURE_ConvertVg(pFloat32 InputArray, Int16U DataLength);
 float MEASURE_Vg(Int16U SampleADC);
 float MEASURE_Ig(Int16U SampleADC);
 //
-float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U Size, Int16U ADCPeriod);
+float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U Size, Int16U ADCPeriod, bool Gate);
 //
 void MEASURE_ArrayEMA(pFloat32 InputArray, Int16U DataLength);
 
