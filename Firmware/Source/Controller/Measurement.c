@@ -99,12 +99,17 @@ float MEASURE_Ig(Int16U SampleADC)
 float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U Size, Int16U ADCPeriod, bool Gate)
 {
 	Int16U StartIndex = 0;
+	Int16U StopIndex = 0;
 	if(Gate)
+	{
 		StartIndex = DataTable[REG_VG_EDGE_TIME]/ADCPeriod;
+		StopIndex = (DataTable[REG_VG_EDGE_TIME] + DataTable[REG_OSC_SYNC_TIME])/ADCPeriod;
+	}
 	else
+	{
 		StartIndex = DataTable[REG_OSC_SYNC_DELAY]/ADCPeriod;
-
-	Int16U StopIndex = (DataTable[REG_OSC_SYNC_DELAY] + DataTable[REG_OSC_SYNC_TIME])/ADCPeriod;
+		StopIndex = (DataTable[REG_OSC_SYNC_DELAY] + DataTable[REG_OSC_SYNC_TIME])/ADCPeriod;
+	}
 	Int16U SizeSample = StopIndex - StartIndex;
 
 	float SumArray = 0;
