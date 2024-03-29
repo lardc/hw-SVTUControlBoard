@@ -8,6 +8,7 @@
 #include "DataTable.h"
 #include "DeviceObjectDictionary.h"
 #include "stdlib.h"
+#include "MemBuffers.h"
 
 // Definitions
 //
@@ -55,13 +56,6 @@ void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength)
 }
 //------------------------------------
 
-void MEASURE_ConvertVg(pFloat32 InputArray, Int16U DataLength)
-{
-	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VG_B, REG_VG_K, REG_VG_P0, REG_VG_P1,
-			REG_VG_P2, 0);
-}
-//------------------------------------
-
 void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange)
 {
 	float RShunt = DataTable[REG_R_SHUNT] / 1000;
@@ -96,28 +90,47 @@ float MEASURE_Ig(Int16U SampleADC)
 }
 //------------------------------------
 
-float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U Size, Int16U ADCPeriod, bool Gate)
+float MEASURE_GateAverageVoltage()
 {
-	Int16U StartIndex = 0;
-	Int16U StopIndex = 0;
-	if(Gate)
-	{
-		StartIndex = DataTable[REG_VG_EDGE_TIME]/ADCPeriod;
-		StopIndex = (DataTable[REG_VG_EDGE_TIME] + DataTable[REG_OSC_SYNC_TIME])/ADCPeriod;
-	}
-	else
-	{
-		StartIndex = DataTable[REG_OSC_SYNC_DELAY]/ADCPeriod;
-		StopIndex = (DataTable[REG_OSC_SYNC_DELAY] + DataTable[REG_OSC_SYNC_TIME])/ADCPeriod;
-	}
-	Int16U SizeSample = StopIndex - StartIndex;
+	Int16U StartIndex, Points;
 
+	StartIndex = DataTable[REG_VG_EDGE_TIME] / TIMER2_uS + DataTable[REG_MSR_DELAY];
+	Points = DataTable[REG_MSR_TIME];
+
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Vg, StartIndex, Points);
+}
+//------------------------------------
+
+float MEASURE_CollectorAverageVoltage()
+{
+	Int16U StartIndex, Points;
+
+	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
+	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
+
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Vd, StartIndex, Points);
+}
+//------------------------------------
+
+float MEASURE_CollectorAverageCurrent()
+{
+	Int16U StartIndex, Points;
+
+	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
+	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
+
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Id, StartIndex, Points);
+}
+//------------------------------------
+
+float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U StartAverage, Int16U Points)
+{
 	float SumArray = 0;
 
-	for (int i = 0; i < SizeSample; i++)
-		SumArray += *(InputArray + StartIndex + i);
+	for (int i = StartAverage; i < (StartAverage + Points); i++)
+		SumArray += *(InputArray + i);
 
-	return (SumArray/SizeSample);
+	return (SumArray / Points);
 }
 //------------------------------------
 

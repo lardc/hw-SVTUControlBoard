@@ -50,12 +50,12 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{R_SHUNT_MIN, R_SHUNT_MAX, R_SHUNT_DEF},								// 44
 		{I_THRESHOLD_MIN, I_THRESHOLD_MAX, I_THRESHOLD_DEF},					// 45
 		{IG_THRESHOLD_MIN, IG_THRESHOLD_MAX, IG_THRESHOLD_DEF},					// 46
-		{OSC_SYNC_TIME_MIN, OSC_SYNC_TIME_MAX, OSC_SYNC_TIME_DEF},				// 47
-		{OSC_SYNC_DELAY_MIN, OSC_SYNC_DELAY_MAX, OSC_SYNC_DELAY_DEF},			// 48
-		{0, 1, 0},																// 49
-		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 50
-		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 51
-		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 52
+		{MSR_DELAY_MIN, MSR_DELAY_MAX, MSR_DELAY_DEF},							// 47
+		{MSR_TIME_MIN, MSR_TIME_MAX, MSR_TIME_DEF},								// 48
+		{NO, YES, NO},															// 49
+		{0, 0, 0},																// 50
+		{0, 0, 0},																// 51
+		{0, 0, 0},																// 52
 		{0, 0, 0},																// 53
 		{0, 0, 0},																// 54
 		{0, 0, 0},																// 55

@@ -81,13 +81,13 @@
 #define VG_SETPOINT_MAX				22
 #define VG_SETPOINT_DEF				15
 //
-#define OSC_SYNC_TIME_MIN			500
-#define OSC_SYNC_TIME_MAX			3000
-#define OSC_SYNC_TIME_DEF			1500
+#define MSR_DELAY_MIN				0
+#define MSR_DELAY_MAX				20
+#define MSR_DELAY_DEF				15
 //
-#define OSC_SYNC_DELAY_MIN			100
-#define OSC_SYNC_DELAY_MAX			2000
-#define OSC_SYNC_DELAY_DEF			1000
+#define MSR_TIME_MIN				1
+#define MSR_TIME_MAX				20
+#define MSR_TIME_DEF				4
 //
 #define IG_THRESHOLD_MIN			10
 #define IG_THRESHOLD_MAX			100
