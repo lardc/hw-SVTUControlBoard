@@ -100,6 +100,7 @@ void GATE_CacheVariables()
 void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 {
 	float RegulatorError, RegulatorOut, Qp, Qi = 0;
+	static Int16U SyncDelayCounter = 0;
 
 	// Формирование линейно нарастающего фронта импульса напряжения
 	if(GateVoltage < GateVoltageSetpoint)
@@ -144,6 +145,14 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 	RegulatorOut = GateVoltage + Qp +Qi;
 
 	GATE_SetVg(RegulatorOut);
+
+	if(IsImpulse)
+	{
+		if(RegulatorCounter >= SyncDelayCounter)
+			LL_SyncScope(true);
+	}
+	else
+		SyncDelayCounter = RegulatorCounter + DataTable[REG_MSR_DELAY];
 
 	RegulatorCounter++;
 
