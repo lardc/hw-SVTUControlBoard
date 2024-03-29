@@ -17,7 +17,5 @@ void INITCFG_ConfigWatchDog();
 void INITCFG_ConfigTimer2();
 void INITCFG_ConfigDAC();
 void INITCFG_ConfigTimer15();
-void INITCFG_ConfigTimer6(Int16U Period_us);
-void INITCFG_ConfigTimer7(Int16U Period_us);
 
 #endif // __INITCONFIG_H

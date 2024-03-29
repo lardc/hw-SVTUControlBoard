@@ -317,8 +317,6 @@ void CONTROL_HandlePulse()
 			case SS_PulseInit:
 				{
 					CONTROL_ResetData();
-					INITCFG_ConfigTimer6(DataTable[REG_OSC_SYNC_DELAY]);
-					INITCFG_ConfigTimer7(DataTable[REG_OSC_SYNC_TIME] + DataTable[REG_OSC_SYNC_DELAY]);
 
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);

@@ -99,27 +99,3 @@ void TIM3_IRQHandler()
 	}
 }
 //-----------------------------------------
-
-void TIM6_DAC_IRQHandler()
-{
-	if(TIM_StatusCheck(TIM6))
-	{
-		if (SUB_State == SS_WaitFinishProcess)
-			LL_SyncScope(true);
-
-		TIM_StatusClear(TIM6);
-		TIM_Stop(TIM6);
-	}
-}
-//-----------------------------------------
-
-void TIM7_IRQHandler()
-{
-	if(TIM_StatusCheck(TIM7))
-	{
-		LL_SyncScope(false);
-		TIM_StatusClear(TIM7);
-		TIM_Stop(TIM7);
-	}
-}
-//-----------------------------------------

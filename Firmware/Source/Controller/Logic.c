@@ -267,10 +267,6 @@ void LOGIC_StartPulse()
 	ADC_SamplingStart(ADC3);
 	TIM_Start(TIM1);
 
-	// Запуск процесса формирования синхронизации для осциллографа
-	TIM_Start(TIM6);
-	TIM_Start(TIM7);
-
 	// Запуск импульса тока в силовой цепи
 	LL_SyncLCSU(true);
 	IsImpulse = true;
@@ -288,6 +284,7 @@ bool LOGIC_FinishProcess()
 
 		IsImpulse = false;
 		LL_SyncLCSU(false);
+		LL_SyncScope(false);
 		GATE_StopProcess();
 
 		// Пересчёт значений
@@ -317,9 +314,9 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	DataTable[REG_RESULT_VD] = MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE, TIMER1_uS, 0);
-	DataTable[REG_RESULT_ID] = MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE, TIMER1_uS, 0);
-	DataTable[REG_RESULT_VG] = MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Vg, VALUES_x_SIZE, TIMER2_uS, 1);
+	DataTable[REG_RESULT_VD] = MEASURE_CollectorAverageVoltage();
+	DataTable[REG_RESULT_ID] = MEASURE_CollectorAverageCurrent();
+	DataTable[REG_RESULT_VG] = MEASURE_GateAverageVoltage();
 
 	if((DataTable[REG_RESULT_VD] > VD_MAX_VALUE) || (DataTable[REG_RESULT_VD] < VD_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;

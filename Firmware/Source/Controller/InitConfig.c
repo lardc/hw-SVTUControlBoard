@@ -180,22 +180,6 @@ void INITCFG_ConfigTimer15()
 }
 //------------------------------------------------
 
-void INITCFG_ConfigTimer6(Int16U Period_us)
-{
-	TIM_Clock_En(TIM_6);
-	TIM_Config(TIM6, SYSCLK, Period_us);
-	TIM_Interupt(TIM6, 0, true);
-}
-//------------------------------------------------
-
-void INITCFG_ConfigTimer7(Int16U Period_us)
-{
-	TIM_Clock_En(TIM_7);
-	TIM_Config(TIM7, SYSCLK, Period_us);
-	TIM_Interupt(TIM7, 0, true);
-}
-//------------------------------------------------
-
 void INITCFG_ConfigWatchDog()
 {
 	IWDG_Config();
