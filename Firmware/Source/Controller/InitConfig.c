@@ -99,7 +99,7 @@ void INITCFG_ConfigADC()
 	ADC_ChannelSeqReset(ADC3);
 	ADC_ChannelSet_Sequence(ADC3, ADC3_UD_CH, 1);
 	ADC_ChannelSeqLen(ADC3, 1);
-	ADC_DMAConfig(ADC3);
+	ADC_DMAEnable(ADC3, true);
 	ADC_Enable(ADC3);
 
 	// ADC4
@@ -107,7 +107,7 @@ void INITCFG_ConfigADC()
 	ADC_ChannelSeqReset(ADC4);
 	ADC_ChannelSet_Sequence(ADC4, ADC4_ID_CH, 1);
 	ADC_ChannelSeqLen(ADC4, 1);
-	ADC_DMAConfig(ADC4);
+	ADC_DMAEnable(ADC4, true);
 	ADC_Enable(ADC4);
 
 	ADC_SamplingStart(ADC1);
@@ -150,13 +150,13 @@ void INITCFG_ConfigDMA()
 	DMA_Reset(DMA_ADC_ID_CH);
 	DMA_Interrupt(DMA_ADC_ID_CH, DMA_TRANSFER_COMPLETE, 0, true);
 	DMAChannelX_DataConfig(DMA_ADC_ID_CH, (Int32U)(&MEMBUF_DMA_Id[0]), (Int32U)(&ADC4->DR), VALUES_POWER_DMA_SIZE);
-	DMAChannelX_Config(DMA_ADC_ID_CH, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
+	DMAChannelX_Config(DMA_ADC_ID_CH, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
 			DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH);
 	
 	DMA_Reset(DMA_ADC_VD_CH);
 	DMA_Interrupt(DMA_ADC_VD_CH, DMA_TRANSFER_COMPLETE, 0, true);
 	DMAChannelX_DataConfig(DMA_ADC_VD_CH, (Int32U)(&MEMBUF_DMA_Vd[0]), (Int32U)(&ADC3->DR), VALUES_POWER_DMA_SIZE);
-	DMAChannelX_Config(DMA_ADC_VD_CH, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_16BIT, DMA_PSIZE_16BIT,
+	DMAChannelX_Config(DMA_ADC_VD_CH, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
 			DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH);
 }
 //------------------------------------

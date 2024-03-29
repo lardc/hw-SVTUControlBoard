@@ -63,9 +63,13 @@
 #define REG_IG_K						28	// Коэффициент пересчёта напряжения АЦП в Ig
 #define REG_IG_B						29	// Смещение оцифрованного Ig
 //
-#define REG_ISET_P2						30	// Коэффициент точной корректировки задания прямого тока P2
-#define REG_ISET_P1						31	// Коэффициент точной корректировки задания прямого тока P1
-#define REG_ISET_P0						32	// Коэффициент точной корректировки задания прямого тока P0
+#define REG_ISET_R0_P2					30	// Диапазон 0 - Коэффициент точной корректировки задания прямого тока P2
+#define REG_ISET_R0_P1					31	// Диапазон 0 - Коэффициент точной корректировки задания прямого тока P1
+#define REG_ISET_R0_P0					32	// Диапазон 0 - Коэффициент точной корректировки задания прямого тока P0
+
+#define REG_ISET_R1_P2					50	// Диапазон 1 - Коэффициент точной корректировки задания прямого тока P2
+#define REG_ISET_R1_P1					51	// Диапазон 1 - Коэффициент точной корректировки задания прямого тока P1
+#define REG_ISET_R1_P0					52	// Диапазон 1 - Коэффициент точной корректировки задания прямого тока P0
 //
 #define REG_REGULATOR_QP				33	// Пропорциональный коэффициент регулятора
 #define REG_REGULATOR_QI				34	// Интегральный коэффициент регулятора
@@ -82,12 +86,14 @@
 #define REG_R_SHUNT						44	// Сопротивление шунта (в мкОм)
 #define REG_I_R0_THRESHOLD				45	// Граница нижнего диапазона тока (в А)
 #define REG_IG_THRESHOLD				46	// Значчение тока Ig при выставлении PROBLEM_GATE_SHORT
+#define REG_MSR_DELAY					47	// Задержка измерения Uce, Ice (в тиках)
+#define REG_MSR_TIME					48	// Время измерения Uce, Ice (в тиках)
+#define REG_EMULATION					49  // Включение режима эмуляции
 //
 
 // Несохраняемы регистры чтения-записи
 #define REG_ID_SETPOINT					128	// Уставка силового тока (в А)
 #define REG_VG_SETPOINT					129	// Уставка напряжения управления (в В)
-#define REG_PULSE_DURATION				130	// Длительность импульса тока (мс)
 //
 #define REG_DBG							150	// Отладочный регистр
 
@@ -132,7 +138,6 @@
 
 // Регистры LCSU
 #define REG_LCSU_PULSE_VALUE			128	// Значение амплитуды импульса тока (в А)
-#define REG_LCSU_TRAPEZE_DURATION		18	// Регистр длительности импульса трапеции
 
 #define REG_LCSU_DEV_STATE				192	// Состояние блока
 #define REG_LCSU_FAULT_REASON			193
@@ -161,7 +166,8 @@
 #define DF_LCSU_CURRENT_CONFIG			4	// Ошибка конфигурации LCSU
 #define DF_SELFTEST_VD					5	// Ошибка измерения напряжения в режиме самотестирования
 #define DF_SELFTEST_ID					6	// Ошибка измерения тока в режиме самотестирования
-#define DF_GATE_VOLTAGE					7	// Проблема с формирователем напряжения управления
+#define DF_SELFTEST_GATE				7	// Ошибка формирования управления в режиме самотестирования
+#define DF_SVTU_WAIT_TIMEOUT			8	// Ошибка превышения времени установления флага готовности данных DMA
 
 // Warning
 #define WARNING_NONE					0	// Предупреждений нет
@@ -173,6 +179,7 @@
 #define PROBLEM_FORCED_STOP				1	// Принудительная остановка процесса
 #define PROBLEM_SAFETY					2	// Сработала система безопасности
 #define PROBLEM_GATE_SHORT				3	// КЗ в цепи управления
+#define PROBLEM_GATE_VOLTAGE			4	// Проблема с формирователем напряжения управления
 
 // User Errors
 #define ERR_NONE						0

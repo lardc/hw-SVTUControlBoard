@@ -21,6 +21,7 @@ int main()
 	INITCFG_ConfigDAC();
 	INITCFG_ConfigDMA();
 	INITCFG_ConfigWatchDog();
+
 	
 	// Инициализация логики контроллера
 	CONTROL_Init();

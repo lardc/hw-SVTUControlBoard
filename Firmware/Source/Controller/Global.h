@@ -14,12 +14,12 @@
 #define EP_COUNT					0				// Количество массивов для чтения
 #define FEP_COUNT					5				// Количество массивов для чтения типа float
 #define ENABLE_LOCKING				FALSE			// Защита паролем
-#define VALUES_x_SIZE				1000			// Размер выходных массивов
+#define VALUES_x_SIZE				75				// Размер выходных массивов
 
 // Временные параметры
 #define TIME_LED_BLINK				500				// Период моргания светодиода на плате (в мс)
 #define TIME_LCSU_UPDATE			10				// Период опроса силовых ячеек (в мс)
-#define TIME_VG_STAB				1000			// Время стабилизации Vg (в мкс)
+#define TIME_VG_STAB				3				// Время стабилизации Vg (в мс)
 #define TIMEOUT_LCSU_SHORT			1000			// Короткий таймаут по операциям с LCSU (в мс)
 #define TIME_FAULT_LED_BLINK		250				//
 #define TIME_EXT_LAMP_ON_STATE		500				//
@@ -40,8 +40,9 @@
 // Различные параметры
 #define SELFTEST_ALLOWED_ERROR		10				// Допустимое отключение параметров режима самотестирования
 #define LCSU_COUNT_MAX				1				// Максимальное количество блоков LCSU в установке
+#define SVTU_WAIT_FINISH_TIME		10				// Время ожидания завершения процесса (в мс)
 
 // Параметры DMA
-#define VALUES_POWER_DMA_SIZE		1000
+#define VALUES_POWER_DMA_SIZE		VALUES_x_SIZE * 5
 
 #endif // __GLOBAL_H

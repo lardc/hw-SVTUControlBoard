@@ -29,7 +29,6 @@ typedef struct __LCSUStructData
 	bool IsActive;
 	LCSUState State;
 	float Current;
-	float PulseDuration;
 } LCSUData, *pLCSUData;
 
 // Variables
@@ -114,6 +113,9 @@ bool LOGIC_PowerEnableLCSU()
 			}
 		}
 	}
+
+	if(!DataTable[REG_LCSU_DETECTED])
+		return false;
 	
 	return true;
 }
@@ -152,9 +154,6 @@ bool LOGIC_WriteLCSUConfig()
 		if(LCSU_DataArray[i].IsActive)
 		{
 			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
-				return false;
-
-			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, LCSU_DataArray[i].PulseDuration))
 				return false;
 		}
 	}
@@ -208,8 +207,6 @@ bool LOGIC_DistributeCurrent(float Current)
 			}
 			else
 				LCSU_DataArray[i].Current = Current;
-
-			LCSU_DataArray[i].PulseDuration = DataTable[REG_PULSE_DURATION];
 		}
 	}
 	
@@ -219,11 +216,22 @@ bool LOGIC_DistributeCurrent(float Current)
 
 float LOGIC_GetCurrentSetpoint()
 {
-	float P0 = DataTable[REG_ISET_P0];
-	float P1 = DataTable[REG_ISET_P1];
-	float P2 = DataTable[REG_ISET_P2];
-	
+	float P0, P1, P2;
 	float current = DataTable[REG_ID_SETPOINT];
+
+	if (current <= DataTable[REG_I_R0_THRESHOLD])
+	{
+		P0 = DataTable[REG_ISET_R0_P0];
+		P1 = DataTable[REG_ISET_R0_P1];
+		P2 = DataTable[REG_ISET_R0_P2];
+	}
+	else
+	{
+		P0 = DataTable[REG_ISET_R1_P0];
+		P1 = DataTable[REG_ISET_R1_P1];
+		P2 = DataTable[REG_ISET_R1_P2];
+	}
+	
 	current = current * current * P2 + current * P1 + P0;
 
 	return (current > 0) ? current : 0;
@@ -242,11 +250,11 @@ void LOGIC_ResetLCSUCurrent()
 
 void LOGIC_SelectCurrentRange(float Current)
 {
-	(Current <= DataTable[REG_I_R0_THRESHOLD]) ? LL_SetIdRange(false) : LL_SetIdRange(true);
+	(Current <= DataTable[REG_I_R0_THRESHOLD]) ? LL_SetIdRange(true) : LL_SetIdRange(false);
 }
 // ----------------------------------------
 
-void LOGIC_ProcessPulse()
+void LOGIC_StartPulse()
 {
 	// Подготовка оцифровки
 	IT_DMAFlagsReset();
@@ -256,24 +264,37 @@ void LOGIC_ProcessPulse()
 	DMA_ChannelEnable(DMA_ADC_VD_CH, true);
 
 	// Запуск оцифровки импульса тока и напряжения в силовой цепи
+	ADC_SamplingStart(ADC3);
 	TIM_Start(TIM1);
 
 	// Запуск импульса тока в силовой цепи
-	LL_SyncScope(true);
 	LL_SyncLCSU(true);
+	IsImpulse = true;
+}
+// ----------------------------------------
 
+bool LOGIC_FinishProcess()
+{
 	// Завершение оцифровки
-	while(!IT_DMASampleCompleted()){}
+	if(IT_DMASampleCompleted())
+	{
+		TIM_Stop(TIM1);
 
-	TIM_Stop(TIM1);
+		TIM_Stop(TIM7);
 
-	LL_SyncLCSU(false);
-	LL_SyncScope(false);
-	GATE_StopProcess();
+		IsImpulse = false;
+		LL_SyncLCSU(false);
+		LL_SyncScope(false);
+		GATE_StopProcess();
 
-	// Пересчёт значений
-	MEASURE_ConvertVd((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
-	MEASURE_ConvertId((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE, LL_IdGetRange());
+		// Пересчёт значений
+		MEASURE_ConvertVd(&MEMBUF_DMA_Vd[0], VALUES_POWER_DMA_SIZE);
+		MEASURE_ConvertId(&MEMBUF_DMA_Id[0], VALUES_POWER_DMA_SIZE, LL_IdGetRange());
+
+		return true;
+	}
+	else
+		return false;
 }
 // ----------------------------------------
 
@@ -293,9 +314,9 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	DataTable[REG_RESULT_VD] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_EP_Vg, VALUES_x_SIZE);
-	DataTable[REG_RESULT_ID] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE);
-	DataTable[REG_RESULT_VG] = MEASURE_ExtractMaxValues((pFloat32)MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
+	DataTable[REG_RESULT_VD] = MEASURE_CollectorAverageVoltage();
+	DataTable[REG_RESULT_ID] = MEASURE_CollectorAverageCurrent();
+	DataTable[REG_RESULT_VG] = MEASURE_GateAverageVoltage();
 
 	if((DataTable[REG_RESULT_VD] > VD_MAX_VALUE) || (DataTable[REG_RESULT_VD] < VD_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;

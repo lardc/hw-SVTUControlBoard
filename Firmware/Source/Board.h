@@ -27,7 +27,7 @@ GPIO_PortPinSettingMacro GPIO_LED 					= {GPIOA, Pin_8};
 GPIO_PortPinSettingMacro GPIO_GATE_EN				= {GPIOA, Pin_0};
 GPIO_PortPinSettingMacro GPIO_TGATE_ST				= {GPIOA, Pin_6};
 GPIO_PortPinSettingMacro GPIO_SYNC_OSC				= {GPIOA, Pin_15};
-GPIO_PortPinSettingMacro GPIO_AIN_ST				= {GPIOB, Pin_1};
+GPIO_PortPinSettingMacro GPIO_AIN_ST				= {GPIOB, Pin_15};
 GPIO_PortPinSettingMacro GPIO_SYNC_LCSU				= {GPIOB, Pin_5};
 GPIO_PortPinSettingMacro GPIO_IND_CTRL				= {GPIOB, Pin_6};
 

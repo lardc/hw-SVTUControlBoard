@@ -12,27 +12,12 @@
 #include "GateDriver.h"
 #include "LowLevel.h"
 #include "BCCIxParams.h"
-
+#include "math.h"
+#include "InitConfig.h"
 // Types
 //
 typedef void (*FUNC_AsyncDelegate)();
-typedef enum __SubState
-{
-	SS_None = 0,
-	
-	SS_PowerOn = 1,
-	SS_WaitCharge = 2,
-	
-	SS_PulseInit = 3,
-	SS_WaitPulsePause = 4,
-	SS_ConfigPulse = 5,
-	SS_WaitConfig = 6,
-	SS_GateVoltageProcess = 7,
-	SS_CurrentPulseProcess = 8,
-	SS_PostPulseCheck = 9,
 
-	SS_PowerOff = 10
-} SubState;
 
 // Variables
 DeviceState CONTROL_State = DS_None;
@@ -43,6 +28,7 @@ bool SelfTest = false;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
 volatile Int64U CONTROL_TimeCounter = 0;
+volatile Int64U CONTROL_Timeout = 0;
 
 // Forward functions
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
@@ -128,8 +114,10 @@ void CONTROL_ResetHardware()
 	LL_AnalogInputsSelftTest(false);
 	LL_ExtIndication(false);
 	LL_SetIdRange(false);
-
 	GATE_StopProcess();
+	TIM_Stop(TIM1);
+	TIM_Stop(TIM6);
+	TIM_Stop(TIM7);
 }
 //-----------------------------------------------
 
@@ -223,6 +211,9 @@ void CONTROL_Idle()
 	CONTROL_HandlePulse();
 	CONTROL_HandlePowerOff();
 	
+	// Обработка сигнала безопасности
+	CONTROL_SafetyProcess();
+
 	CONTROL_WatchDogUpdate();
 }
 //-----------------------------------------------
@@ -289,7 +280,7 @@ void CONTROL_HandlePowerOn()
 		{
 			case SS_PowerOn:
 				{
-					if(LOGIC_PowerEnableLCSU())
+					if(LOGIC_PowerEnableLCSU() || DataTable[REG_EMULATION])
 					{
 						Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 						CONTROL_SetDeviceState(DS_InProcess, SS_WaitCharge);
@@ -301,7 +292,7 @@ void CONTROL_HandlePowerOn()
 				
 			case SS_WaitCharge:
 				{
-					if(LOGIC_AreLCSUInStateX(LCSU_Ready))
+					if(LOGIC_AreLCSUInStateX(LCSU_Ready) || DataTable[REG_EMULATION])
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					else
 						CONTROL_HandleFaultLCSUEvents(Timeout);
@@ -326,6 +317,7 @@ void CONTROL_HandlePulse()
 			case SS_PulseInit:
 				{
 					CONTROL_ResetData();
+
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
 				}
@@ -344,7 +336,7 @@ void CONTROL_HandlePulse()
 				{
 					float CurrentAmplitude = SelfTest ? DataTable[REG_ID_MAX] : LOGIC_GetCurrentSetpoint();
 
-					if(LOGIC_DistributeCurrent(CurrentAmplitude))
+					if(LOGIC_DistributeCurrent(CurrentAmplitude)||DataTable[REG_EMULATION])
 					{
 						bool NoError = false;
 						LOGIC_SelectCurrentRange(CurrentAmplitude);
@@ -390,28 +382,62 @@ void CONTROL_HandlePulse()
 				if(GATE_RegulatorStatusCheck(RS_TargetReached))
 				{
 					if(CONTROL_TimeCounter >= Timeout)
-						CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseProcess);
+						CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
 				}
 				else
 				{
 					if(GATE_RegulatorStatusCheck(RS_FollowingError))
-						CONTROL_SwitchToFault(DF_GATE_VOLTAGE);
+					{
+						if (SelfTest)
+						{
+							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
+							CONTROL_SwitchToFault(DF_SELFTEST_GATE);
+						}
+						else
+						{
+							CONTROL_ResetData();
+							CONTROL_ResetHardware();
+							DataTable[REG_PROBLEM] = PROBLEM_GATE_VOLTAGE;
+							CONTROL_SetDeviceState(DS_Ready, SS_None);
+						}
+					}
 
 					if(GATE_RegulatorStatusCheck(RS_GateShort))
 					{
-						DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
-						DataTable[REG_PROBLEM] = PROBLEM_GATE_SHORT;
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
+						if (SelfTest)
+						{
+							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
+							CONTROL_SwitchToFault(DF_SELFTEST_GATE);
+						}
+						else
+						{
+							GATE_StopProcess();
+							DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
+							DataTable[REG_PROBLEM] = PROBLEM_GATE_SHORT;
+							CONTROL_SetDeviceState(DS_Ready, SS_None);
+						}
 					}
 				}
 				break;
 
-			case SS_CurrentPulseProcess:
-				IsImpulse = true;
-				LOGIC_ProcessPulse();
-				IsImpulse = false;
+			case SS_CurrentPulseStart:
+				LOGIC_StartPulse();
 
-				CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+				CONTROL_Timeout = CONTROL_TimeCounter + SVTU_WAIT_FINISH_TIME;
+				CONTROL_SetDeviceState(DS_InProcess, SS_WaitFinishProcess);
+				break;
+
+			case SS_WaitFinishProcess:
+				if(CONTROL_TimeCounter < CONTROL_Timeout)
+				{
+					if(LOGIC_FinishProcess())
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+				}
+				else
+				{
+					DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
+					CONTROL_SwitchToFault(DF_SVTU_WAIT_TIMEOUT);
+				}
 				break;
 
 			case SS_PostPulseCheck:
@@ -430,6 +456,7 @@ void CONTROL_HandlePulse()
 						{
 							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
 							CONTROL_SwitchToFault(SelfTestResult);
+							break;
 						}
 						else
 						{
@@ -453,10 +480,10 @@ void CONTROL_HandlePulse()
 
 Int16U CONTROL_CheckSelfTestResults()
 {
-	if(DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX] * 100 > SELFTEST_ALLOWED_ERROR)
+	if(fabs((1-DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX]) * 100) > SELFTEST_ALLOWED_ERROR)
 		return DF_SELFTEST_ID;
 
-	if(DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT]) * 100 > SELFTEST_ALLOWED_ERROR)
+	if(fabs(1-(DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT]/1000)))*100 > SELFTEST_ALLOWED_ERROR)
 		return DF_SELFTEST_VD;
 
 	return 0;
@@ -465,8 +492,8 @@ Int16U CONTROL_CheckSelfTestResults()
 
 void CONTROL_SaveDataToEndpoint()
 {
-	LOGIC_SaveToEndpoint((pFloat32)MEMBUF_DMA_Vd, (pFloat32)MEMBUF_EP_Vd, VALUES_POWER_DMA_SIZE);
-	LOGIC_SaveToEndpoint((pFloat32)MEMBUF_DMA_Id, (pFloat32)MEMBUF_EP_Id, VALUES_POWER_DMA_SIZE);
+	LOGIC_SaveToEndpoint(&MEMBUF_DMA_Vd[0], &MEMBUF_EP_Vd[0], VALUES_POWER_DMA_SIZE);
+	LOGIC_SaveToEndpoint(&MEMBUF_DMA_Id[0], &MEMBUF_EP_Id[0], VALUES_POWER_DMA_SIZE);
 	CONTROL_PowerValues_Counter = VALUES_x_SIZE;
 }
 //-----------------------------------------------
@@ -504,10 +531,11 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 
 void CONTROL_SafetyProcess()
 {
-	if(!LL_SafetyIsActive())
+	if(!LL_SafetyIsActive() && CONTROL_State == DS_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge && SUB_State != SS_PowerOff)
 	{
-		CONTROL_ResetData();
 		CONTROL_ResetHardware();
+
+		CONTROL_ResetData();
 
 		DataTable[REG_PROBLEM] = PROBLEM_SAFETY;
 

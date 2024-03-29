@@ -8,6 +8,7 @@
 #include "DataTable.h"
 #include "DeviceObjectDictionary.h"
 #include "stdlib.h"
+#include "MemBuffers.h"
 
 // Definitions
 //
@@ -19,6 +20,7 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U Reg
 		Int16U RegisterK, Int16U RegisterP0, Int16U RegisterP1, Int16U RegisterP2, float RShunt);
 int MEASURE_SortCondition(const void *A, const void *B);
 float MEASURE_ConvertX(Int16U SampleADC, Int16U P2reg, Int16U P1reg, Int16U P0reg, Int16U Kreg, Int16U Breg);
+
 
 // Functions
 //
@@ -34,7 +36,7 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U Reg
 	
 	for(Int16U i = 0; i < DataLength; i++)
 	{
-		float tmp = (InputArray[i] + Offset) * ADC_REF_VOLTAGE / ADC_RESOLUTION * K;
+		float tmp = (float)(*((pInt32U)(InputArray + i))) * K + Offset;
 
 		if(RShunt)
 			tmp = tmp / RShunt;
@@ -54,18 +56,11 @@ void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength)
 }
 //------------------------------------
 
-void MEASURE_ConvertVg(pFloat32 InputArray, Int16U DataLength)
-{
-	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VG_B, REG_VG_K, REG_VG_P0, REG_VG_P1,
-			REG_VG_P2, 0);
-}
-//------------------------------------
-
 void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange)
 {
 	float RShunt = DataTable[REG_R_SHUNT] / 1000;
 
-	if(CurrentRange)
+	if(!CurrentRange)
 		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_R1_B, REG_ID_R1_K, REG_ID_R1_P0, REG_ID_R1_P1, REG_ID_R1_P2, RShunt);
 	else
 		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_R0_B, REG_ID_R0_K, REG_ID_R0_P0, REG_ID_R0_P1, REG_ID_R0_P2, RShunt);
@@ -95,26 +90,47 @@ float MEASURE_Ig(Int16U SampleADC)
 }
 //------------------------------------
 
-float MEASURE_ExtractMaxValues(pFloat32 InputArray, Int16U Size)
+float MEASURE_GateAverageVoltage()
 {
-	float AverageValue = 0;
-	static float InputArrayCopy[VALUES_POWER_DMA_SIZE];
+	Int16U StartIndex, Points;
 
-	for (int i = 0; i < Size; i++)
-		{
-			// Из-за процесса отпирания прибора 1/3 массива содержит ненужные данные, которые необходимо обнулить
-			if(i < (Size / 3))
-				InputArrayCopy[i] = 0;
-			else
-				InputArrayCopy[i] = *(InputArray + i);
-		}
+	StartIndex = DataTable[REG_VG_EDGE_TIME] / TIMER2_uS + DataTable[REG_MSR_DELAY];
+	Points = DataTable[REG_MSR_TIME];
 
-	qsort(InputArrayCopy, Size, sizeof(*InputArrayCopy), MEASURE_SortCondition);
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Vg, StartIndex, Points);
+}
+//------------------------------------
 
-	for (int i = Size - SAMPLING_AVG_NUM - MAX_SAMPLES_CUTOFF_NUM; i < Size - MAX_SAMPLES_CUTOFF_NUM; ++i)
-		AverageValue += *(InputArrayCopy + i);
+float MEASURE_CollectorAverageVoltage()
+{
+	Int16U StartIndex, Points;
 
-	return (AverageValue / SAMPLING_AVG_NUM);
+	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
+	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
+
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Vd, StartIndex, Points);
+}
+//------------------------------------
+
+float MEASURE_CollectorAverageCurrent()
+{
+	Int16U StartIndex, Points;
+
+	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
+	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
+
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Id, StartIndex, Points);
+}
+//------------------------------------
+
+float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U StartAverage, Int16U Points)
+{
+	float SumArray = 0;
+
+	for (int i = StartAverage; i < (StartAverage + Points); i++)
+		SumArray += *(InputArray + i);
+
+	return (SumArray / Points);
 }
 //------------------------------------
 

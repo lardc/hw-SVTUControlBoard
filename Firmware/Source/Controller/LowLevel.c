@@ -63,6 +63,6 @@ void LL_SetIdRange(bool Range)
 
 bool LL_IdGetRange()
 {
-	return GPIO_GetState(GPIO_SYNC_OSC);
+	return GPIO_GetState(GPIO_ID_RANGE);
 }
 //------------------------------------

@@ -23,8 +23,6 @@ void ADC1_2_IRQHandler()
 	float GateCurrent = MEASURE_Ig(ADC_Read(ADC1));
 
 	GATE_RegulatorProcess(GateVoltage, GateCurrent);
-
-	CONTROL_SafetyProcess();
 }
 //-----------------------------------------
 

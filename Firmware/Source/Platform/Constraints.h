@@ -39,11 +39,11 @@
 #define REGULATOR_QIMAX_DEF			1000
 //
 #define ALLOWED_ERR_MIN				0
-#define ALLOWED_ERR_MAX				5
+#define ALLOWED_ERR_MAX				15
 #define ALLOWED_ERR_DEF				0
 //
 #define FOLLOWING_ERR_CNT_MIN		0
-#define FOLLOWING_ERR_CNT_MAX		10
+#define FOLLOWING_ERR_CNT_MAX		30
 #define FOLLOWING_ERR_CNT_DEF		5
 //
 #define YES							1
@@ -58,7 +58,7 @@
 #define LCSU_START_NID_DEF			110
 //
 #define LONG_TIMEOUT_MIN			1000
-#define LONG_TIMEOUT_MAX			10000
+#define LONG_TIMEOUT_MAX			30000
 #define LONG_TIMEOUT_DEF			1000
 //
 #define VG_EDGE_TIME_MIN			500
@@ -77,13 +77,17 @@
 #define ID_SETPOINT_MAX				1700
 #define ID_SETPOINT_DEF				500
 //
-#define VG_SETPOINT_MIN				10
-#define VG_SETPOINT_MAX				20
+#define VG_SETPOINT_MIN				5
+#define VG_SETPOINT_MAX				22
 #define VG_SETPOINT_DEF				15
 //
-#define PULSE_DURATION_MIN			5
-#define PULSE_DURATION_MAX			10
-#define PULSE_DURATION_DEF			10
+#define MSR_DELAY_MIN				0
+#define MSR_DELAY_MAX				20
+#define MSR_DELAY_DEF				15
+//
+#define MSR_TIME_MIN				1
+#define MSR_TIME_MAX				20
+#define MSR_TIME_DEF				4
 //
 #define IG_THRESHOLD_MIN			10
 #define IG_THRESHOLD_MAX			100
