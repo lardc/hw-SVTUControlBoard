@@ -45,6 +45,8 @@ void CONTROL_HandlePowerOff();
 void CONTROL_SaveDataToEndpoint();
 void CONTROL_SaveResults();
 Int16U CONTROL_CheckSelfTestResults();
+bool CONTROL_IsSafetyEvent();
+void CONTROL_FinishedWithProblem(Int16U Problem);
 
 // Functions
 //
@@ -159,7 +161,13 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 		case ACT_START_TEST:
 			{
 				if(CONTROL_State == DS_Ready)
-					CONTROL_SetDeviceState(DS_InProcess, SS_PulseInit);
+				{
+					CONTROL_ResetData();
+					if(CONTROL_IsSafetyEvent())
+						CONTROL_FinishedWithProblem(PROBLEM_SAFETY);
+					else
+						CONTROL_SetDeviceState(DS_InProcess, SS_PulseInit);
+				}
 				else
 					*pUserError = ERR_DEVICE_NOT_READY;
 			}
@@ -170,9 +178,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 			{
 				LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS);
 				CONTROL_ResetToDefaults();
-
-				DataTable[REG_PROBLEM] = PROBLEM_FORCED_STOP;
-
+				CONTROL_FinishedWithProblem(PROBLEM_FORCED_STOP);
 				CONTROL_SetDeviceState(DS_Ready, SS_None);
 			}
 			break;
@@ -395,9 +401,8 @@ void CONTROL_HandlePulse()
 						}
 						else
 						{
-							CONTROL_ResetData();
 							CONTROL_ResetHardware();
-							DataTable[REG_PROBLEM] = PROBLEM_GATE_VOLTAGE;
+							CONTROL_FinishedWithProblem(PROBLEM_GATE_VOLTAGE);
 							CONTROL_SetDeviceState(DS_Ready, SS_None);
 						}
 					}
@@ -412,8 +417,7 @@ void CONTROL_HandlePulse()
 						else
 						{
 							GATE_StopProcess();
-							DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
-							DataTable[REG_PROBLEM] = PROBLEM_GATE_SHORT;
+							CONTROL_FinishedWithProblem(PROBLEM_GATE_SHORT);
 							CONTROL_SetDeviceState(DS_Ready, SS_None);
 						}
 					}
@@ -529,16 +533,25 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 }
 //-----------------------------------------------
 
+bool CONTROL_IsSafetyEvent()
+{
+	return LL_GetSafetyState();
+}
+//-----------------------------------------------
+
+void CONTROL_FinishedWithProblem(Int16U Problem)
+{
+	DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
+	DataTable[REG_PROBLEM] = Problem;
+}
+//-----------------------------------------------
+
 void CONTROL_SafetyProcess()
 {
-	if(!LL_SafetyIsActive() && CONTROL_State == DS_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge && SUB_State != SS_PowerOff)
+	if(CONTROL_IsSafetyEvent() && CONTROL_State == DS_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge && SUB_State != SS_PowerOff)
 	{
 		CONTROL_ResetHardware();
-
-		CONTROL_ResetData();
-
-		DataTable[REG_PROBLEM] = PROBLEM_SAFETY;
-
+		CONTROL_FinishedWithProblem(PROBLEM_SAFETY);
 		CONTROL_SetDeviceState(DS_Ready, SS_None);
 	}
 }

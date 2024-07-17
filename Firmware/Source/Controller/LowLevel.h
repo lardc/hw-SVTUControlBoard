@@ -13,7 +13,7 @@ void LL_AnalogInputsSelftTest(bool State);
 void LL_ExtIndication(bool State);
 void LL_ExtIndicationToggle();
 void LL_WriteDAC(Int16U Data);
-bool LL_SafetyIsActive();
+bool LL_GetSafetyState();
 void LL_SetIdRange(bool Range);
 bool LL_IdGetRange();
 
