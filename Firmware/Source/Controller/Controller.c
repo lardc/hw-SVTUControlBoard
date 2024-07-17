@@ -484,10 +484,10 @@ void CONTROL_HandlePulse()
 
 Int16U CONTROL_CheckSelfTestResults()
 {
-	if(fabs((1-DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX]) * 100) > SELFTEST_ALLOWED_ERROR)
+	if(fabsf((1 - DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX]) * 100) > SELFTEST_ALLOWED_ERROR)
 		return DF_SELFTEST_ID;
 
-	if(fabs(1-(DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT]/1000)))*100 > SELFTEST_ALLOWED_ERROR)
+	if(fabsf(1 - (DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT] / 1000))) * 100 > SELFTEST_ALLOWED_ERROR)
 		return DF_SELFTEST_VD;
 
 	return 0;
