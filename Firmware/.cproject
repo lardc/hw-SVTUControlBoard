@@ -50,6 +50,7 @@
 									<listOptionValue builtIn="false" value="&quot;..\..\..\hw-STM32-libs\System\Core&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;..\..\..\hw-STM32-libs\Library&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;..\..\..\hw-STM32-libs\Interface&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;..\..\..\hw-STM32-libs\Firmware&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;..\Source&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;..\Source\Platform&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;..\Source\Controller&quot;"/>

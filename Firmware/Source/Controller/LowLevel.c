@@ -49,9 +49,9 @@ void LL_WriteDAC(Int16U Data)
 }
 //-----------------------------
 
-bool LL_SafetyIsActive()
+bool LL_GetSafetyState()
 {
-	return !GPIO_GetState(GPIO_SAFETY);
+	return GPIO_GetState(GPIO_SAFETY);
 }
 //------------------------------------
 
