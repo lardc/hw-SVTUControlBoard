@@ -14,6 +14,10 @@
 #include "BCCIxParams.h"
 #include "math.h"
 #include "InitConfig.h"
+#include "SaveToFlash.h"
+#include "Constraints.h"
+#include "JSONDescription.h"
+
 // Types
 //
 typedef void (*FUNC_AsyncDelegate)();
@@ -25,10 +29,12 @@ static Boolean CycleActive = false;
 SubState SUB_State = SS_None;
 bool IsImpulse = false;
 bool SelfTest = false;
+static Boolean RequestSaveToFlash = false;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
 volatile Int64U CONTROL_TimeCounter = 0;
 volatile Int64U CONTROL_Timeout = 0;
+volatile Int16U CONTROL_ExtInfoCounter = 0;
 
 // Forward functions
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
@@ -47,24 +53,31 @@ void CONTROL_SaveResults();
 Int16U CONTROL_CheckSelfTestResults();
 bool CONTROL_IsSafetyEvent();
 void CONTROL_FinishedWithProblem(Int16U Problem);
+void CONTROL_InitStoragePointers();
+void CONTROL_InitJSONPointers();
 
 // Functions
 //
 void CONTROL_Init()
 {
 	// Переменные для конфигурации EndPoint
-	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR, EP_IG};
-	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
+	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR, EP_IG, EP_ExtInfoData};
+
+	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_EXT_INFO_SIZE};
+
 	pInt16U FEPCounters[FEP_COUNT] = {(pInt16U)&CONTROL_PowerValues_Counter, (pInt16U)&CONTROL_PowerValues_Counter,
-										(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter};
+			(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&CONTROL_ExtInfoCounter};
+
 	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_Id, (pFloat32)MEMBUF_EP_Vd, (pFloat32)MEMBUF_EP_Vg,
-			(pFloat32)MEMBUF_EP_VgErr, (pFloat32)MEMBUF_EP_Ig};
+			(pFloat32)MEMBUF_EP_VgErr, (pFloat32)MEMBUF_EP_Ig, (pFloat32)&CONTROL_ExtInfoData};
 	
-	// Конфигурация сервиса работы Data-table и EPROM
+	// Конфигурация сервиса работы DataTable и EEPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
 	
-	// Инициализация data table
+	// Инициализация DataTable
 	DT_Init(EPROMService, false);
+
+	// Инициализация функций связанных с CAN NodeID
 	DT_SaveFirmwareInfo(CAN_SLAVE_NID, CAN_MASTER_NID);
 	
 	// Инициализация device profile
@@ -76,6 +89,8 @@ void CONTROL_Init()
 	CONTROL_ResetToDefaults();
 
 	LOGIC_FindLCSU();
+	// Инициализация указателей на сохраняемые данные
+	CONTROL_InitStoragePointers();
 }
 //-----------------------------------------------
 
@@ -206,6 +221,13 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 
 void CONTROL_Idle()
 {
+	// Проверка флага сохранения во Flash память
+	if (RequestSaveToFlash)
+	{
+		RequestSaveToFlash = false;
+		STF_SaveDiagData();
+	}
+
 	// Обработка мастер-запросов по интерфейсу
 	DEVPROFILE_ProcessRequests();
 	
@@ -587,3 +609,32 @@ void CONTROL_HandleExternalLamp(bool IsImpulse)
 	}
 }
 //-----------------------------------------------
+
+void CONTROL_InitStoragePointers()
+{
+	//STF_AssignPointer(0, (Int32U)&);
+	//STF_AssignPointer(16, (Int32U)&CONTROL_Values_Counter);
+}
+//-----------------------------------------------
+
+void CONTROL_InitJSONPointers()
+{
+	/*Itm1Min = DataTable[REG_CFG_CURRENT_LIMIT_MIN] == 0 ? CURRENT_SETPOINT_MIN : DataTable[REG_CFG_CURRENT_LIMIT_MIN];
+	Itm1Max = DataTable[REG_I2DAC_CUST_RANGE0];
+
+	Itm2Min = DataTable[REG_I2DAC_CUST_RANGE0];
+	Itm2Max = DataTable[REG_I2DAC_CUST_RANGE1];
+
+	Itm3Min = DataTable[REG_I2DAC_CUST_RANGE1];
+	Itm3Max = DataTable[REG_CFG_CURRENT_LIMIT_MAX] == 0 ? CURRENT_SETPOINT_MAX : DataTable[REG_CFG_CURRENT_LIMIT_MAX];
+
+	JSON_AssignPointer(0, &Itm1Min);
+	JSON_AssignPointer(1, &Itm1Max);
+
+	JSON_AssignPointer(2, &Itm2Min);
+	JSON_AssignPointer(3, &Itm2Max);
+
+	JSON_AssignPointer(4, &Itm3Min);
+	JSON_AssignPointer(5, &Itm3Max);*/
+}
+//------------------------------------------
