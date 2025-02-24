@@ -17,6 +17,7 @@
 #include "SaveToFlash.h"
 #include "Constraints.h"
 #include "JSONDescription.h"
+#include "StorageDescription.c"
 
 // Types
 //
@@ -612,8 +613,26 @@ void CONTROL_HandleExternalLamp(bool IsImpulse)
 
 void CONTROL_InitStoragePointers()
 {
-	//STF_AssignPointer(0, (Int32U)&);
-	//STF_AssignPointer(16, (Int32U)&CONTROL_Values_Counter);
+	STF_AssignPointer(0, (Int32U)&DataTable[REG_ID_SETPOINT]);
+	STF_AssignPointer(1, (Int32U)&DataTable[REG_VG_SETPOINT]);
+
+	STF_AssignPointer(2, (Int32U)&DataTable[REG_DEV_STATE]);
+	STF_AssignPointer(3, (Int32U)&DataTable[REG_FAULT_REASON]);
+	STF_AssignPointer(4, (Int32U)&DataTable[REG_DISABLE_REASON]);
+	STF_AssignPointer(5, (Int32U)&DataTable[REG_WARNING]);
+	STF_AssignPointer(6, (Int32U)&DataTable[REG_PROBLEM]);
+	STF_AssignPointer(7, (Int32U)&DataTable[REG_OP_RESULT]);
+	STF_AssignPointer(8, (Int32U)&DataTable[REG_SELF_TEST_OP_RESULT]);
+	STF_AssignPointer(9, (Int32U)&DataTable[REG_SUB_STATE]);
+
+	STF_AssignPointer(10, (Int32U)MEMBUF_EP_Id);
+	STF_AssignPointer(11, (Int32U)MEMBUF_EP_Vd);
+	STF_AssignPointer(12, (Int32U)MEMBUF_EP_Vg);
+	STF_AssignPointer(13, (Int32U)MEMBUF_EP_VgErr);
+	STF_AssignPointer(14, (Int32U)MEMBUF_EP_Ig);
+
+	STF_AssignPointer(15, (Int32U)&CONTROL_PowerValues_Counter);
+	STF_AssignPointer(16, (Int32U)&GateValues_Counter);
 }
 //-----------------------------------------------
 
