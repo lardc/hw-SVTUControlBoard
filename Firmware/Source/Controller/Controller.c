@@ -638,22 +638,34 @@ void CONTROL_InitStoragePointers()
 
 void CONTROL_InitJSONPointers()
 {
-	/*Itm1Min = DataTable[REG_CFG_CURRENT_LIMIT_MIN] == 0 ? CURRENT_SETPOINT_MIN : DataTable[REG_CFG_CURRENT_LIMIT_MIN];
-	Itm1Max = DataTable[REG_I2DAC_CUST_RANGE0];
+	Utm1Min = DataTable[REG_UT_MIN] ? VD_MIN_VALUE : DataTable[REG_UT_MIN];
+	Utm1Max = DataTable[REG_UT_MAX] ? VD_MAX_VALUE : DataTable[REG_UT_MAX];
 
-	Itm2Min = DataTable[REG_I2DAC_CUST_RANGE0];
-	Itm2Max = DataTable[REG_I2DAC_CUST_RANGE1];
+	Utm2Min;
+	Utm2Max;
 
-	Itm3Min = DataTable[REG_I2DAC_CUST_RANGE1];
-	Itm3Max = DataTable[REG_CFG_CURRENT_LIMIT_MAX] == 0 ? CURRENT_SETPOINT_MAX : DataTable[REG_CFG_CURRENT_LIMIT_MAX];
+	ItmSetMin = DataTable[REG_IT_MIN] ? ID_MIN_VALUE : DataTable[REG_IT_MIN];
+	ItmSetMax = DataTable[REG_IT_MAX] ? ID_MAX_VALUE : DataTable[REG_IT_MAX];
 
-	JSON_AssignPointer(0, &Itm1Min);
-	JSON_AssignPointer(1, &Itm1Max);
+	ItmMeas1Min = DataTable[REG_IT_MIN] ? ID_MIN_VALUE : DataTable[REG_IT_MIN];
+	ItmMeas1Max = DataTable[REG_I_R0_THRESHOLD];
 
-	JSON_AssignPointer(2, &Itm2Min);
-	JSON_AssignPointer(3, &Itm2Max);
+	ItmMeas2Min = DataTable[REG_I_R0_THRESHOLD];
+	ItmMeas2Max = DataTable[REG_IT_MAX] ? ID_MAX_VALUE : DataTable[REG_IT_MAX];
 
-	JSON_AssignPointer(4, &Itm3Min);
-	JSON_AssignPointer(5, &Itm3Max);*/
+	JSON_AssignPointer(0, &Utm1Min);
+	JSON_AssignPointer(1, &Utm1Max);
+
+	JSON_AssignPointer(2, &Utm2Min);
+	JSON_AssignPointer(3, &Utm2Max);
+
+	JSON_AssignPointer(4, &ItmSetMin);
+	JSON_AssignPointer(5, &ItmSetMax);
+
+	JSON_AssignPointer(6, &ItmMeas1Min);
+	JSON_AssignPointer(7, &ItmMeas1Max);
+
+	JSON_AssignPointer(8, &ItmMeas2Min);
+	JSON_AssignPointer(9, &ItmMeas2Max);
 }
 //------------------------------------------

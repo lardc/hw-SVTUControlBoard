@@ -51,4 +51,4 @@ const char TemplateJSON[] = "[{\n"
 "		}]\n"
 "}]";
 
-float Itm1Min;
+float Utm1Min, Utm1Max, Utm2Min, Utm2Max, ItmSetMin, ItmSetMax, ItmMeas1Min, ItmMeas1Max, ItmMeas2Min, ItmMeas2Max;

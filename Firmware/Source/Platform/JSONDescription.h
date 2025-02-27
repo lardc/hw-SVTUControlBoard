@@ -4,6 +4,6 @@
 #include "stdinc.h"
 #include "FormatOutputJSON.h"
 
-extern float Itm1Min;
+extern float Utm1Min, Utm1Max, Utm2Min, Utm2Max, ItmSetMin, ItmSetMax, ItmMeas1Min, ItmMeas1Max, ItmMeas2Min, ItmMeas2Max;
 
 #endif // __JSON_DESCRIPTION_H
