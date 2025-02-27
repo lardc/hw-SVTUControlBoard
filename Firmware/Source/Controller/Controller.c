@@ -14,10 +14,9 @@
 #include "BCCIxParams.h"
 #include "math.h"
 #include "InitConfig.h"
-#include "SaveToFlash.h"
 #include "Constraints.h"
 #include "JSONDescription.h"
-#include "StorageDescription.c"
+#include "SaveToFlash.h"
 
 // Types
 //
@@ -641,8 +640,8 @@ void CONTROL_InitJSONPointers()
 	Utm1Min = DataTable[REG_UT_MIN] ? VD_MIN_VALUE : DataTable[REG_UT_MIN];
 	Utm1Max = DataTable[REG_UT_MAX] ? VD_MAX_VALUE : DataTable[REG_UT_MAX];
 
-	Utm2Min;
-	Utm2Max;
+	Utm2Min = DataTable[REG_UT_MAX] ? VD_MAX_VALUE : DataTable[REG_UT_MAX];
+	Utm2Max = DataTable[REG_UT2_MAX];
 
 	ItmSetMin = DataTable[REG_IT_MIN] ? ID_MIN_VALUE : DataTable[REG_IT_MIN];
 	ItmSetMax = DataTable[REG_IT_MAX] ? ID_MAX_VALUE : DataTable[REG_IT_MAX];
@@ -653,19 +652,23 @@ void CONTROL_InitJSONPointers()
 	ItmMeas2Min = DataTable[REG_I_R0_THRESHOLD];
 	ItmMeas2Max = DataTable[REG_IT_MAX] ? ID_MAX_VALUE : DataTable[REG_IT_MAX];
 
+	Utm2Active = DataTable[REG_UT2_MAX] ? 1 : 0;
+
 	JSON_AssignPointer(0, &Utm1Min);
 	JSON_AssignPointer(1, &Utm1Max);
 
-	JSON_AssignPointer(2, &Utm2Min);
-	JSON_AssignPointer(3, &Utm2Max);
+	JSON_AssignPointer(2, &Utm2Active);
 
-	JSON_AssignPointer(4, &ItmSetMin);
-	JSON_AssignPointer(5, &ItmSetMax);
+	JSON_AssignPointer(3, &Utm2Min);
+	JSON_AssignPointer(4, &Utm2Max);
 
-	JSON_AssignPointer(6, &ItmMeas1Min);
-	JSON_AssignPointer(7, &ItmMeas1Max);
+	JSON_AssignPointer(5, &ItmSetMin);
+	JSON_AssignPointer(6, &ItmSetMax);
 
-	JSON_AssignPointer(8, &ItmMeas2Min);
-	JSON_AssignPointer(9, &ItmMeas2Max);
+	JSON_AssignPointer(7, &ItmMeas1Min);
+	JSON_AssignPointer(8, &ItmMeas1Max);
+
+	JSON_AssignPointer(9, &ItmMeas2Min);
+	JSON_AssignPointer(10, &ItmMeas2Max);
 }
 //------------------------------------------

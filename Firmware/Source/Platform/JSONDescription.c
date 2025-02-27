@@ -14,7 +14,7 @@ const char TemplateJSON[] = "[{\n"
 "		{\n"
 "			'rangeId' : '2',\n"
 "			'unitsMultiply' : '1',\n"
-"			'active' : '1',\n"
+"			'active' : '$',\n"
 "			'min': '$',\n"
 "			'max': '$'\n"
 "		}]\n"
@@ -52,3 +52,5 @@ const char TemplateJSON[] = "[{\n"
 "}]";
 
 float Utm1Min, Utm1Max, Utm2Min, Utm2Max, ItmSetMin, ItmSetMax, ItmMeas1Min, ItmMeas1Max, ItmMeas2Min, ItmMeas2Max;
+
+bool Utm2Active;
