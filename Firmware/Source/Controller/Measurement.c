@@ -54,12 +54,12 @@ void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength, bool CheckChannel
 	if (CheckChannel)
 	{
 		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_B, REG_VD_K, REG_VD_P0, REG_VD_P1,
-					REG_VD_P2, 0))
+					REG_VD_P2, 0);
 	}
 	else
 	{
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_B, REG_VD_K, REG_VD_P0, REG_VD_P1,
-					REG_VD_P2, 0);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_UTCH2_B, REG_UTCH2_K, REG_UTCH2_P0, REG_UTCH2_P1,
+				REG_UTCH2_P2, 0);
 	}
 }
 //------------------------------------
