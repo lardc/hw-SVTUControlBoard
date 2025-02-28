@@ -90,6 +90,8 @@
 #define REG_MSR_TIME					48	// Время измерения Uce, Ice (в тиках)
 #define REG_EMULATION					49  // Включение режима эмуляции
 //
+#define REG_PCB_VERSION					120	// 0 - версия платы 1.0
+											// 1 - версия  2.0
 
 // Несохраняемы регистры чтения-записи
 #define REG_ID_SETPOINT					128	// Уставка силового тока (в А)

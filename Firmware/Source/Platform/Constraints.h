@@ -106,7 +106,9 @@
 #define COEF_VG_B_DEF				1
 #define COEF_VG_SET_B_DEF			1
 #define COEF_IG_B_DEF				1
-
+//
+#define	PCB_VERSION_10				0
+#define PCB_VERSION_20				1
 
 // Types
 typedef struct __TableItemConstraint

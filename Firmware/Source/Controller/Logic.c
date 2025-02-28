@@ -260,8 +260,10 @@ void LOGIC_StartPulse()
 	IT_DMAFlagsReset();
 	DMA_ChannelReload(DMA_ADC_ID_CH, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_VD_CH, VALUES_POWER_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_UT_CH2, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelEnable(DMA_ADC_ID_CH, true);
 	DMA_ChannelEnable(DMA_ADC_VD_CH, true);
+	DMA_ChannelEnable(DMA_ADC_UT_CH2, true);
 
 	// Запуск оцифровки импульса тока и напряжения в силовой цепи
 	ADC_SamplingStart(ADC3);
@@ -290,6 +292,14 @@ bool LOGIC_FinishProcess()
 		// Пересчёт значений
 		MEASURE_ConvertVd(&MEMBUF_DMA_Vd[0], VALUES_POWER_DMA_SIZE);
 		MEASURE_ConvertId(&MEMBUF_DMA_Id[0], VALUES_POWER_DMA_SIZE, LL_IdGetRange());
+		if (DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
+		{
+			MEASURE_ConvertVd(&MEMBUF_DMA_Ut_Ch2[0], VALUES_POWER_DMA_SIZE);
+		}
+		/*if ((MEASURE_ConvertUT2-"погрешность второго канала")>5 ||(MEASURE_ConvertVD-"погрешность первого канала")>5)
+			MEASURE_ResultUT = Measure_ConvertUT2;
+		else
+			Measure_ResultUT = Measure_ConvertVD;*/
 
 		return true;
 	}

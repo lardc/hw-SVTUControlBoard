@@ -146,3 +146,4 @@ void MEASURE_ArrayEMA(pFloat32 InputArray, Int16U DataLength)
 		InputArray[i] = InputArray[i] * ADC_EMA_FACTOR + (1 - ADC_EMA_FACTOR) * InputArray[i - 1];
 }
 //------------------------------------
+
