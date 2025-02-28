@@ -49,10 +49,18 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U Reg
 }
 //------------------------------------
 
-void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength)
+void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength, bool CheckChannel)
 {
-	MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_B, REG_VD_K, REG_VD_P0, REG_VD_P1,
-			REG_VD_P2, 0);
+	if (CheckChannel)
+	{
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_B, REG_VD_K, REG_VD_P0, REG_VD_P1,
+					REG_VD_P2, 0))
+	}
+	else
+	{
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_B, REG_VD_K, REG_VD_P0, REG_VD_P1,
+					REG_VD_P2, 0);
+	}
 }
 //------------------------------------
 
