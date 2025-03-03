@@ -83,11 +83,11 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 77
 		{0, 0, 0},																// 78
 		{0, 0, 0},																// 79
-		{VOLTAGE_MIN, VOLTAGE_MAX, 0},											// 80
-		{VOLTAGE_MIN, VOLTAGE_MAX, 0},											// 81
-		{REG_IT_MIN, REG_IT_MAX, 0},											// 82
-		{REG_IT_MIN, REG_IT_MAX, 0},											// 83
-		{VOLTAGE_MIN, VOLTAGE_MAX, 0},											// 84
+		{0, VOLTAGE_MAX, 0},													// 80
+		{0, VOLTAGE_MAX, 0},													// 81
+		{0, CURRENT_MAX, 0},													// 82
+		{0, CURRENT_MAX, 0},													// 83
+		{0, VOLTAGE_MAX, 0},													// 84
 		{0, 0, 0},																// 85
 		{0, 0, 0},																// 86
 		{0, 0, 0},																// 87
