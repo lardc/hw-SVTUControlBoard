@@ -498,6 +498,7 @@ void CONTROL_SaveDataToEndpoint()
 {
 	LOGIC_SaveToEndpoint(&MEMBUF_DMA_Vd[0], &MEMBUF_EP_Vd[0], VALUES_POWER_DMA_SIZE);
 	LOGIC_SaveToEndpoint(&MEMBUF_DMA_Id[0], &MEMBUF_EP_Id[0], VALUES_POWER_DMA_SIZE);
+	LOGIC_SaveToEndpoint(&MEMBUF_DMA_Ut_Ch2[0], &MEMBUF_EP_Ut_Ch2[0], VALUES_POWER_DMA_SIZE);
 	CONTROL_PowerValues_Counter = VALUES_x_SIZE;
 }
 //-----------------------------------------------

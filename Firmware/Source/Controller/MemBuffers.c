@@ -7,6 +7,7 @@
 // Variables
 //
 float MEMBUF_EP_Vd[VALUES_x_SIZE] = {0};
+float MEMBUF_EP_Ut_Ch2[VALUES_x_SIZE] = {0};
 float MEMBUF_EP_Id[VALUES_x_SIZE] = {0};
 float MEMBUF_EP_Vg[VALUES_x_SIZE] = {0};
 float MEMBUF_EP_VgErr[VALUES_x_SIZE] = {0};
