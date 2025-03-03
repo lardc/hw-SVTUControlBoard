@@ -637,20 +637,20 @@ void CONTROL_InitStoragePointers()
 
 void CONTROL_InitJSONPointers()
 {
-	Utm1Min = DataTable[REG_UT_MIN] ? VD_MIN_VALUE : DataTable[REG_UT_MIN];
-	Utm1Max = DataTable[REG_UT_MAX] ? VD_MAX_VALUE : DataTable[REG_UT_MAX];
+	Utm1Min = DataTable[REG_UT_MIN] ? DataTable[REG_UT_MIN] : VD_MIN_VALUE;
+	Utm1Max = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : VD_MAX_VALUE;
 
-	Utm2Min = DataTable[REG_UT_MAX] ? VD_MAX_VALUE : DataTable[REG_UT_MAX];
+	Utm2Min = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : VD_MAX_VALUE;
 	Utm2Max = DataTable[REG_UT2_MAX];
 
-	ItmSetMin = DataTable[REG_IT_MIN] ? ID_MIN_VALUE : DataTable[REG_IT_MIN];
-	ItmSetMax = DataTable[REG_IT_MAX] ? ID_MAX_VALUE : DataTable[REG_IT_MAX];
+	ItmSetMin = DataTable[REG_IT_MIN] ? DataTable[REG_IT_MIN] : ID_MIN_VALUE;
+	ItmSetMax = DataTable[REG_IT_MAX] ? DataTable[REG_IT_MAX] : ID_MAX_VALUE;
 
-	ItmMeas1Min = DataTable[REG_IT_MIN] ? ID_MIN_VALUE : DataTable[REG_IT_MIN];
+	ItmMeas1Min = DataTable[REG_IT_MIN] ? DataTable[REG_IT_MIN] : ID_MIN_VALUE;
 	ItmMeas1Max = DataTable[REG_I_R0_THRESHOLD];
 
 	ItmMeas2Min = DataTable[REG_I_R0_THRESHOLD];
-	ItmMeas2Max = DataTable[REG_IT_MAX] ? ID_MAX_VALUE : DataTable[REG_IT_MAX];
+	ItmMeas2Max = DataTable[REG_IT_MAX] ? DataTable[REG_IT_MAX] : ID_MAX_VALUE;
 
 	Utm2Active = DataTable[REG_UT2_MAX] ? 1 : 0;
 

@@ -17,6 +17,7 @@
 #include "SaveToFlash.h"
 #include "FormatOutputJSON.h"
 #include "MemBuffers.h"
+#include "ZwIWDG.h"
 
 // Types
 //
@@ -197,7 +198,9 @@ static Boolean DEVPROFILE_DispatchAction(Int16U ActionID, pInt16U UserError)
 			break;
 
 		case ACT_FLASH_DIAG_ERASE:
+			IWDG_ConfigureSlowUpdate();
 			STF_EraseDataSector();
+			IWDG_ConfigureFastUpdate();
 			break;
 
 		case ACT_FLASH_DIAG_TO_EP:
