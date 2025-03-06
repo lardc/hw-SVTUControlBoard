@@ -23,6 +23,15 @@
 #define ACT_RESET_TO_DEFAULT			202	// Сброс DataTable в состояние по умолчанию
 //
 #define ACT_BOOT_LOADER_REQUEST			320	// Перезапуск процессора с целью перепрограммирования
+
+#define ACT_FLASH_DIAG_INIT_READ		331	// Инициализировать начало считывания отладочной информации
+
+#define ACT_FLASH_DIAG_SAVE				332	// Сохранение блока отладочной информации во флэш
+#define ACT_FLASH_DIAG_ERASE			333	// Стирание области отладочной информации
+
+#define ACT_FLASH_DIAG_TO_EP			340	// Выполнить чтение массива из памяти отладочной информации в EP
+#define ACT_JSON_INIT_READ				341	// Инициализация начала считывания JSON
+#define ACT_JSON_TO_EP					342	// Выполнить чтение шаблона JSON в EP
 // -----------------------------
 
 // Регистры
@@ -90,6 +99,11 @@
 #define REG_MSR_TIME					48	// Время измерения Uce, Ice (в тиках)
 #define REG_EMULATION					49  // Включение режима эмуляции
 //
+#define REG_UT_MIN						80	// Нижняя граница измеряемого напряжения
+#define REG_UT_MAX						81	// Верхняя граница измеряемого напряжения
+#define REG_IT_MIN						82	// Нижняя граница измеряемого тока
+#define REG_IT_MAX						83	// Верхняя граница измеряемого тока
+#define REG_UT2_MAX						84	// Вторая верхняя граница измеряемого напряжения
 
 // Несохраняемы регистры чтения-записи
 #define REG_ID_SETPOINT					128	// Уставка силового тока (в А)
@@ -152,6 +166,8 @@
 #define EP_VG							3	// Оцифрованные данные Vg
 #define EP_VG_ERR						4	// Ошибка регулятора Vg
 #define EP_IG							5	// Оцифрованные данные Ig
+
+#define EP_ExtInfoData					20	// External information from flash
 
 // Operation results
 #define OPRESULT_NONE					0	// No information or not finished
