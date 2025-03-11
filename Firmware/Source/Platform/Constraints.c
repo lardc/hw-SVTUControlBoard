@@ -53,16 +53,16 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{MSR_DELAY_MIN, MSR_DELAY_MAX, MSR_DELAY_DEF},							// 47
 		{MSR_TIME_MIN, MSR_TIME_MAX, MSR_TIME_DEF},								// 48
 		{NO, YES, NO},															// 49
-		{0, 0, 0},																// 50
-		{0, 0, 0},																// 51
-		{0, 0, 0},																// 52
+		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 50
+		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 51
+		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 52
 		{0, 0, 0},																// 53
 		{0, 0, 0},																// 54
-		{0, 0, 0},																// 55
-		{0, 0, 0},																// 56
-		{0, 0, 0},																// 57
-		{0, 0, 0},																// 58
-		{0, 0, 0},																// 59
+		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 55
+		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 56
+		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 57
+		{COEF_K_MIN, COEF_K_MAX, COEF_UT2_K_DEF},								// 58
+		{COEF_B_MIN, COEF_B_MAX, COEF_UT2_B_DEF},								// 59
 		{0, 0, 0},																// 60
 		{0, 0, 0},																// 61
 		{0, 0, 0},																// 62

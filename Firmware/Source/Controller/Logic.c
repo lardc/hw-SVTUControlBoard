@@ -35,8 +35,6 @@ typedef struct __LCSUStructData
 //
 LCSUData LCSU_DataArray[LCSU_COUNT_MAX] = {0};
 static Int16U ActiveLCSUCounter = 0, CachedLCSUStartNid = 0, CachedLCSUMaxCurrent = 0;
-bool Channel1=0;
-bool Channel2=1;
 
 // Forward functions
 //
@@ -292,16 +290,12 @@ bool LOGIC_FinishProcess()
 		GATE_StopProcess();
 
 		// Пересчёт значений
-		MEASURE_ConvertVd(&MEMBUF_DMA_Vd[0], VALUES_POWER_DMA_SIZE, Channel1);
+		MEASURE_ConvertVd(&MEMBUF_DMA_Vd[0], VALUES_POWER_DMA_SIZE);
 		MEASURE_ConvertId(&MEMBUF_DMA_Id[0], VALUES_POWER_DMA_SIZE, LL_IdGetRange());
 		if (DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
 		{
-			MEASURE_ConvertVd(&MEMBUF_DMA_Ut_Ch2[0], VALUES_POWER_DMA_SIZE, Channel2);
+			MEASURE_ConvertUt2(&MEMBUF_DMA_Ut_Ch2[0], VALUES_POWER_DMA_SIZE);
 		}
-		/*if ((MEASURE_ConvertUT2-"погрешность второго канала")>5 ||(MEASURE_ConvertVD-"погрешность первого канала")>5)
-			MEASURE_ResultUT = Measure_ConvertUT2;
-		else
-			Measure_ResultUT = Measure_ConvertVD;*/
 
 		return true;
 	}
