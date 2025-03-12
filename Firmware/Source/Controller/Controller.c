@@ -14,6 +14,10 @@
 #include "BCCIxParams.h"
 #include "math.h"
 #include "InitConfig.h"
+#include "Constraints.h"
+#include "JSONDescription.h"
+#include "SaveToFlash.h"
+
 // Types
 //
 typedef void (*FUNC_AsyncDelegate)();
@@ -25,10 +29,12 @@ static Boolean CycleActive = false;
 SubState SUB_State = SS_None;
 bool IsImpulse = false;
 bool SelfTest = false;
+static Boolean RequestSaveToFlash = false;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
 volatile Int64U CONTROL_TimeCounter = 0;
 volatile Int64U CONTROL_Timeout = 0;
+volatile Int16U CONTROL_ExtInfoCounter = 0;
 
 // Forward functions
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
@@ -47,24 +53,31 @@ void CONTROL_SaveResults();
 Int16U CONTROL_CheckSelfTestResults();
 bool CONTROL_IsSafetyEvent();
 void CONTROL_FinishedWithProblem(Int16U Problem);
+void CONTROL_InitStoragePointers();
+void CONTROL_InitJSONPointers();
 
 // Functions
 //
 void CONTROL_Init()
 {
 	// Переменные для конфигурации EndPoint
-	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR, EP_IG};
-	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE};
+	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR, EP_IG, EP_ExtInfoData};
+
+	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_EXT_INFO_SIZE};
+
 	pInt16U FEPCounters[FEP_COUNT] = {(pInt16U)&CONTROL_PowerValues_Counter, (pInt16U)&CONTROL_PowerValues_Counter,
-										(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter};
+			(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&CONTROL_ExtInfoCounter};
+
 	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_Id, (pFloat32)MEMBUF_EP_Vd, (pFloat32)MEMBUF_EP_Vg,
-			(pFloat32)MEMBUF_EP_VgErr, (pFloat32)MEMBUF_EP_Ig};
+			(pFloat32)MEMBUF_EP_VgErr, (pFloat32)MEMBUF_EP_Ig, (pFloat32)&CONTROL_ExtInfoData};
 	
-	// Конфигурация сервиса работы Data-table и EPROM
+	// Конфигурация сервиса работы DataTable и EEPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
 	
-	// Инициализация data table
+	// Инициализация DataTable
 	DT_Init(EPROMService, false);
+
+	// Инициализация функций связанных с CAN NodeID
 	DT_SaveFirmwareInfo(CAN_SLAVE_NID, CAN_MASTER_NID);
 	
 	// Инициализация device profile
@@ -76,6 +89,8 @@ void CONTROL_Init()
 	CONTROL_ResetToDefaults();
 
 	LOGIC_FindLCSU();
+	// Инициализация указателей на сохраняемые данные
+	CONTROL_InitStoragePointers();
 }
 //-----------------------------------------------
 
@@ -206,6 +221,13 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 
 void CONTROL_Idle()
 {
+	// Проверка флага сохранения во Flash память
+	if (RequestSaveToFlash)
+	{
+		RequestSaveToFlash = false;
+		STF_SaveDiagData();
+	}
+
 	// Обработка мастер-запросов по интерфейсу
 	DEVPROFILE_ProcessRequests();
 	
@@ -588,3 +610,66 @@ void CONTROL_HandleExternalLamp(bool IsImpulse)
 	}
 }
 //-----------------------------------------------
+
+void CONTROL_InitStoragePointers()
+{
+	STF_AssignPointer(0, (Int32U)&DataTable[REG_ID_SETPOINT]);
+	STF_AssignPointer(1, (Int32U)&DataTable[REG_VG_SETPOINT]);
+
+	STF_AssignPointer(2, (Int32U)&DataTable[REG_DEV_STATE]);
+	STF_AssignPointer(3, (Int32U)&DataTable[REG_FAULT_REASON]);
+	STF_AssignPointer(4, (Int32U)&DataTable[REG_DISABLE_REASON]);
+	STF_AssignPointer(5, (Int32U)&DataTable[REG_WARNING]);
+	STF_AssignPointer(6, (Int32U)&DataTable[REG_PROBLEM]);
+	STF_AssignPointer(7, (Int32U)&DataTable[REG_OP_RESULT]);
+	STF_AssignPointer(8, (Int32U)&DataTable[REG_SELF_TEST_OP_RESULT]);
+	STF_AssignPointer(9, (Int32U)&DataTable[REG_SUB_STATE]);
+
+	STF_AssignPointer(10, (Int32U)MEMBUF_EP_Id);
+	STF_AssignPointer(11, (Int32U)MEMBUF_EP_Vd);
+	STF_AssignPointer(12, (Int32U)MEMBUF_EP_Vg);
+	STF_AssignPointer(13, (Int32U)MEMBUF_EP_VgErr);
+	STF_AssignPointer(14, (Int32U)MEMBUF_EP_Ig);
+
+	STF_AssignPointer(15, (Int32U)&CONTROL_PowerValues_Counter);
+	STF_AssignPointer(16, (Int32U)&GateValues_Counter);
+}
+//-----------------------------------------------
+
+void CONTROL_InitJSONPointers()
+{
+	Utm1Min = DataTable[REG_UT_MIN] ? DataTable[REG_UT_MIN] : VD_MIN_VALUE;
+	Utm1Max = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : VD_MAX_VALUE;
+
+	Utm2Min = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : VD_MAX_VALUE;
+	Utm2Max = DataTable[REG_UT2_MAX];
+
+	ItmSetMin = DataTable[REG_IT_MIN] ? DataTable[REG_IT_MIN] : ID_MIN_VALUE;
+	ItmSetMax = DataTable[REG_IT_MAX] ? DataTable[REG_IT_MAX] : ID_MAX_VALUE;
+
+	ItmMeas1Min = DataTable[REG_IT_MIN] ? DataTable[REG_IT_MIN] : ID_MIN_VALUE;
+	ItmMeas1Max = DataTable[REG_I_R0_THRESHOLD];
+
+	ItmMeas2Min = DataTable[REG_I_R0_THRESHOLD];
+	ItmMeas2Max = DataTable[REG_IT_MAX] ? DataTable[REG_IT_MAX] : ID_MAX_VALUE;
+
+	Utm2Active = DataTable[REG_UT2_MAX] ? 1 : 0;
+
+	JSON_AssignPointer(0, &Utm1Min);
+	JSON_AssignPointer(1, &Utm1Max);
+
+	JSON_AssignPointer(2, &Utm2Active);
+
+	JSON_AssignPointer(3, &Utm2Min);
+	JSON_AssignPointer(4, &Utm2Max);
+
+	JSON_AssignPointer(5, &ItmSetMin);
+	JSON_AssignPointer(6, &ItmSetMax);
+
+	JSON_AssignPointer(7, &ItmMeas1Min);
+	JSON_AssignPointer(8, &ItmMeas1Max);
+
+	JSON_AssignPointer(9, &ItmMeas2Min);
+	JSON_AssignPointer(10, &ItmMeas2Max);
+}
+//------------------------------------------

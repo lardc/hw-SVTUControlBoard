@@ -112,6 +112,12 @@
 //
 #define COEF_UT2_K_DEF				1
 #define COEF_UT2_B_DEF				1
+//
+#define CURRENT_MIN					50 		// в А
+#define CURRENT_MAX					13000 	// в А
+//
+#define VOLTAGE_MIN					100		// в мВ
+#define VOLTAGE_MAX					15000	// в мВ
 
 // Types
 typedef struct __TableItemConstraint
