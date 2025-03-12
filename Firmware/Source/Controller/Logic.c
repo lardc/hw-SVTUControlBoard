@@ -290,11 +290,11 @@ bool LOGIC_FinishProcess()
 		GATE_StopProcess();
 
 		// Пересчёт значений
-		MEASURE_ConvertVd(&MEMBUF_DMA_Vd[0], VALUES_POWER_DMA_SIZE);
-		MEASURE_ConvertId(&MEMBUF_DMA_Id[0], VALUES_POWER_DMA_SIZE, LL_IdGetRange());
+		MEASURE_ConvertVd(MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
+		MEASURE_ConvertId(MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE, LL_IdGetRange());
 		if (DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
 		{
-			MEASURE_ConvertUt2(&MEMBUF_DMA_Ut_Ch2[0], VALUES_POWER_DMA_SIZE);
+			MEASURE_ConvertUt2(MEMBUF_DMA_Ut_Ch2, VALUES_POWER_DMA_SIZE);
 		}
 
 		return true;
@@ -320,7 +320,30 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	DataTable[REG_RESULT_VD] = MEASURE_CollectorAverageVoltage();
+	float UtResult = 0;
+	float UtCh2Result = 0;
+	float UtCh1Limit = 5.5;
+	UtResult = MEASURE_CollectorAverageVoltage();
+	switch((Int16U)DataTable[REG_PCB_VERSION])
+	{
+		case PCB_VERSION_10:
+			DataTable[REG_RESULT_VD] = UtResult;
+			break;
+
+		case PCB_VERSION_20:
+			{
+				UtCh2Result = MEASURE_CollectorAverageVoltageCh2();
+				if(UtResult > UtCh1Limit)
+				{
+					DataTable[REG_RESULT_VD] = UtCh2Result;
+				}
+				else
+				{
+					DataTable[REG_RESULT_VD] = UtResult;
+				}
+			}
+			break;
+	}
 	DataTable[REG_RESULT_ID] = MEASURE_CollectorAverageCurrent();
 	DataTable[REG_RESULT_VG] = MEASURE_GateAverageVoltage();
 
