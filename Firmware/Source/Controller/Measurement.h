@@ -6,10 +6,12 @@
 // Functions
 //
 void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength);
+void MEASURE_ConvertUt2(pFloat32 InputArray, Int16U DataLength);
 void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange);
 //
 float MEASURE_CollectorAverageCurrent();
 float MEASURE_CollectorAverageVoltage();
+float MEASURE_CollectorAverageVoltageCh2();
 float MEASURE_GateAverageVoltage();
 //
 float MEASURE_Vg(Int16U SampleADC);
