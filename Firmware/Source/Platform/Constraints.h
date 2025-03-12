@@ -95,14 +95,14 @@
 //
 #define COEF_ID_R0_K_DEF			1
 #define COEF_ID_R1_K_DEF			1
-#define COEF_VD_K_DEF				1
+#define COEF_UT_K_DEF				1
 #define COEF_VG_K_DEF				1
 #define COEF_VG_SET_K_DEF			1
 #define COEF_IG_K_DEF				1
 //
 #define COEF_ID_R0_B_DEF			1
 #define COEF_ID_R1_B_DEF			1
-#define COEF_VD_B_DEF				1
+#define COEF_UT_B_DEF				1
 #define COEF_VG_B_DEF				1
 #define COEF_VG_SET_B_DEF			1
 #define COEF_IG_B_DEF				1

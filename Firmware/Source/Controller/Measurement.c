@@ -49,10 +49,10 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U Reg
 }
 //------------------------------------
 
-void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength)
+void MEASURE_ConvertUt(pFloat32 InputArray, Int16U DataLength)
 {
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_B, REG_VD_K, REG_VD_P0, REG_VD_P1,
-					REG_VD_P2, 0);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_UT_B, REG_UT_K, REG_UT_P0, REG_UT_P1,
+					REG_UT_P2, 0);
 }
 
 void MEASURE_ConvertUt2(pFloat32 InputArray, Int16U DataLength)
@@ -114,7 +114,7 @@ float MEASURE_CollectorAverageVoltage()
 	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
 	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
 
-	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Vd, StartIndex, Points);
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Ut, StartIndex, Points);
 }
 //------------------------------------
 

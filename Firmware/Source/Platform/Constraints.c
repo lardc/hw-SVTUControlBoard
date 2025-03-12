@@ -16,8 +16,8 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 10
 		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 11
 		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 12
-		{COEF_K_MIN, COEF_K_MAX, COEF_VD_K_DEF},								// 13
-		{COEF_B_MIN, COEF_B_MAX, COEF_VD_B_DEF},								// 14
+		{COEF_K_MIN, COEF_K_MAX, COEF_UT_K_DEF},								// 13
+		{COEF_B_MIN, COEF_B_MAX, COEF_UT_B_DEF},								// 14
 		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 15
 		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 16
 		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 17

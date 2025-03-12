@@ -259,10 +259,10 @@ void LOGIC_StartPulse()
 	// Подготовка оцифровки
 	IT_DMAFlagsReset();
 	DMA_ChannelReload(DMA_ADC_ID_CH, VALUES_POWER_DMA_SIZE);
-	DMA_ChannelReload(DMA_ADC_VD_CH, VALUES_POWER_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_UT_CH, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_UT_CH2, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelEnable(DMA_ADC_ID_CH, true);
-	DMA_ChannelEnable(DMA_ADC_VD_CH, true);
+	DMA_ChannelEnable(DMA_ADC_UT_CH, true);
 	DMA_ChannelEnable(DMA_ADC_UT_CH2, true);
 
 	// Запуск оцифровки импульса тока и напряжения в силовой цепи
@@ -290,7 +290,7 @@ bool LOGIC_FinishProcess()
 		GATE_StopProcess();
 
 		// Пересчёт значений
-		MEASURE_ConvertVd(MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
+		MEASURE_ConvertUt(MEMBUF_DMA_Ut, VALUES_POWER_DMA_SIZE);
 		MEASURE_ConvertId(MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE, LL_IdGetRange());
 		if (DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
 		{
@@ -324,20 +324,20 @@ void LOGIC_SaveResults()
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
-			DataTable[REG_RESULT_VD] = UtResult;
+			DataTable[REG_RESULT_UT] = UtResult;
 			break;
 
 		case PCB_VERSION_20:
 			{
 				float UtCh2Result = MEASURE_CollectorAverageVoltageCh2();
-				DataTable[REG_RESULT_VD] = UtResult > (Int16U)DataTable[REG_UT_MAX] ? UtCh2Result : UtResult;
+				DataTable[REG_RESULT_UT] = UtResult > (Int16U)DataTable[REG_UT_MAX] ? UtCh2Result : UtResult;
 			}
 			break;
 	}
 	DataTable[REG_RESULT_ID] = MEASURE_CollectorAverageCurrent();
 	DataTable[REG_RESULT_VG] = MEASURE_GateAverageVoltage();
 
-	if((DataTable[REG_RESULT_VD] > VD_MAX_VALUE) || (DataTable[REG_RESULT_VD] < VD_MIN_VALUE))
+	if((DataTable[REG_RESULT_UT] > UT_MAX_VALUE) || (DataTable[REG_RESULT_UT] < UT_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
 
 	if((DataTable[REG_RESULT_ID] > ID_MAX_VALUE) || (DataTable[REG_RESULT_ID] < ID_MIN_VALUE))

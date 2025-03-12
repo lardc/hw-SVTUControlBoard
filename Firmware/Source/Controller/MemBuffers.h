@@ -6,7 +6,7 @@
 
 // Variables
 //
-extern float MEMBUF_EP_Vd[VALUES_x_SIZE];
+extern float MEMBUF_EP_Ut[VALUES_x_SIZE];
 extern float MEMBUF_EP_Ut_Ch2[VALUES_x_SIZE];
 extern float MEMBUF_EP_Id[VALUES_x_SIZE];
 extern float MEMBUF_EP_Vg[VALUES_x_SIZE];
@@ -15,7 +15,7 @@ extern float MEMBUF_EP_Ig[VALUES_x_SIZE];
 
 extern volatile float CONTROL_ExtInfoData[VALUES_EXT_INFO_SIZE];
 
-extern float MEMBUF_DMA_Vd[VALUES_POWER_DMA_SIZE];
+extern float MEMBUF_DMA_Ut[VALUES_POWER_DMA_SIZE];
 extern float MEMBUF_DMA_Id[VALUES_POWER_DMA_SIZE];
 extern float MEMBUF_DMA_Ut_Ch2[VALUES_POWER_DMA_SIZE];
 

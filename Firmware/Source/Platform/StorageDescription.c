@@ -18,7 +18,7 @@ RecordDescription StorageDescription[] =
 	{"REG_SUB_STATE",			 	DT_Float,	1},
 
 	{"Id Digital",					DT_Float,	VALUES_x_SIZE},
-	{"Vd Digital",					DT_Float,	VALUES_x_SIZE},
+	{"Ut Digital",					DT_Float,	VALUES_x_SIZE},
 	{"Vg Digital",					DT_Float,	VALUES_x_SIZE},
 	{"Vg Error",					DT_Float,	VALUES_x_SIZE},
 	{"Ig Digital",					DT_Float,	VALUES_x_SIZE},

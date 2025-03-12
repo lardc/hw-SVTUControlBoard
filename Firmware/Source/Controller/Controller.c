@@ -61,14 +61,14 @@ void CONTROL_InitJSONPointers();
 void CONTROL_Init()
 {
 	// Переменные для конфигурации EndPoint
-	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR, EP_IG, EP_ExtInfoData};
+	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_UT, EP_VG, EP_VG_ERR, EP_IG, EP_ExtInfoData};
 
 	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_EXT_INFO_SIZE};
 
 	pInt16U FEPCounters[FEP_COUNT] = {(pInt16U)&CONTROL_PowerValues_Counter, (pInt16U)&CONTROL_PowerValues_Counter,
 			(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&CONTROL_ExtInfoCounter};
 
-	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_Id, (pFloat32)MEMBUF_EP_Vd, (pFloat32)MEMBUF_EP_Vg,
+	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_Id, (pFloat32)MEMBUF_EP_Ut, (pFloat32)MEMBUF_EP_Vg,
 			(pFloat32)MEMBUF_EP_VgErr, (pFloat32)MEMBUF_EP_Ig, (pFloat32)&CONTROL_ExtInfoData};
 	
 	// Конфигурация сервиса работы DataTable и EEPROM
@@ -110,7 +110,7 @@ void CONTROL_ResetData()
 	DataTable[REG_PROBLEM] = PROBLEM_NONE;
 	DataTable[REG_OP_RESULT] = OPRESULT_NONE;
 
-	DataTable[REG_RESULT_VD] = 0;
+	DataTable[REG_RESULT_UT] = 0;
 	DataTable[REG_RESULT_ID] = 0;
 	DataTable[REG_RESULT_VG] = 0;
 
@@ -509,8 +509,8 @@ Int16U CONTROL_CheckSelfTestResults()
 	if(fabsf((1 - DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX]) * 100) > SELFTEST_ALLOWED_ERROR)
 		return DF_SELFTEST_ID;
 
-	if(fabsf(1 - (DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT] / 1000))) * 100 > SELFTEST_ALLOWED_ERROR)
-		return DF_SELFTEST_VD;
+	if(fabsf(1 - (DataTable[REG_RESULT_UT] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT] / 1000))) * 100 > SELFTEST_ALLOWED_ERROR)
+		return DF_SELFTEST_UT;
 
 	return 0;
 }
@@ -518,7 +518,7 @@ Int16U CONTROL_CheckSelfTestResults()
 
 void CONTROL_SaveDataToEndpoint()
 {
-	LOGIC_SaveToEndpoint(MEMBUF_DMA_Vd, MEMBUF_EP_Vd, VALUES_POWER_DMA_SIZE);
+	LOGIC_SaveToEndpoint(MEMBUF_DMA_Ut, MEMBUF_EP_Ut, VALUES_POWER_DMA_SIZE);
 	LOGIC_SaveToEndpoint(MEMBUF_DMA_Id, MEMBUF_EP_Id, VALUES_POWER_DMA_SIZE);
 	LOGIC_SaveToEndpoint(MEMBUF_DMA_Ut_Ch2, MEMBUF_EP_Ut_Ch2, VALUES_POWER_DMA_SIZE);
 	CONTROL_PowerValues_Counter = VALUES_x_SIZE;
@@ -626,7 +626,7 @@ void CONTROL_InitStoragePointers()
 	STF_AssignPointer(9, (Int32U)&DataTable[REG_SUB_STATE]);
 
 	STF_AssignPointer(10, (Int32U)MEMBUF_EP_Id);
-	STF_AssignPointer(11, (Int32U)MEMBUF_EP_Vd);
+	STF_AssignPointer(11, (Int32U)MEMBUF_EP_Ut);
 	STF_AssignPointer(12, (Int32U)MEMBUF_EP_Vg);
 	STF_AssignPointer(13, (Int32U)MEMBUF_EP_VgErr);
 	STF_AssignPointer(14, (Int32U)MEMBUF_EP_Ig);
@@ -638,10 +638,10 @@ void CONTROL_InitStoragePointers()
 
 void CONTROL_InitJSONPointers()
 {
-	Utm1Min = DataTable[REG_UT_MIN] ? DataTable[REG_UT_MIN] : VD_MIN_VALUE;
-	Utm1Max = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : VD_MAX_VALUE;
+	Utm1Min = DataTable[REG_UT_MIN] ? DataTable[REG_UT_MIN] : UT_MIN_VALUE;
+	Utm1Max = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : UT_MAX_VALUE;
 
-	Utm2Min = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : VD_MAX_VALUE;
+	Utm2Min = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : UT_MAX_VALUE;
 	Utm2Max = DataTable[REG_UT2_MAX];
 
 	ItmSetMin = DataTable[REG_IT_MIN] ? DataTable[REG_IT_MIN] : ID_MIN_VALUE;
