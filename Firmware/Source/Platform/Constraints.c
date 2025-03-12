@@ -6,13 +6,13 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 0
 		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 1
 		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 2
-		{COEF_K_MIN, COEF_K_MAX, COEF_ID_R0_K_DEF},								// 3
-		{COEF_B_MIN, COEF_B_MAX, COEF_ID_R0_B_DEF},								// 4
+		{COEF_K_MIN, COEF_K_MAX, COEF_IT_R0_K_DEF},								// 3
+		{COEF_B_MIN, COEF_B_MAX, COEF_IT_R0_B_DEF},								// 4
 		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 5
 		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 6
 		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 7
-		{COEF_K_MIN, COEF_K_MAX, COEF_ID_R1_K_DEF},								// 8
-		{COEF_B_MIN, COEF_B_MAX, COEF_ID_R1_B_DEF},								// 9
+		{COEF_K_MIN, COEF_K_MAX, COEF_IT_R1_K_DEF},								// 8
+		{COEF_B_MIN, COEF_B_MAX, COEF_IT_R1_B_DEF},								// 9
 		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 10
 		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 11
 		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 12
@@ -131,7 +131,7 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 125
 		{0, 0, 0},																// 126
 		{0, 0, 0},																// 127
-		{ID_SETPOINT_MIN, ID_SETPOINT_MAX, ID_SETPOINT_DEF},					// 128
+		{IT_SETPOINT_MIN, IT_SETPOINT_MAX, IT_SETPOINT_DEF},					// 128
 		{VG_SETPOINT_MIN, VG_SETPOINT_MAX, VG_SETPOINT_DEF},					// 129
 		{0, 0, 0},																// 130
 		{0, 0, 0},																// 131

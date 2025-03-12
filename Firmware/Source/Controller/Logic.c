@@ -60,7 +60,7 @@ bool LOGIC_FindLCSU()
 	}
 	
 	DataTable[REG_LCSU_DETECTED] = ActiveLCSUCounter;
-	DataTable[REG_ID_MAX] = CachedLCSUMaxCurrent * ActiveLCSUCounter;
+	DataTable[REG_IT_READ_MAX] = CachedLCSUMaxCurrent * ActiveLCSUCounter;
 	
 	return ActiveLCSUCounter;
 }
@@ -217,7 +217,7 @@ bool LOGIC_DistributeCurrent(float Current)
 float LOGIC_GetCurrentSetpoint()
 {
 	float P0, P1, P2;
-	float current = DataTable[REG_ID_SETPOINT];
+	float current = DataTable[REG_IT_SETPOINT];
 
 	if (current <= DataTable[REG_I_R0_THRESHOLD])
 	{
@@ -250,7 +250,7 @@ void LOGIC_ResetLCSUCurrent()
 
 void LOGIC_SelectCurrentRange(float Current)
 {
-	(Current <= DataTable[REG_I_R0_THRESHOLD]) ? LL_SetIdRange(true) : LL_SetIdRange(false);
+	(Current <= DataTable[REG_I_R0_THRESHOLD]) ? LL_SetItRange(true) : LL_SetItRange(false);
 }
 // ----------------------------------------
 
@@ -258,10 +258,10 @@ void LOGIC_StartPulse()
 {
 	// Подготовка оцифровки
 	IT_DMAFlagsReset();
-	DMA_ChannelReload(DMA_ADC_ID_CH, VALUES_POWER_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_IT_CH, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_UT_CH, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_UT_CH2, VALUES_POWER_DMA_SIZE);
-	DMA_ChannelEnable(DMA_ADC_ID_CH, true);
+	DMA_ChannelEnable(DMA_ADC_IT_CH, true);
 	DMA_ChannelEnable(DMA_ADC_UT_CH, true);
 	DMA_ChannelEnable(DMA_ADC_UT_CH2, true);
 
@@ -291,7 +291,7 @@ bool LOGIC_FinishProcess()
 
 		// Пересчёт значений
 		MEASURE_ConvertUt(MEMBUF_DMA_Ut, VALUES_POWER_DMA_SIZE);
-		MEASURE_ConvertId(MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE, LL_IdGetRange());
+		MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
 		if (DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
 		{
 			MEASURE_ConvertUt2(MEMBUF_DMA_Ut_Ch2, VALUES_POWER_DMA_SIZE);
@@ -334,13 +334,13 @@ void LOGIC_SaveResults()
 			}
 			break;
 	}
-	DataTable[REG_RESULT_ID] = MEASURE_CollectorAverageCurrent();
+	DataTable[REG_RESULT_IT] = MEASURE_CollectorAverageCurrent();
 	DataTable[REG_RESULT_VG] = MEASURE_GateAverageVoltage();
 
 	if((DataTable[REG_RESULT_UT] > UT_MAX_VALUE) || (DataTable[REG_RESULT_UT] < UT_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
 
-	if((DataTable[REG_RESULT_ID] > ID_MAX_VALUE) || (DataTable[REG_RESULT_ID] < ID_MIN_VALUE))
+	if((DataTable[REG_RESULT_IT] > IT_MAX_VALUE) || (DataTable[REG_RESULT_IT] < IT_MIN_VALUE))
 			DataTable[REG_WARNING] = WARNING_CURRENT_OUT_OF_RANGE;
 }
 // ----------------------------------------

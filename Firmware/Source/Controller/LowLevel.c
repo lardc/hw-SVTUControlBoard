@@ -55,14 +55,14 @@ bool LL_GetSafetyState()
 }
 //------------------------------------
 
-void LL_SetIdRange(bool Range)
+void LL_SetItRange(bool Range)
 {
-	GPIO_SetState(GPIO_ID_RANGE, Range);
+	GPIO_SetState(GPIO_IT_RANGE, Range);
 }
 //------------------------------------
 
-bool LL_IdGetRange()
+bool LL_ItGetRange()
 {
-	return GPIO_GetState(GPIO_ID_RANGE);
+	return GPIO_GetState(GPIO_IT_RANGE);
 }
 //------------------------------------

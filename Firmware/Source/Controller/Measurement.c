@@ -62,14 +62,14 @@ void MEASURE_ConvertUt2(pFloat32 InputArray, Int16U DataLength)
 }
 //------------------------------------
 
-void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange)
+void MEASURE_ConvertIt(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange)
 {
 	float RShunt = DataTable[REG_R_SHUNT] / 1000;
 
 	if(!CurrentRange)
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_R1_B, REG_ID_R1_K, REG_ID_R1_P0, REG_ID_R1_P1, REG_ID_R1_P2, RShunt);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_IT_R1_B, REG_IT_R1_K, REG_IT_R1_P0, REG_IT_R1_P1, REG_IT_R1_P2, RShunt);
 	else
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_R0_B, REG_ID_R0_K, REG_ID_R0_P0, REG_ID_R0_P1, REG_ID_R0_P2, RShunt);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_IT_R0_B, REG_IT_R0_K, REG_IT_R0_P0, REG_IT_R0_P1, REG_IT_R0_P2, RShunt);
 }
 //------------------------------------
 
@@ -136,7 +136,7 @@ float MEASURE_CollectorAverageCurrent()
 	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
 	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
 
-	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Id, StartIndex, Points);
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_It, StartIndex, Points);
 }
 //------------------------------------
 

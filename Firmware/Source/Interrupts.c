@@ -13,7 +13,7 @@
 
 // Variables
 //
-static volatile bool IdCompleted, UTCompleted;
+static volatile bool ItCompleted, UTCompleted;
 
 // Functions
 //
@@ -28,22 +28,22 @@ void ADC1_2_IRQHandler()
 
 bool IT_DMASampleCompleted()
 {
-	return IdCompleted && UTCompleted;
+	return ItCompleted && UTCompleted;
 }
 //-----------------------------------------
 
 void IT_DMAFlagsReset()
 {
-	IdCompleted = UTCompleted = false;
+	ItCompleted = UTCompleted = false;
 }
 //-----------------------------------------
 
 void DMA2_Channel5_IRQHandler()
 {
-	// Id
+	// It
 	if(DMA_IsTransferComplete(DMA2, DMA_ISR_TCIF5))
 	{
-		IdCompleted = true;
+		ItCompleted = true;
 		DMA_TransferCompleteReset(DMA2, DMA_IFCR_CTCIF5);
 	}
 }

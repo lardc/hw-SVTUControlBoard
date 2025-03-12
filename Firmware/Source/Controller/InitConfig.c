@@ -31,7 +31,7 @@ void INITCFG_ConfigGPIO()
 	GPIO_InitAnalog(GPIO_MSR_IGBT_UG);
 	GPIO_InitAnalog(GPIO_MSR_IGBT_UG_PCB20);
 	GPIO_InitAnalog(GPIO_MSR_UD);
-	GPIO_InitAnalog(GPIO_MSR_ID);
+	GPIO_InitAnalog(GPIO_MSR_IT);
 	GPIO_InitAnalog(GPIO_ADC_UD2);
 	
 	// Выходы
@@ -40,7 +40,7 @@ void INITCFG_ConfigGPIO()
 	GPIO_InitPushPullOutput(GPIO_AIN_ST);
 	GPIO_InitPushPullOutput(GPIO_SYNC_LCSU);
 	GPIO_InitPushPullOutput(GPIO_IND_CTRL);
-	GPIO_InitPushPullOutput(GPIO_ID_RANGE);
+	GPIO_InitPushPullOutput(GPIO_IT_RANGE);
 
 	// Начальная установка состояний
 	GPIO_SetState(GPIO_LED, false);
@@ -48,7 +48,7 @@ void INITCFG_ConfigGPIO()
 	GPIO_SetState(GPIO_AIN_ST, false);
 	GPIO_SetState(GPIO_SYNC_LCSU, false);
 	GPIO_SetState(GPIO_IND_CTRL, false);
-	GPIO_SetState(GPIO_ID_RANGE, false);
+	GPIO_SetState(GPIO_IT_RANGE, false);
 	
 	// Альтернативные функции
 	GPIO_InitAltFunction(GPIO_ALT_CAN_RX, AltFn_9);
@@ -135,7 +135,7 @@ void INITCFG_ConfigADC()
 	// ADC4
 	ADC_Calibration(ADC4);
 	ADC_ChannelSeqReset(ADC4);
-	ADC_ChannelSet_Sequence(ADC4, ADC4_ID_CH, 1);
+	ADC_ChannelSet_Sequence(ADC4, ADC4_IT_CH, 1);
 	ADC_ChannelSeqLen(ADC4, 1);
 	ADC_DMAEnable(ADC4, true);
 	ADC_Enable(ADC4);
@@ -177,10 +177,10 @@ void INITCFG_ConfigDMA()
 	DMA_Clk_Enable(DMA1_ClkEN);
 	DMA_Clk_Enable(DMA2_ClkEN);
 	
-	DMA_Reset(DMA_ADC_ID_CH);
-	DMA_Interrupt(DMA_ADC_ID_CH, DMA_TRANSFER_COMPLETE, 0, true);
-	DMAChannelX_DataConfig(DMA_ADC_ID_CH, (Int32U)(MEMBUF_DMA_Id), (Int32U)(&ADC4->DR), VALUES_POWER_DMA_SIZE);
-	DMAChannelX_Config(DMA_ADC_ID_CH, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
+	DMA_Reset(DMA_ADC_IT_CH);
+	DMA_Interrupt(DMA_ADC_IT_CH, DMA_TRANSFER_COMPLETE, 0, true);
+	DMAChannelX_DataConfig(DMA_ADC_IT_CH, (Int32U)(MEMBUF_DMA_It), (Int32U)(&ADC4->DR), VALUES_POWER_DMA_SIZE);
+	DMAChannelX_Config(DMA_ADC_IT_CH, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
 			DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH);
 	
 	DMA_Reset(DMA_ADC_UT_CH);

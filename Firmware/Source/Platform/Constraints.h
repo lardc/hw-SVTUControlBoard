@@ -73,9 +73,9 @@
 #define I_THRESHOLD_MAX				12000
 #define I_THRESHOLD_DEF				300
 //
-#define ID_SETPOINT_MIN				50
-#define ID_SETPOINT_MAX				1700
-#define ID_SETPOINT_DEF				500
+#define IT_SETPOINT_MIN				50
+#define IT_SETPOINT_MAX				1700
+#define IT_SETPOINT_DEF				500
 //
 #define VG_SETPOINT_MIN				5
 #define VG_SETPOINT_MAX				22
@@ -93,15 +93,15 @@
 #define IG_THRESHOLD_MAX			100
 #define IG_THRESHOLD_DEF			30
 //
-#define COEF_ID_R0_K_DEF			1
-#define COEF_ID_R1_K_DEF			1
+#define COEF_IT_R0_K_DEF			1
+#define COEF_IT_R1_K_DEF			1
 #define COEF_UT_K_DEF				1
 #define COEF_VG_K_DEF				1
 #define COEF_VG_SET_K_DEF			1
 #define COEF_IG_K_DEF				1
 //
-#define COEF_ID_R0_B_DEF			1
-#define COEF_ID_R1_B_DEF			1
+#define COEF_IT_R0_B_DEF			1
+#define COEF_IT_R1_B_DEF			1
 #define COEF_UT_B_DEF				1
 #define COEF_VG_B_DEF				1
 #define COEF_VG_SET_B_DEF			1

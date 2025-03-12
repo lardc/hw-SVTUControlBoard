@@ -14,7 +14,7 @@ void LL_ExtIndication(bool State);
 void LL_ExtIndicationToggle();
 void LL_WriteDAC(Int16U Data);
 bool LL_GetSafetyState();
-void LL_SetIdRange(bool Range);
-bool LL_IdGetRange();
+void LL_SetItRange(bool Range);
+bool LL_ItGetRange();
 
 #endif // __LOWLEVEL_H
