@@ -320,10 +320,7 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	float UtResult = 0;
-	float UtCh2Result = 0;
-	float UtCh1Limit = 5.5;
-	UtResult = MEASURE_CollectorAverageVoltage();
+	float UtResult = MEASURE_CollectorAverageVoltage();
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
@@ -332,15 +329,8 @@ void LOGIC_SaveResults()
 
 		case PCB_VERSION_20:
 			{
-				UtCh2Result = MEASURE_CollectorAverageVoltageCh2();
-				if(UtResult > UtCh1Limit)
-				{
-					DataTable[REG_RESULT_VD] = UtCh2Result;
-				}
-				else
-				{
-					DataTable[REG_RESULT_VD] = UtResult;
-				}
+				float UtCh2Result = MEASURE_CollectorAverageVoltageCh2();
+				DataTable[REG_RESULT_VD] = UtResult > (Int16U)DataTable[REG_UT_MAX] ? UtCh2Result : UtResult;
 			}
 			break;
 	}
