@@ -9,9 +9,7 @@ void MEASURE_ConvertUt(pFloat32 InputArray, Int16U DataLength);
 void MEASURE_ConvertUt2(pFloat32 InputArray, Int16U DataLength);
 void MEASURE_ConvertIt(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange);
 //
-float MEASURE_CollectorAverageCurrent();
-float MEASURE_CollectorAverageVoltage();
-float MEASURE_CollectorAverageVoltageCh2();
+float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary);
 float MEASURE_GateAverageVoltage();
 //
 float MEASURE_Vg(Int16U SampleADC);

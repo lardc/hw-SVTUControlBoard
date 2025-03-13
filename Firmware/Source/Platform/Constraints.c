@@ -124,7 +124,7 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 118
 		{0, 0, 0},																// 119
 		{PCB_VERSION_10, PCB_VERSION_20, PCB_VERSION_10},						// 120
-		{0, 0, 0},																// 121
+		{PCB_TIRIS, PCB_IGBT, PCB_TIRIS},										// 121
 		{0, 0, 0},																// 122
 		{0, 0, 0},																// 123
 		{0, 0, 0},																// 124

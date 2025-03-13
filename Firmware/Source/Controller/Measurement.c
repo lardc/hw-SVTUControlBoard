@@ -107,36 +107,14 @@ float MEASURE_GateAverageVoltage()
 }
 //------------------------------------
 
-float MEASURE_CollectorAverageVoltage()
+float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary)
 {
 	Int16U StartIndex, Points;
 
 	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
 	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
 
-	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Ut, StartIndex, Points);
-}
-//------------------------------------
-
-float MEASURE_CollectorAverageVoltageCh2()
-{
-	Int16U StartIndex, Points;
-
-	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
-	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
-
-	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Ut_Ch2, StartIndex, Points);
-}
-//------------------------------------
-
-float MEASURE_CollectorAverageCurrent()
-{
-	Int16U StartIndex, Points;
-
-	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
-	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
-
-	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_It, StartIndex, Points);
+	return MEASURE_ExtractAverageValues(MEMBUF_DMA_Intermediary, StartIndex, Points);
 }
 //------------------------------------
 

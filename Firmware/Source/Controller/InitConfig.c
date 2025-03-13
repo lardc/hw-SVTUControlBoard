@@ -29,10 +29,10 @@ void INITCFG_ConfigGPIO()
 	
 	// Аналоговые входы
 	GPIO_InitAnalog(GPIO_MSR_IGBT_UG);
-	GPIO_InitAnalog(GPIO_MSR_IGBT_UG_PCB20);
+	GPIO_InitAnalog(GPIO_MSR_IGBT_IG);
 	GPIO_InitAnalog(GPIO_MSR_UD);
+	GPIO_InitAnalog(GPIO_MSR_UD2);
 	GPIO_InitAnalog(GPIO_MSR_IT);
-	GPIO_InitAnalog(GPIO_ADC_UD2);
 	
 	// Выходы
 	GPIO_InitPushPullOutput(GPIO_LED);
@@ -87,40 +87,42 @@ void INITCFG_ConfigADC()
 	ADC_Calibration(ADC1);
 	ADC_TrigConfig(ADC1, ADC12_TIM2_TRGO, RISE);
 	ADC_ChannelSeqReset(ADC1);
-	ADC_ChannelSet_Sequence(ADC1, ADC1_IGBT_IG_CH, 1);
 
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
-		case PCB_VERSION_10:
-			ADC_ChannelSeqLen(ADC1, 1);
-			break;
-
 		case PCB_VERSION_20:
-			ADC_ChannelSet_Sequence(ADC1, ADC1_IGBT_UG_CH_PCB20, 2);
-			ADC_ChannelSeqLen(ADC1, 2);
+			if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
+			{
+				ADC_ChannelSet_Sequence(ADC1, ADC1_UT_CH2, 1);
+				ADC_DMAEnable(ADC1, true);
+			}
 			break;
 	}
 
+	ADC_ChannelSeqLen(ADC1, 1);
 	ADC_Interrupt(ADC1, EOCIE, 0, true);
 	ADC_Enable(ADC1);
 
 	// ADC2
 	ADC_Calibration(ADC2);
 	ADC_ChannelSeqReset(ADC2);
+	ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
 
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
-			ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
+			ADC_ChannelSeqLen(ADC2, 1);
 			break;
 
 		case PCB_VERSION_20:
-			ADC_ChannelSet_Sequence(ADC2, ADC2_UT_CH2, 1);
-			ADC_DMAEnable(ADC2, true);
+			if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
+			{
+				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_IG_CH, 2);
+				ADC_ChannelSeqLen(ADC2, 2);
+			}
 			break;
 	}
 
-	ADC_ChannelSeqLen(ADC2, 1);
 	ADC_Enable(ADC2);
 
 	// ADC3
@@ -191,7 +193,7 @@ void INITCFG_ConfigDMA()
 
 	DMA_Reset(DMA_ADC_UT_CH2);
 		DMA_Interrupt(DMA_ADC_UT_CH2, DMA_TRANSFER_COMPLETE, 0, true);
-		DMAChannelX_DataConfig(DMA_ADC_UT_CH2, (Int32U)(MEMBUF_DMA_Ut_Ch2), (Int32U)(&ADC2->DR), VALUES_POWER_DMA_SIZE);
+		DMAChannelX_DataConfig(DMA_ADC_UT_CH2, (Int32U)(MEMBUF_DMA_Ut_Ch2), (Int32U)(&ADC1->DR), VALUES_POWER_DMA_SIZE);
 		DMAChannelX_Config(DMA_ADC_UT_CH2, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
 				DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH);
 

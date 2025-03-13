@@ -320,7 +320,7 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	float UtResult = MEASURE_CollectorAverageVoltage();
+	float UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut);
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
@@ -329,18 +329,20 @@ void LOGIC_SaveResults()
 
 		case PCB_VERSION_20:
 			{
-				float UtCh2Result = MEASURE_CollectorAverageVoltageCh2();
+				float UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut_Ch2);
 				DataTable[REG_RESULT_UT] = UtResult > (Int16U)DataTable[REG_UT_MAX] ? UtCh2Result : UtResult;
 			}
 			break;
 	}
-	DataTable[REG_RESULT_IT] = MEASURE_CollectorAverageCurrent();
+
+	float ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It);
+	DataTable[REG_RESULT_IT] = ItResult;
 	DataTable[REG_RESULT_VG] = MEASURE_GateAverageVoltage();
 
-	if((DataTable[REG_RESULT_UT] > UT_MAX_VALUE) || (DataTable[REG_RESULT_UT] < UT_MIN_VALUE))
+	if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
 
-	if((DataTable[REG_RESULT_IT] > IT_MAX_VALUE) || (DataTable[REG_RESULT_IT] < IT_MIN_VALUE))
+	if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
 			DataTable[REG_WARNING] = WARNING_CURRENT_OUT_OF_RANGE;
 }
 // ----------------------------------------
