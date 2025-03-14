@@ -19,8 +19,8 @@
 // Определения для аналоговых портов
 GPIO_PortPinSettingMacro GPIO_MSR_IGBT_UG 			= {GPIOA, Pin_7};
 GPIO_PortPinSettingMacro GPIO_MSR_IGBT_IG 			= {GPIOB, Pin_3};
-GPIO_PortPinSettingMacro GPIO_MSR_UD2				= {GPIOA, Pin_3};
-GPIO_PortPinSettingMacro GPIO_MSR_UD 				= {GPIOB, Pin_13};
+GPIO_PortPinSettingMacro GPIO_MSR_UT2				= {GPIOA, Pin_3};
+GPIO_PortPinSettingMacro GPIO_MSR_UT 				= {GPIOB, Pin_13};
 GPIO_PortPinSettingMacro GPIO_MSR_IT				= {GPIOB, Pin_12};
 GPIO_PortPinSettingMacro GPIO_IT_RANGE				= {GPIOB, Pin_14};
 

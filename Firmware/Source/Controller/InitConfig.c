@@ -30,8 +30,8 @@ void INITCFG_ConfigGPIO()
 	// Аналоговые входы
 	GPIO_InitAnalog(GPIO_MSR_IGBT_UG);
 	GPIO_InitAnalog(GPIO_MSR_IGBT_IG);
-	GPIO_InitAnalog(GPIO_MSR_UD);
-	GPIO_InitAnalog(GPIO_MSR_UD2);
+	GPIO_InitAnalog(GPIO_MSR_UT);
+	GPIO_InitAnalog(GPIO_MSR_UT2);
 	GPIO_InitAnalog(GPIO_MSR_IT);
 	
 	// Выходы
@@ -93,7 +93,7 @@ void INITCFG_ConfigADC()
 		case PCB_VERSION_20:
 			if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
 			{
-				ADC_ChannelSet_Sequence(ADC1, ADC1_UT_CH2, 1);
+				ADC_ChannelSet_Sequence(ADC1, ADC1_UT2, 1);
 				ADC_DMAEnable(ADC1, true);
 			}
 			break;
@@ -191,10 +191,10 @@ void INITCFG_ConfigDMA()
 	DMAChannelX_Config(DMA_ADC_UT_CH, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
 			DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH);
 
-	DMA_Reset(DMA_ADC_UT_CH2);
-		DMA_Interrupt(DMA_ADC_UT_CH2, DMA_TRANSFER_COMPLETE, 0, true);
-		DMAChannelX_DataConfig(DMA_ADC_UT_CH2, (Int32U)(MEMBUF_DMA_Ut_Ch2), (Int32U)(&ADC1->DR), VALUES_POWER_DMA_SIZE);
-		DMAChannelX_Config(DMA_ADC_UT_CH2, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
+	DMA_Reset(DMA_ADC_UT2);
+		DMA_Interrupt(DMA_ADC_UT2, DMA_TRANSFER_COMPLETE, 0, true);
+		DMAChannelX_DataConfig(DMA_ADC_UT2, (Int32U)(MEMBUF_DMA_Ut2), (Int32U)(&ADC1->DR), VALUES_POWER_DMA_SIZE);
+		DMAChannelX_Config(DMA_ADC_UT2, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
 				DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH);
 
 }

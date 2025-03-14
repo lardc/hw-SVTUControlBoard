@@ -57,8 +57,8 @@ void MEASURE_ConvertUt(pFloat32 InputArray, Int16U DataLength)
 
 void MEASURE_ConvertUt2(pFloat32 InputArray, Int16U DataLength)
 {
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_UTCH2_B, REG_UTCH2_K, REG_UTCH2_P0, REG_UTCH2_P1,
-				REG_UTCH2_P2, 0);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_UT2_B, REG_UT2_K, REG_UT2_P0, REG_UT2_P1,
+				REG_UT2_P2, 0);
 }
 //------------------------------------
 

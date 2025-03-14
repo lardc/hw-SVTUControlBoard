@@ -31,7 +31,7 @@
 // ----------------------------------------------
 
 // DMA
-#define DMA_ADC_UT_CH2					DMA1_Channel1	// Канал DMA для АЦП UT второго канала
+#define DMA_ADC_UT2					DMA1_Channel1	// Канал DMA для АЦП UT второго канала
 #define DMA_ADC_IGBT_GATE_CH			DMA2_Channel1	// Канал DMA для АЦП g IGBT
 #define DMA_ADC_IT_CH					DMA2_Channel2	// Канал DMA для АЦП It
 #define DMA_ADC_UT_CH					DMA2_Channel5	// Канал DMA для АЦП UT
@@ -39,7 +39,7 @@
 // ----------------------------------------------
 
 // ADC
-#define ADC1_UT_CH2						4			// АЦП1 номер канала измерения для второго входа UT
+#define ADC1_UT2						4			// АЦП1 номер канала измерения для второго входа UT
 #define ADC2_IGBT_UG_CH					4			// АЦП2 номер канала измерения Ug IGBT
 #define ADC2_IGBT_IG_CH					12			// АЦП2 номер канала измерения Ig IGBT для версии платы 2.0
 #define ADC3_UD_CH						5			// АЦП3 номер канала измерения Ud
