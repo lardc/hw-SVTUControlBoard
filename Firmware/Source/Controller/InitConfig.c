@@ -91,32 +91,39 @@ void INITCFG_ConfigADC()
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_20:
-			if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
+			if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
+			{
+				ADC_ChannelSet_Sequence(ADC1, ADC1_UGT, 1);
+				ADC_ChannelSet_Sequence(ADC1, ADC1_IGT, 2);
+				ADC_ChannelSeqLen(ADC1, 2);
+			}
+			else if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
 			{
 				ADC_ChannelSet_Sequence(ADC1, ADC1_UT2, 1);
 				ADC_DMAEnable(ADC1, true);
+				ADC_ChannelSeqLen(ADC1, 1);
 			}
 			break;
 	}
 
-	ADC_ChannelSeqLen(ADC1, 1);
 	ADC_Interrupt(ADC1, EOCIE, 0, true);
 	ADC_Enable(ADC1);
 
 	// ADC2
 	ADC_Calibration(ADC2);
 	ADC_ChannelSeqReset(ADC2);
-	ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
 
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
+			ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
 			ADC_ChannelSeqLen(ADC2, 1);
 			break;
 
 		case PCB_VERSION_20:
 			if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
 			{
+				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
 				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_IG_CH, 2);
 				ADC_ChannelSeqLen(ADC2, 2);
 			}
