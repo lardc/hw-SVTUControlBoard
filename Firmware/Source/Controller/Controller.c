@@ -449,7 +449,7 @@ void CONTROL_HandlePulse()
 			case SS_CurrentPulseStart:
 				LOGIC_StartPulse();
 
-				CONTROL_Timeout = CONTROL_TimeCounter + SVTU_WAIT_FINISH_TIME;
+				CONTROL_Timeout = CONTROL_TimeCounter + DataTable[REG_SVTU_WAIT_FINISH_TIME];
 				CONTROL_SetDeviceState(DS_InProcess, SS_WaitFinishProcess);
 				break;
 

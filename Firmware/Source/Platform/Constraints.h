@@ -121,6 +121,13 @@
 //
 #define VOLTAGE_MIN					100		// в мВ
 #define VOLTAGE_MAX					15000	// в мВ
+//
+#define LCSU_AMOUNT_MIN				1
+#define LCSU_AMOUNT_MAX				2
+//
+#define SVTU_WAIT_MIN				10		// в мс
+#define SVTU_WAIT_MAX				50		// в мс
+#define SVTU_WAIT_DEF				30		// в мс
 
 // Types
 typedef struct __TableItemConstraint

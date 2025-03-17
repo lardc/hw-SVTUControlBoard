@@ -88,8 +88,8 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, CURRENT_MAX, 0},													// 82
 		{0, CURRENT_MAX, 0},													// 83
 		{0, VOLTAGE_MAX, 0},													// 84
-		{0, 0, 0},																// 85
-		{0, 0, 0},																// 86
+		{LCSU_AMOUNT_MIN, LCSU_AMOUNT_MAX, LCSU_AMOUNT_MIN},						// 85
+		{SVTU_WAIT_MIN, SVTU_WAIT_MAX, SVTU_WAIT_DEF},							// 86
 		{0, 0, 0},																// 87
 		{0, 0, 0},																// 88
 		{0, 0, 0},																// 89

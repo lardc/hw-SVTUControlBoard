@@ -33,7 +33,7 @@ typedef struct __LCSUStructData
 
 // Variables
 //
-LCSUData LCSU_DataArray[LCSU_COUNT_MAX] = {0};
+LCSUData LCSU_DataArray[LCSU_AMOUNT_MAX] = {0};
 static Int16U ActiveLCSUCounter = 0, CachedLCSUStartNid = 0, CachedLCSUMaxCurrent = 0;
 
 // Forward functions
@@ -48,7 +48,7 @@ bool LOGIC_FindLCSU()
 	CachedLCSUStartNid = DataTable[REG_LCSU_START_NID];
 	CachedLCSUMaxCurrent = DataTable[REG_LCSU_MAX_CURRENT];
 	
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_DEV_STATE, NULL))
 		{
@@ -70,7 +70,7 @@ bool LOGIC_UpdateLCSUState()
 {
 	Int16U Register;
 	
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -87,7 +87,7 @@ bool LOGIC_UpdateLCSUState()
 
 bool LOGIC_CallCommandForLCSU(Int16U Command)
 {
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -102,7 +102,7 @@ bool LOGIC_CallCommandForLCSU(Int16U Command)
 
 bool LOGIC_PowerEnableLCSU()
 {
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -125,7 +125,7 @@ bool LOGIC_AreLCSUInStateX(Int16U State)
 {
 	bool result = true;
 	
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State != State)
 			result = false;
@@ -137,7 +137,7 @@ bool LOGIC_AreLCSUInStateX(Int16U State)
 
 bool LOGIC_IsLCSUInFaultOrDisabled(Int16U Fault, Int16U Disabled)
 {
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].State == Fault || LCSU_DataArray[i].State == Disabled)
 			return true;
@@ -149,7 +149,7 @@ bool LOGIC_IsLCSUInFaultOrDisabled(Int16U Fault, Int16U Disabled)
 
 bool LOGIC_WriteLCSUConfig()
 {
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -165,7 +165,7 @@ bool LOGIC_WriteLCSUConfig()
 bool LOGIC_SetCurrentForCertainLCSU(Int16U Nid, float Current)
 {
 	// Nid вне диапазона
-	if(Nid < CachedLCSUStartNid || Nid >= (CachedLCSUStartNid + LCSU_COUNT_MAX))
+	if(Nid < CachedLCSUStartNid || Nid >= (CachedLCSUStartNid + DataTable[REG_LCSU_COUNT_MAX]))
 		return false;
 	
 	// Выбранный блок LCSU не активен
@@ -196,7 +196,7 @@ bool LOGIC_DistributeCurrent(float Current)
 	LOGIC_ResetLCSUCurrent();
 
 	// Запись значений и формы импульса тока
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -240,7 +240,7 @@ float LOGIC_GetCurrentSetpoint()
 
 void LOGIC_ResetLCSUCurrent()
 {
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 			LCSU_DataArray[i].Current = 0;
