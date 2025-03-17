@@ -54,17 +54,17 @@
 #define REG_UT_K						13	// Коэффициент пересчёта напряжения АЦП в UT
 #define REG_UT_B						14	// Смещение оцифрованного UT
 //
-#define REG_VG_P2						15	// Коэффициент точной корректировки Vg P2
-#define REG_VG_P1						16	// Коэффициент точной корректировки Vg P1
-#define REG_VG_P0						17	// Коэффициент точной корректировки Vg P0
-#define REG_VG_K						18	// Коэффициент пересчёта напряжения АЦП в Vg
-#define REG_VG_B						19	// Смещение оцифрованного Vg
+#define REG_UG_P2						15	// Коэффициент точной корректировки Ug P2
+#define REG_UG_P1						16	// Коэффициент точной корректировки Ug P1
+#define REG_UG_P0						17	// Коэффициент точной корректировки Ug P0
+#define REG_UG_K						18	// Коэффициент пересчёта напряжения АЦП в Ug
+#define REG_UG_B						19	// Смещение оцифрованного Ug
 //
-#define REG_VG_SET_P2					20	// Коэффициент точной корректировки Vg P2
-#define REG_VG_SET_P1					21	// Коэффициент точной корректировки Vg P1
-#define REG_VG_SET_P0					22	// Коэффициент точной корректировки Vg P0
-#define REG_VG_SET_K					23	// Коэффициент преобразованиия Vg в ЦАП
-#define REG_VG_SET_B					24	// Смещение при преобразовании Vg в ЦАП
+#define REG_UG_SET_P2					20	// Коэффициент точной корректировки Ug P2
+#define REG_UG_SET_P1					21	// Коэффициент точной корректировки Ug P1
+#define REG_UG_SET_P0					22	// Коэффициент точной корректировки Ug P0
+#define REG_UG_SET_K					23	// Коэффициент преобразованиия Ug в ЦАП
+#define REG_UG_SET_B					24	// Смещение при преобразовании Ug в ЦАП
 //
 #define REG_IG_P2						25	// Коэффициент точной корректировки Ig P2
 #define REG_IG_P1						26	// Коэффициент точной корректировки Ig P1
@@ -86,7 +86,7 @@
 #define REG_LCSU_MAX_CURRENT			39	// Максимальный ток с одного LCSU (в А)
 #define REG_LCSU_START_NID				40	// Стартовое значение NodeID для первого LCSU
 #define REG_LCSU_LONG_TIMEOUT			41	// Длинный таймаут по операциям с LCSU (в мс)
-#define REG_VG_EDGE_TIME				42	// Длительность фронта импульса управления (мкс)
+#define REG_UG_EDGE_TIME				42	// Длительность фронта импульса управления (мкс)
 #define REG_LAMP_CTRL					43	// Запрет управление блоком внешнего индикатора
 #define REG_R_SHUNT						44	// Сопротивление шунта (в мкОм)
 #define REG_I_R0_THRESHOLD				45	// Граница нижнего диапазона тока (в А)
@@ -118,7 +118,7 @@
 
 // Несохраняемы регистры чтения-записи
 #define REG_IT_SETPOINT					128	// Уставка силового тока (в А)
-#define REG_VG_SETPOINT					129	// Уставка напряжения управления (в В)
+#define REG_UG_SETPOINT					129	// Уставка напряжения управления (в В)
 //
 #define REG_DBG							150	// Отладочный регистр
 
@@ -134,7 +134,7 @@
 //
 #define REG_RESULT_UT					200	// Измеренное значение прямого напряжения (в мВ)
 #define REG_RESULT_IT					201	// Измеренное значение прямого тока (в А)
-#define REG_RESULT_VG					202	// Измеренное значение напряжения цепи управления (в В)
+#define REG_RESULT_UG					202	// Измеренное значение напряжения цепи управления (в В)
 //
 #define REG_LCSU_DETECTED				205	// Обнаруженное количество силовых ячеек
 #define REG_IT_READ_MAX					206	// Максимальный ток, получаемый с установки (в А)
@@ -174,8 +174,8 @@
 // Endpoints
 #define EP_IT							1	// Оцифрованные данные It
 #define EP_UT							2	// Оцифрованные данные UT
-#define EP_VG							3	// Оцифрованные данные Vg
-#define EP_VG_ERR						4	// Ошибка регулятора Vg
+#define EP_UG							3	// Оцифрованные данные Ug
+#define EP_UG_ERR						4	// Ошибка регулятора Ug
 #define EP_IG							5	// Оцифрованные данные Ig
 
 #define EP_ExtInfoData					20	// External information from flash

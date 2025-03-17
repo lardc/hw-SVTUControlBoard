@@ -61,15 +61,15 @@ void CONTROL_InitJSONPointers();
 void CONTROL_Init()
 {
 	// Переменные для конфигурации EndPoint
-	Int16U FEPIndexes[FEP_COUNT] = {EP_IT, EP_UT, EP_VG, EP_VG_ERR, EP_IG, EP_ExtInfoData};
+	Int16U FEPIndexes[FEP_COUNT] = {EP_IT, EP_UT, EP_UG, EP_UG_ERR, EP_IG, EP_ExtInfoData};
 
 	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_EXT_INFO_SIZE};
 
 	pInt16U FEPCounters[FEP_COUNT] = {(pInt16U)&CONTROL_PowerValues_Counter, (pInt16U)&CONTROL_PowerValues_Counter,
 			(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&CONTROL_ExtInfoCounter};
 
-	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_It, (pFloat32)MEMBUF_EP_Ut, (pFloat32)MEMBUF_EP_Vg,
-			(pFloat32)MEMBUF_EP_VgErr, (pFloat32)MEMBUF_EP_Ig, (pFloat32)&CONTROL_ExtInfoData};
+	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_It, (pFloat32)MEMBUF_EP_Ut, (pFloat32)MEMBUF_EP_Ug,
+			(pFloat32)MEMBUF_EP_UgErr, (pFloat32)MEMBUF_EP_Ig, (pFloat32)&CONTROL_ExtInfoData};
 	
 	// Конфигурация сервиса работы DataTable и EEPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
@@ -112,7 +112,7 @@ void CONTROL_ResetData()
 
 	DataTable[REG_RESULT_UT] = 0;
 	DataTable[REG_RESULT_IT] = 0;
-	DataTable[REG_RESULT_VG] = 0;
+	DataTable[REG_RESULT_UG] = 0;
 
 	DataTable[REG_BHL_ERROR_CODE] = 0;
 	DataTable[REG_BHL_DEVICE] = 0;
@@ -405,7 +405,7 @@ void CONTROL_HandlePulse()
 				
 			case SS_GateVoltageProcess:
 				if(GATE_RegulatorStatusCheck(RS_InProcess))
-					Timeout = CONTROL_TimeCounter + TIME_VG_STAB;
+					Timeout = CONTROL_TimeCounter + TIME_UG_STAB;
 
 				if(GATE_RegulatorStatusCheck(RS_TargetReached))
 				{
@@ -614,7 +614,7 @@ void CONTROL_HandleExternalLamp(bool IsImpulse)
 void CONTROL_InitStoragePointers()
 {
 	STF_AssignPointer(0, (Int32U)&DataTable[REG_IT_SETPOINT]);
-	STF_AssignPointer(1, (Int32U)&DataTable[REG_VG_SETPOINT]);
+	STF_AssignPointer(1, (Int32U)&DataTable[REG_UG_SETPOINT]);
 
 	STF_AssignPointer(2, (Int32U)&DataTable[REG_DEV_STATE]);
 	STF_AssignPointer(3, (Int32U)&DataTable[REG_FAULT_REASON]);
@@ -627,8 +627,8 @@ void CONTROL_InitStoragePointers()
 
 	STF_AssignPointer(10, (Int32U)MEMBUF_EP_It);
 	STF_AssignPointer(11, (Int32U)MEMBUF_EP_Ut);
-	STF_AssignPointer(12, (Int32U)MEMBUF_EP_Vg);
-	STF_AssignPointer(13, (Int32U)MEMBUF_EP_VgErr);
+	STF_AssignPointer(12, (Int32U)MEMBUF_EP_Ug);
+	STF_AssignPointer(13, (Int32U)MEMBUF_EP_UgErr);
 	STF_AssignPointer(14, (Int32U)MEMBUF_EP_Ig);
 
 	STF_AssignPointer(15, (Int32U)&CONTROL_PowerValues_Counter);

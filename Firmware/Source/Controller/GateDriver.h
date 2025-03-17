@@ -19,7 +19,7 @@ extern RegulatorState GATE_RegulatorState;
 
 // Functions
 //
-void GATE_SetVg(float Value);
+void GATE_SetUg(float Value);
 void GATE_StartProcess();
 void GATE_RegulatorProcess(float GateVoltageSample, float CurrentSample);
 void GATE_StopProcess();

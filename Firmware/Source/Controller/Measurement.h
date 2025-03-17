@@ -12,7 +12,7 @@ void MEASURE_ConvertIt(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRan
 float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary);
 float MEASURE_GateAverageVoltage();
 //
-float MEASURE_Vg(Int16U SampleADC);
+float MEASURE_Ug(Int16U SampleADC);
 float MEASURE_Ig(Int16U SampleADC);
 //
 float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U StartAverage, Int16U Points);

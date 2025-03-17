@@ -32,7 +32,7 @@
 
 // DMA
 #define DMA_ADC_UT2						DMA1_Channel1	// Канал DMA для АЦП UT второго канала
-#define DMA_ADC_IGBT_GATE_CH			DMA2_Channel1	// Канал DMA для АЦП Vg IGBT
+#define DMA_ADC_IGBT_GATE_CH			DMA2_Channel1	// Канал DMA для АЦП Ug IGBT
 #define DMA_ADC_IT_CH					DMA2_Channel2	// Канал DMA для АЦП It
 #define DMA_ADC_UT_CH					DMA2_Channel5	// Канал DMA для АЦП UT
 

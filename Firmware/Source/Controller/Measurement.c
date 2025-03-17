@@ -84,9 +84,9 @@ float MEASURE_ConvertX(Int16U SampleADC, Int16U P2reg, Int16U P1reg, Int16U P0re
 }
 //------------------------------------
 
-float MEASURE_Vg(Int16U SampleADC)
+float MEASURE_Ug(Int16U SampleADC)
 {
-	return MEASURE_ConvertX(SampleADC, REG_VG_P2, REG_VG_P1, REG_VG_P0, REG_VG_K, REG_VG_B);
+	return MEASURE_ConvertX(SampleADC, REG_UG_P2, REG_UG_P1, REG_UG_P0, REG_UG_K, REG_UG_B);
 }
 //------------------------------------
 
@@ -100,10 +100,10 @@ float MEASURE_GateAverageVoltage()
 {
 	Int16U StartIndex, Points;
 
-	StartIndex = DataTable[REG_VG_EDGE_TIME] / TIMER2_uS + DataTable[REG_MSR_DELAY];
+	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + DataTable[REG_MSR_DELAY];
 	Points = DataTable[REG_MSR_TIME];
 
-	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Vg, StartIndex, Points);
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Ug, StartIndex, Points);
 }
 //------------------------------------
 

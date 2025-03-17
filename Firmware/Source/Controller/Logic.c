@@ -337,7 +337,7 @@ void LOGIC_SaveResults()
 
 	float ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It);
 	DataTable[REG_RESULT_IT] = ItResult;
-	DataTable[REG_RESULT_VG] = MEASURE_GateAverageVoltage();
+	DataTable[REG_RESULT_UG] = MEASURE_GateAverageVoltage();
 
 	if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;

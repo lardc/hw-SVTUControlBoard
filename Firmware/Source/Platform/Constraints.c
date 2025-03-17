@@ -21,13 +21,13 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 15
 		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 16
 		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 17
-		{COEF_K_MIN, COEF_K_MAX, COEF_VG_K_DEF},								// 18
-		{COEF_B_MIN, COEF_B_MAX, COEF_VG_B_DEF},								// 19
+		{COEF_K_MIN, COEF_K_MAX, COEF_UG_K_DEF},								// 18
+		{COEF_B_MIN, COEF_B_MAX, COEF_UG_B_DEF},								// 19
 		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 20
 		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 21
 		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 22
-		{COEF_K_MIN, COEF_K_MAX, COEF_VG_SET_K_DEF},							// 23
-		{COEF_B_MIN, COEF_B_MAX, COEF_VG_SET_B_DEF},							// 24
+		{COEF_K_MIN, COEF_K_MAX, COEF_UG_SET_K_DEF},							// 23
+		{COEF_B_MIN, COEF_B_MAX, COEF_UG_SET_B_DEF},							// 24
 		{COEF_P2_MIN, COEF_P2_MAX, COEF_P2_DEF},								// 25
 		{COEF_P1_MIN, COEF_P1_MAX, COEF_P1_DEF},								// 26
 		{COEF_P0_MIN, COEF_P0_MAX, COEF_P0_DEF},								// 27
@@ -45,7 +45,7 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{LCSU_CURRENT_MIN, LCSU_CURRENT_MAX, LCSU_CURRENT_DEF},					// 39
 		{LCSU_START_NID_MIN, LCSU_START_NID_MAX, LCSU_START_NID_DEF},			// 40
 		{LONG_TIMEOUT_MIN, LONG_TIMEOUT_MAX, LONG_TIMEOUT_DEF},					// 41
-		{VG_EDGE_TIME_MIN, VG_EDGE_TIME_MAX, VG_EDGE_TIME_DEF},					// 42
+		{UG_EDGE_TIME_MIN, UG_EDGE_TIME_MAX, UG_EDGE_TIME_DEF},					// 42
 		{NO, YES, NO},															// 43
 		{R_SHUNT_MIN, R_SHUNT_MAX, R_SHUNT_DEF},								// 44
 		{I_THRESHOLD_MIN, I_THRESHOLD_MAX, I_THRESHOLD_DEF},					// 45
@@ -132,7 +132,7 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 126
 		{0, 0, 0},																// 127
 		{IT_SETPOINT_MIN, IT_SETPOINT_MAX, IT_SETPOINT_DEF},					// 128
-		{VG_SETPOINT_MIN, VG_SETPOINT_MAX, VG_SETPOINT_DEF},					// 129
+		{UG_SETPOINT_MIN, UG_SETPOINT_MAX, UG_SETPOINT_DEF},					// 129
 		{0, 0, 0},																// 130
 		{0, 0, 0},																// 131
 		{0, 0, 0},																// 132
