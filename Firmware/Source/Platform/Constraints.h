@@ -128,6 +128,10 @@
 #define SVTU_WAIT_MIN				10		// в мс
 #define SVTU_WAIT_MAX				50		// в мс
 #define SVTU_WAIT_DEF				30		// в мс
+//
+#define PULSE_TIME_MIN				1		// в мс
+#define PULSE_TIME_MAX				10		// в мс
+#define PULSE_TIME_DEF				3		// в мс
 
 // Types
 typedef struct __TableItemConstraint

@@ -405,7 +405,7 @@ void CONTROL_HandlePulse()
 				
 			case SS_GateVoltageProcess:
 				if(GATE_RegulatorStatusCheck(RS_InProcess))
-					Timeout = CONTROL_TimeCounter + TIME_UG_STAB;
+					Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME];
 
 				if(GATE_RegulatorStatusCheck(RS_TargetReached))
 				{
