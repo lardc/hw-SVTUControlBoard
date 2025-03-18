@@ -90,12 +90,18 @@ void INITCFG_ConfigADC()
 
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
+		case PCB_VERSION_10:
+			ADC_ChannelSet_Sequence(ADC1, ADC1_IGT_IGBT_IG_CH, 1);
+			ADC_ChannelSeqLen(ADC1, 1);
+			break;
+
 		case PCB_VERSION_20:
 			if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
 			{
 				ADC_ChannelSet_Sequence(ADC1, ADC1_UGT, 1);
-				ADC_ChannelSet_Sequence(ADC1, ADC1_IGT, 2);
+				ADC_ChannelSet_Sequence(ADC1, ADC1_IGT_IGBT_IG_CH, 2);
 				ADC_ChannelSeqLen(ADC1, 2);
+				ADC_DMAEnable(ADC1, true);
 			}
 			else if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
 			{
@@ -198,11 +204,11 @@ void INITCFG_ConfigDMA()
 	DMAChannelX_Config(DMA_ADC_UT_CH, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
 			DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH);
 
-	DMA_Reset(DMA_ADC_UT2);
-		DMA_Interrupt(DMA_ADC_UT2, DMA_TRANSFER_COMPLETE, 0, true);
-		DMAChannelX_DataConfig(DMA_ADC_UT2, (Int32U)(MEMBUF_DMA_Ut2), (Int32U)(&ADC1->DR), VALUES_POWER_DMA_SIZE);
-		DMAChannelX_Config(DMA_ADC_UT2, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
-				DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH);
+	DMA_Reset(DMA_ADC_UT2_UGIG);
+	DMA_Interrupt(DMA_ADC_UT2_UGIG, DMA_TRANSFER_COMPLETE, 0, true);
+	DMAChannelX_DataConfig(DMA_ADC_UT2_UGIG, (Int32U)(MEMBUF_DMA_Ut2_UgIg), (Int32U)(&ADC1->DR), VALUES_POWER_DMA_SIZE);
+	DMAChannelX_Config(DMA_ADC_UT2_UGIG, DMA_MEM2MEM_DIS, DMA_LvlPriority_LOW, DMA_MSIZE_32BIT, DMA_PSIZE_16BIT,
+			DMA_MINC_EN, DMA_PINC_DIS, DMA_CIRCMODE_DIS, DMA_READ_FROM_PERIPH);
 
 }
 //------------------------------------

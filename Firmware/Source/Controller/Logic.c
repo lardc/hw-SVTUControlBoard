@@ -260,10 +260,10 @@ void LOGIC_StartPulse()
 	IT_DMAFlagsReset();
 	DMA_ChannelReload(DMA_ADC_IT_CH, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_UT_CH, VALUES_POWER_DMA_SIZE);
-	DMA_ChannelReload(DMA_ADC_UT2, VALUES_POWER_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_UT2_UGIG, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelEnable(DMA_ADC_IT_CH, true);
 	DMA_ChannelEnable(DMA_ADC_UT_CH, true);
-	DMA_ChannelEnable(DMA_ADC_UT2, true);
+	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
 
 	// Запуск оцифровки импульса тока и напряжения в силовой цепи
 	ADC_SamplingStart(ADC3);
@@ -294,7 +294,7 @@ bool LOGIC_FinishProcess()
 		MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
 		if (DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
 		{
-			MEASURE_ConvertUt2(MEMBUF_DMA_Ut2, VALUES_POWER_DMA_SIZE);
+			MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
 		}
 
 		return true;
@@ -329,7 +329,7 @@ void LOGIC_SaveResults()
 
 		case PCB_VERSION_20:
 			{
-				float UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2);
+				float UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg);
 				DataTable[REG_RESULT_UT] = UtResult > (Int16U)DataTable[REG_UT_MAX] ? UtCh2Result : UtResult;
 			}
 			break;
