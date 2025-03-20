@@ -20,35 +20,11 @@ static volatile bool ItCompleted, UTCompleted;
 //
 void ADC1_2_IRQHandler()
 {
+	// Расчеты производятся только для версии платы 1.0
 	float GateVoltage, GateCurrent;
-	switch((Int16U)DataTable[REG_PCB_VERSION])
-	{
-		case PCB_VERSION_10:
-			GateVoltage = MEASURE_Ug_ADC_Direct(ADC_Read(ADC2));
-			GateCurrent = MEASURE_Ig_ADC_Direct(ADC_Read(ADC1));
-			break;
 
-		/*case PCB_VERSION_20:
-			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
-			{
-				DMA_ChannelReload(DMA_ADC_UT2_UGIG, 2);
-    			DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
-				TIM_Start(TIM3);
-				GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_Ut2_UgIg, 0);
-				GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_Ut2_UgIg, 1);
-				TIM_Stop(TIM3);
-			}
-			else if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
-			{
-				DMA_ChannelReload(DMA_ADC_IGBT_UGIG, 2);
-    			DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
-				TIM_Start(TIM3);
-				GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_IGBT_UgIg, 0);
-				GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_IGBT_UgIg, 1);
-				TIM_Stop(TIM3);
-			}
-			break;*/
-	}
+	GateVoltage = MEASURE_Ug_ADC_Direct(ADC_Read(ADC2));
+	GateCurrent = MEASURE_Ig_ADC_Direct(ADC_Read(ADC1));
 
 	GATE_RegulatorProcess(GateVoltage, GateCurrent);
 }
@@ -63,6 +39,34 @@ bool IT_DMASampleCompleted()
 void IT_DMAFlagsReset()
 {
 	ItCompleted = UTCompleted = false;
+}
+//-----------------------------------------
+
+void DMA1_Channel1_IRQHandler()
+{
+	// Расчеты производятся только для версии платы 2.0 с тиристором
+	float GateVoltage, GateCurrent;
+
+	DMA_ChannelReload(DMA_ADC_UT2_UGIG, 2);
+	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
+	GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_Ut2_UgIg, 0);
+	GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_Ut2_UgIg, 1);
+
+	GATE_RegulatorProcess(GateVoltage, GateCurrent);
+}
+//-----------------------------------------
+
+void DMA1_Channel2_IRQHandler()
+{
+	// Расчеты производятся только для версии платы 2.0 с IGBT
+	float GateVoltage, GateCurrent;
+
+	DMA_ChannelReload(DMA_ADC_IGBT_UGIG, 2);
+	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
+	GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_IGBT_UgIg, 0);
+	GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_IGBT_UgIg, 1);
+
+	GATE_RegulatorProcess(GateVoltage, GateCurrent);
 }
 //-----------------------------------------
 

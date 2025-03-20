@@ -30,6 +30,8 @@ void INITCFG_ConfigGPIO()
 	// Аналоговые входы
 	GPIO_InitAnalog(GPIO_MSR_IGBT_UG);
 	GPIO_InitAnalog(GPIO_MSR_IGBT_IG);
+	GPIO_InitAnalog(GPIO_MSR_UG);
+	GPIO_InitAnalog(GPIO_MSR_IG);
 	GPIO_InitAnalog(GPIO_MSR_UT);
 	GPIO_InitAnalog(GPIO_MSR_UT2);
 	GPIO_InitAnalog(GPIO_MSR_IT);
@@ -80,31 +82,42 @@ void INITCFG_ConfigADC()
 	RCC_ADC_Clk_EN(ADC_12_ClkEN);
 	RCC_ADC_Clk_EN(ADC_34_ClkEN);
 
-	ADC1_2_SetDualMode(true);
+	switch((Int16U)DataTable[REG_PCB_VERSION])
+	{
+		case PCB_VERSION_10:
+			ADC1_2_SetDualMode(true);
+			break;
+
+		case PCB_VERSION_20:
+			ADC1_2_SetDualMode(false);
+			break;
+	}
 	ADC3_4_SetDualMode(true);
 
 	// ADC1
 	ADC_Calibration(ADC1);
-	ADC_TrigConfig(ADC1, ADC12_TIM2_TRGO, RISE);
 	ADC_ChannelSeqReset(ADC1);
 
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
+			ADC_TrigConfig(ADC1, ADC12_TIM2_TRGO, RISE);
 			ADC_ChannelSet_Sequence(ADC1, ADC1_IGT_IGBT_IG_CH, 1);
 			ADC_ChannelSeqLen(ADC1, 1);
 			break;
 
 		case PCB_VERSION_20:
-			if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
+			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
 			{
+				ADC_TrigConfig(ADC1, ADC12_TIM2_TRGO, RISE);
 				ADC_ChannelSet_Sequence(ADC1, ADC1_UGT, 1);
 				ADC_ChannelSet_Sequence(ADC1, ADC1_IGT_IGBT_IG_CH, 2);
 				ADC_ChannelSeqLen(ADC1, 2);
 				ADC_DMAEnable(ADC1, true);
 			}
-			else if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
+			else if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
 			{
+				ADC_TrigConfig(ADC1, ADC12_TIM1_TRGO, RISE);
 				ADC_ChannelSet_Sequence(ADC1, ADC1_UT2, 1);
 				ADC_DMAEnable(ADC1, true);
 				ADC_ChannelSeqLen(ADC1, 1);
@@ -129,6 +142,7 @@ void INITCFG_ConfigADC()
 		case PCB_VERSION_20:
 			if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
 			{
+				ADC_TrigConfig(ADC2, ADC12_TIM2_TRGO, RISE);
 				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
 				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_IG_CH, 2);
 				ADC_ChannelSeqLen(ADC2, 2);
