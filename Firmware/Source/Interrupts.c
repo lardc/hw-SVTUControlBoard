@@ -24,29 +24,31 @@ void ADC1_2_IRQHandler()
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
-			GateVoltage = MEASURE_Ug(ADC_Read(ADC2));
-			GateCurrent = MEASURE_Ig(ADC_Read(ADC1));
+			GateVoltage = MEASURE_Ug_ADC_Direct(ADC_Read(ADC2));
+			GateCurrent = MEASURE_Ig_ADC_Direct(ADC_Read(ADC1));
 			break;
 
 		/*case PCB_VERSION_20:
 			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
 			{
+				DMA_ChannelReload(DMA_ADC_UT2_UGIG, 2);
+    			DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
 				TIM_Start(TIM3);
-				GateVoltage = MEASURE_Ug(MEMBUF_DMA_Ut2_UgIg,);
-				GateCurrent = MEASURE_Ig(ADC_Read(ADC1));
+				GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_Ut2_UgIg, 0);
+				GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_Ut2_UgIg, 1);
 				TIM_Stop(TIM3);
 			}
 			else if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
 			{
-				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
-				GateVoltage = MEASURE_Ug(ADC_Read(ADC2));
-				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_IG_CH, 2);
-				GateCurrent = MEASURE_Ig(ADC_Read(ADC2));
+				DMA_ChannelReload(DMA_ADC_IGBT_UGIG, 2);
+    			DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
+				TIM_Start(TIM3);
+				GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_IGBT_UgIg, 0);
+				GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_IGBT_UgIg, 1);
+				TIM_Stop(TIM3);
 			}
 			break;*/
 	}
-	/*float GateVoltage = MEASURE_Ug(ADC_Read(ADC2));
-	float GateCurrent = MEASURE_Ig(ADC_Read(ADC1));*/
 
 	GATE_RegulatorProcess(GateVoltage, GateCurrent);
 }

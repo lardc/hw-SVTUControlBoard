@@ -18,5 +18,6 @@ extern volatile float CONTROL_ExtInfoData[VALUES_EXT_INFO_SIZE];
 extern float MEMBUF_DMA_Ut[VALUES_POWER_DMA_SIZE];
 extern float MEMBUF_DMA_It[VALUES_POWER_DMA_SIZE];
 extern float MEMBUF_DMA_Ut2_UgIg[VALUES_POWER_DMA_SIZE];
+extern float MEMBUF_DMA_IGBT_UgIg[2];
 
 #endif // __MEM_BUFFERS_H

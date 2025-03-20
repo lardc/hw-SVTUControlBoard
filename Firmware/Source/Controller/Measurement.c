@@ -9,6 +9,7 @@
 #include "DeviceObjectDictionary.h"
 #include "stdlib.h"
 #include "MemBuffers.h"
+#include "Constraints.h"
 
 // Definitions
 //
@@ -20,6 +21,7 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U Reg
 		Int16U RegisterK, Int16U RegisterP0, Int16U RegisterP1, Int16U RegisterP2, float RShunt);
 int MEASURE_SortCondition(const void *A, const void *B);
 float MEASURE_ConvertX(Int16U SampleADC, Int16U P2reg, Int16U P1reg, Int16U P0reg, Int16U Kreg, Int16U Breg);
+float MEASURE_ConvertX_Array(pFloat32 MEMBUF, Int16U Index, Int16U P2reg, Int16U P1reg, Int16U P0reg, Int16U Kreg, Int16U Breg);
 
 
 // Functions
@@ -84,15 +86,38 @@ float MEASURE_ConvertX(Int16U SampleADC, Int16U P2reg, Int16U P1reg, Int16U P0re
 }
 //------------------------------------
 
-float MEASURE_Ug(Int16U SampleADC)
+float MEASURE_ConvertX_Array(pFloat32 MEMBUF, Int16U Index, Int16U P2reg, Int16U P1reg, Int16U P0reg, Int16U Kreg, Int16U Breg)
+{
+	float Result = 0;
+
+	Result = MEMBUF[Index] * DataTable[Kreg] + DataTable[Breg];
+	Result = Result * Result * DataTable[P2reg] + Result * DataTable[P1reg] + DataTable[P0reg];
+
+	return (Result > 0) ? Result : 0;
+}
+//------------------------------------
+
+float MEASURE_Ug_ADC_Direct(Int16U SampleADC)
 {
 	return MEASURE_ConvertX(SampleADC, REG_UG_P2, REG_UG_P1, REG_UG_P0, REG_UG_K, REG_UG_B);
 }
 //------------------------------------
 
-float MEASURE_Ig(Int16U SampleADC)
+float MEASURE_Ug_DMA(pFloat32 MEMBUF, Int16U Index)
+{
+	return MEASURE_ConvertX_Array(MEMBUF, Index, REG_UG_P2, REG_UG_P1, REG_UG_P0, REG_UG_K, REG_UG_B);
+}
+//------------------------------------
+
+float MEASURE_Ig_ADC_Direct(Int16U SampleADC)
 {
 	return MEASURE_ConvertX(SampleADC, REG_IG_P2, REG_IG_P1, REG_IG_P0, REG_IG_K, REG_IG_B);
+}
+//------------------------------------
+
+float MEASURE_Ig_DMA(pFloat32 MEMBUF, Int16U Index)
+{
+	return MEASURE_ConvertX_Array(MEMBUF, Index, REG_IG_P2, REG_IG_P1, REG_IG_P0, REG_IG_K, REG_IG_B);
 }
 //------------------------------------
 
