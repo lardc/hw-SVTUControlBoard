@@ -49,27 +49,27 @@ void MEASURE_ConvertADCtoValx(pFloat32 InputArray, Int16U DataLength, Int16U Reg
 }
 //------------------------------------
 
-void MEASURE_ConvertVd(pFloat32 InputArray, Int16U DataLength)
+void MEASURE_ConvertUt(pFloat32 InputArray, Int16U DataLength)
 {
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_VD_B, REG_VD_K, REG_VD_P0, REG_VD_P1,
-					REG_VD_P2, 0);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_UT_B, REG_UT_K, REG_UT_P0, REG_UT_P1,
+					REG_UT_P2, 0);
 }
 
 void MEASURE_ConvertUt2(pFloat32 InputArray, Int16U DataLength)
 {
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_UTCH2_B, REG_UTCH2_K, REG_UTCH2_P0, REG_UTCH2_P1,
-				REG_UTCH2_P2, 0);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_UT2_B, REG_UT2_K, REG_UT2_P0, REG_UT2_P1,
+				REG_UT2_P2, 0);
 }
 //------------------------------------
 
-void MEASURE_ConvertId(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange)
+void MEASURE_ConvertIt(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange)
 {
 	float RShunt = DataTable[REG_R_SHUNT] / 1000;
 
 	if(!CurrentRange)
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_R1_B, REG_ID_R1_K, REG_ID_R1_P0, REG_ID_R1_P1, REG_ID_R1_P2, RShunt);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_IT_R1_B, REG_IT_R1_K, REG_IT_R1_P0, REG_IT_R1_P1, REG_IT_R1_P2, RShunt);
 	else
-		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_ID_R0_B, REG_ID_R0_K, REG_ID_R0_P0, REG_ID_R0_P1, REG_ID_R0_P2, RShunt);
+		MEASURE_ConvertADCtoValx(InputArray, DataLength, REG_IT_R0_B, REG_IT_R0_K, REG_IT_R0_P0, REG_IT_R0_P1, REG_IT_R0_P2, RShunt);
 }
 //------------------------------------
 
@@ -84,9 +84,9 @@ float MEASURE_ConvertX(Int16U SampleADC, Int16U P2reg, Int16U P1reg, Int16U P0re
 }
 //------------------------------------
 
-float MEASURE_Vg(Int16U SampleADC)
+float MEASURE_Ug(Int16U SampleADC)
 {
-	return MEASURE_ConvertX(SampleADC, REG_VG_P2, REG_VG_P1, REG_VG_P0, REG_VG_K, REG_VG_B);
+	return MEASURE_ConvertX(SampleADC, REG_UG_P2, REG_UG_P1, REG_UG_P0, REG_UG_K, REG_UG_B);
 }
 //------------------------------------
 
@@ -100,43 +100,21 @@ float MEASURE_GateAverageVoltage()
 {
 	Int16U StartIndex, Points;
 
-	StartIndex = DataTable[REG_VG_EDGE_TIME] / TIMER2_uS + DataTable[REG_MSR_DELAY];
+	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + DataTable[REG_MSR_DELAY];
 	Points = DataTable[REG_MSR_TIME];
 
-	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Vg, StartIndex, Points);
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Ug, StartIndex, Points);
 }
 //------------------------------------
 
-float MEASURE_CollectorAverageVoltage()
+float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary)
 {
 	Int16U StartIndex, Points;
 
 	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
 	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
 
-	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Vd, StartIndex, Points);
-}
-//------------------------------------
-
-float MEASURE_CollectorAverageVoltageCh2()
-{
-	Int16U StartIndex, Points;
-
-	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
-	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
-
-	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Ut_Ch2, StartIndex, Points);
-}
-//------------------------------------
-
-float MEASURE_CollectorAverageCurrent()
-{
-	Int16U StartIndex, Points;
-
-	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
-	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
-
-	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_DMA_Id, StartIndex, Points);
+	return MEASURE_ExtractAverageValues(MEMBUF_DMA_Intermediary, StartIndex, Points);
 }
 //------------------------------------
 

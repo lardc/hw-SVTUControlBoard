@@ -5,8 +5,8 @@
 // Variables
 RecordDescription StorageDescription[] =
 {
-	{"REG_ID_SETPOINT",	 			DT_Float,	1},
-	{"REG_VG_SETPOINT", 			DT_Float,	1},
+	{"REG_IT_SETPOINT",	 			DT_Float,	1},
+	{"REG_UG_SETPOINT", 			DT_Float,	1},
 
 	{"REG_DEV_STATE", 				DT_Float,	1},
 	{"REG_FAULT_REASON", 			DT_Float,	1},
@@ -17,10 +17,10 @@ RecordDescription StorageDescription[] =
 	{"REG_SELF_TEST_OP_RESULT", 	DT_Float,	1},
 	{"REG_SUB_STATE",			 	DT_Float,	1},
 
-	{"Id Digital",					DT_Float,	VALUES_x_SIZE},
-	{"Vd Digital",					DT_Float,	VALUES_x_SIZE},
-	{"Vg Digital",					DT_Float,	VALUES_x_SIZE},
-	{"Vg Error",					DT_Float,	VALUES_x_SIZE},
+	{"It Digital",					DT_Float,	VALUES_x_SIZE},
+	{"Ut Digital",					DT_Float,	VALUES_x_SIZE},
+	{"Ug Digital",					DT_Float,	VALUES_x_SIZE},
+	{"Ug Error",					DT_Float,	VALUES_x_SIZE},
 	{"Ig Digital",					DT_Float,	VALUES_x_SIZE},
 
 	{"Power Values Counter",		DT_Int16U,	1},

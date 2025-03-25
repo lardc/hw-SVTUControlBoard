@@ -61,15 +61,15 @@ void CONTROL_InitJSONPointers();
 void CONTROL_Init()
 {
 	// Переменные для конфигурации EndPoint
-	Int16U FEPIndexes[FEP_COUNT] = {EP_ID, EP_VD, EP_VG, EP_VG_ERR, EP_IG, EP_ExtInfoData};
+	Int16U FEPIndexes[FEP_COUNT] = {EP_IT, EP_UT, EP_UG, EP_UG_ERR, EP_IG, EP_ExtInfoData};
 
 	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_EXT_INFO_SIZE};
 
 	pInt16U FEPCounters[FEP_COUNT] = {(pInt16U)&CONTROL_PowerValues_Counter, (pInt16U)&CONTROL_PowerValues_Counter,
 			(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&CONTROL_ExtInfoCounter};
 
-	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_Id, (pFloat32)MEMBUF_EP_Vd, (pFloat32)MEMBUF_EP_Vg,
-			(pFloat32)MEMBUF_EP_VgErr, (pFloat32)MEMBUF_EP_Ig, (pFloat32)&CONTROL_ExtInfoData};
+	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_It, (pFloat32)MEMBUF_EP_Ut, (pFloat32)MEMBUF_EP_Ug,
+			(pFloat32)MEMBUF_EP_UgErr, (pFloat32)MEMBUF_EP_Ig, (pFloat32)&CONTROL_ExtInfoData};
 	
 	// Конфигурация сервиса работы DataTable и EEPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
@@ -110,9 +110,9 @@ void CONTROL_ResetData()
 	DataTable[REG_PROBLEM] = PROBLEM_NONE;
 	DataTable[REG_OP_RESULT] = OPRESULT_NONE;
 
-	DataTable[REG_RESULT_VD] = 0;
-	DataTable[REG_RESULT_ID] = 0;
-	DataTable[REG_RESULT_VG] = 0;
+	DataTable[REG_RESULT_UT] = 0;
+	DataTable[REG_RESULT_IT] = 0;
+	DataTable[REG_RESULT_UG] = 0;
 
 	DataTable[REG_BHL_ERROR_CODE] = 0;
 	DataTable[REG_BHL_DEVICE] = 0;
@@ -130,7 +130,7 @@ void CONTROL_ResetHardware()
 	LL_SyncScope(false);
 	LL_AnalogInputsSelftTest(false);
 	LL_ExtIndication(false);
-	LL_SetIdRange(false);
+	LL_SetItRange(false);
 	GATE_StopProcess();
 	TIM_Stop(TIM1);
 	TIM_Stop(TIM6);
@@ -362,7 +362,7 @@ void CONTROL_HandlePulse()
 				
 			case SS_ConfigPulse:
 				{
-					float CurrentAmplitude = SelfTest ? DataTable[REG_ID_MAX] : LOGIC_GetCurrentSetpoint();
+					float CurrentAmplitude = SelfTest ? DataTable[REG_IT_READ_MAX] : LOGIC_GetCurrentSetpoint();
 
 					if(LOGIC_DistributeCurrent(CurrentAmplitude)||DataTable[REG_EMULATION])
 					{
@@ -405,7 +405,7 @@ void CONTROL_HandlePulse()
 				
 			case SS_GateVoltageProcess:
 				if(GATE_RegulatorStatusCheck(RS_InProcess))
-					Timeout = CONTROL_TimeCounter + TIME_VG_STAB;
+					Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME];
 
 				if(GATE_RegulatorStatusCheck(RS_TargetReached))
 				{
@@ -449,7 +449,7 @@ void CONTROL_HandlePulse()
 			case SS_CurrentPulseStart:
 				LOGIC_StartPulse();
 
-				CONTROL_Timeout = CONTROL_TimeCounter + SVTU_WAIT_FINISH_TIME;
+				CONTROL_Timeout = CONTROL_TimeCounter + DataTable[REG_SVTU_WAIT_FINISH_TIME];
 				CONTROL_SetDeviceState(DS_InProcess, SS_WaitFinishProcess);
 				break;
 
@@ -506,11 +506,11 @@ void CONTROL_HandlePulse()
 
 Int16U CONTROL_CheckSelfTestResults()
 {
-	if(fabsf((1 - DataTable[REG_RESULT_ID] / DataTable[REG_ID_MAX]) * 100) > SELFTEST_ALLOWED_ERROR)
-		return DF_SELFTEST_ID;
+	if(fabsf((1 - DataTable[REG_RESULT_IT] / DataTable[REG_IT_READ_MAX]) * 100) > SELFTEST_ALLOWED_ERROR)
+		return DF_SELFTEST_IT;
 
-	if(fabsf(1 - (DataTable[REG_RESULT_VD] / (DataTable[REG_RESULT_ID] * DataTable[REG_R_SHUNT] / 1000))) * 100 > SELFTEST_ALLOWED_ERROR)
-		return DF_SELFTEST_VD;
+	if(fabsf(1 - (DataTable[REG_RESULT_UT] / (DataTable[REG_RESULT_IT] * DataTable[REG_R_SHUNT] / 1000))) * 100 > SELFTEST_ALLOWED_ERROR)
+		return DF_SELFTEST_UT;
 
 	return 0;
 }
@@ -518,9 +518,9 @@ Int16U CONTROL_CheckSelfTestResults()
 
 void CONTROL_SaveDataToEndpoint()
 {
-	LOGIC_SaveToEndpoint(MEMBUF_DMA_Vd, MEMBUF_EP_Vd, VALUES_POWER_DMA_SIZE);
-	LOGIC_SaveToEndpoint(MEMBUF_DMA_Id, MEMBUF_EP_Id, VALUES_POWER_DMA_SIZE);
-	LOGIC_SaveToEndpoint(MEMBUF_DMA_Ut_Ch2, MEMBUF_EP_Ut_Ch2, VALUES_POWER_DMA_SIZE);
+	LOGIC_SaveToEndpoint(MEMBUF_DMA_Ut, MEMBUF_EP_Ut, VALUES_POWER_DMA_SIZE);
+	LOGIC_SaveToEndpoint(MEMBUF_DMA_It, MEMBUF_EP_It, VALUES_POWER_DMA_SIZE);
+	LOGIC_SaveToEndpoint(MEMBUF_DMA_Ut2_UgIg, MEMBUF_EP_Ut_Ch2, VALUES_POWER_DMA_SIZE);
 	CONTROL_PowerValues_Counter = VALUES_x_SIZE;
 }
 //-----------------------------------------------
@@ -613,8 +613,8 @@ void CONTROL_HandleExternalLamp(bool IsImpulse)
 
 void CONTROL_InitStoragePointers()
 {
-	STF_AssignPointer(0, (Int32U)&DataTable[REG_ID_SETPOINT]);
-	STF_AssignPointer(1, (Int32U)&DataTable[REG_VG_SETPOINT]);
+	STF_AssignPointer(0, (Int32U)&DataTable[REG_IT_SETPOINT]);
+	STF_AssignPointer(1, (Int32U)&DataTable[REG_UG_SETPOINT]);
 
 	STF_AssignPointer(2, (Int32U)&DataTable[REG_DEV_STATE]);
 	STF_AssignPointer(3, (Int32U)&DataTable[REG_FAULT_REASON]);
@@ -625,10 +625,10 @@ void CONTROL_InitStoragePointers()
 	STF_AssignPointer(8, (Int32U)&DataTable[REG_SELF_TEST_OP_RESULT]);
 	STF_AssignPointer(9, (Int32U)&DataTable[REG_SUB_STATE]);
 
-	STF_AssignPointer(10, (Int32U)MEMBUF_EP_Id);
-	STF_AssignPointer(11, (Int32U)MEMBUF_EP_Vd);
-	STF_AssignPointer(12, (Int32U)MEMBUF_EP_Vg);
-	STF_AssignPointer(13, (Int32U)MEMBUF_EP_VgErr);
+	STF_AssignPointer(10, (Int32U)MEMBUF_EP_It);
+	STF_AssignPointer(11, (Int32U)MEMBUF_EP_Ut);
+	STF_AssignPointer(12, (Int32U)MEMBUF_EP_Ug);
+	STF_AssignPointer(13, (Int32U)MEMBUF_EP_UgErr);
 	STF_AssignPointer(14, (Int32U)MEMBUF_EP_Ig);
 
 	STF_AssignPointer(15, (Int32U)&CONTROL_PowerValues_Counter);
@@ -638,20 +638,20 @@ void CONTROL_InitStoragePointers()
 
 void CONTROL_InitJSONPointers()
 {
-	Utm1Min = DataTable[REG_UT_MIN] ? DataTable[REG_UT_MIN] : VD_MIN_VALUE;
-	Utm1Max = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : VD_MAX_VALUE;
+	Utm1Min = DataTable[REG_UT_MIN] ? DataTable[REG_UT_MIN] : UT_MIN_VALUE;
+	Utm1Max = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : UT_MAX_VALUE;
 
-	Utm2Min = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : VD_MAX_VALUE;
+	Utm2Min = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : UT_MAX_VALUE;
 	Utm2Max = DataTable[REG_UT2_MAX];
 
-	ItmSetMin = DataTable[REG_IT_MIN] ? DataTable[REG_IT_MIN] : ID_MIN_VALUE;
-	ItmSetMax = DataTable[REG_IT_MAX] ? DataTable[REG_IT_MAX] : ID_MAX_VALUE;
+	ItmSetMin = DataTable[REG_IT_MIN] ? DataTable[REG_IT_MIN] : IT_MIN_VALUE;
+	ItmSetMax = DataTable[REG_IT_MAX] ? DataTable[REG_IT_MAX] : IT_MAX_VALUE;
 
-	ItmMeas1Min = DataTable[REG_IT_MIN] ? DataTable[REG_IT_MIN] : ID_MIN_VALUE;
+	ItmMeas1Min = DataTable[REG_IT_MIN] ? DataTable[REG_IT_MIN] : IT_MIN_VALUE;
 	ItmMeas1Max = DataTable[REG_I_R0_THRESHOLD];
 
 	ItmMeas2Min = DataTable[REG_I_R0_THRESHOLD];
-	ItmMeas2Max = DataTable[REG_IT_MAX] ? DataTable[REG_IT_MAX] : ID_MAX_VALUE;
+	ItmMeas2Max = DataTable[REG_IT_MAX] ? DataTable[REG_IT_MAX] : IT_MAX_VALUE;
 
 	Utm2Active = DataTable[REG_UT2_MAX] ? 1 : 0;
 

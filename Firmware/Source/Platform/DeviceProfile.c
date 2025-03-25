@@ -145,6 +145,13 @@ void DEVPROFILE_FillNVPartDefault(void)
 
 static Boolean DEVPROFILE_Validate16(Int16U Address, Int16U Data)
 {
+	if (Address == REG_IT_SETPOINT)
+	{
+		Int16U Min = DataTable[REG_IT_MIN] ? DataTable[REG_IT_MIN] : Constraint[Address].Min;
+		Int16U Max = DataTable[REG_IT_MAX] ? DataTable[REG_IT_MAX] : Constraint[Address].Max;
+		if (Data < Min || Data > Max)
+			return FALSE;
+	}
 	if(Address < DATA_TABLE_WP_START)
 		return (Constraint[Address].Min <= Data) && (Data <= Constraint[Address].Max);
 	else

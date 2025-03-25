@@ -61,9 +61,9 @@
 #define LONG_TIMEOUT_MAX			30000
 #define LONG_TIMEOUT_DEF			1000
 //
-#define VG_EDGE_TIME_MIN			500
-#define VG_EDGE_TIME_MAX			2000
-#define VG_EDGE_TIME_DEF			1000
+#define UG_EDGE_TIME_MIN			500
+#define UG_EDGE_TIME_MAX			2000
+#define UG_EDGE_TIME_DEF			1000
 //
 #define R_SHUNT_MIN					75
 #define R_SHUNT_MAX					1000
@@ -73,13 +73,13 @@
 #define I_THRESHOLD_MAX				12000
 #define I_THRESHOLD_DEF				300
 //
-#define ID_SETPOINT_MIN				50
-#define ID_SETPOINT_MAX				1700
-#define ID_SETPOINT_DEF				500
+#define IT_SETPOINT_MIN				50
+#define IT_SETPOINT_MAX				1700
+#define IT_SETPOINT_DEF				500
 //
-#define VG_SETPOINT_MIN				5
-#define VG_SETPOINT_MAX				22
-#define VG_SETPOINT_DEF				15
+#define UG_SETPOINT_MIN				5
+#define UG_SETPOINT_MAX				22
+#define UG_SETPOINT_DEF				15
 //
 #define MSR_DELAY_MIN				0
 #define MSR_DELAY_MAX				20
@@ -93,22 +93,25 @@
 #define IG_THRESHOLD_MAX			100
 #define IG_THRESHOLD_DEF			30
 //
-#define COEF_ID_R0_K_DEF			1
-#define COEF_ID_R1_K_DEF			1
-#define COEF_VD_K_DEF				1
-#define COEF_VG_K_DEF				1
-#define COEF_VG_SET_K_DEF			1
+#define COEF_IT_R0_K_DEF			1
+#define COEF_IT_R1_K_DEF			1
+#define COEF_UT_K_DEF				1
+#define COEF_UG_K_DEF				1
+#define COEF_UG_SET_K_DEF			1
 #define COEF_IG_K_DEF				1
 //
-#define COEF_ID_R0_B_DEF			1
-#define COEF_ID_R1_B_DEF			1
-#define COEF_VD_B_DEF				1
-#define COEF_VG_B_DEF				1
-#define COEF_VG_SET_B_DEF			1
+#define COEF_IT_R0_B_DEF			1
+#define COEF_IT_R1_B_DEF			1
+#define COEF_UT_B_DEF				1
+#define COEF_UG_B_DEF				1
+#define COEF_UG_SET_B_DEF			1
 #define COEF_IG_B_DEF				1
 //
 #define	PCB_VERSION_10				0
 #define PCB_VERSION_20				1
+//
+#define PCB_TIRIS					0
+#define PCB_IGBT					1
 //
 #define COEF_UT2_K_DEF				1
 #define COEF_UT2_B_DEF				1
@@ -118,6 +121,17 @@
 //
 #define VOLTAGE_MIN					100		// в мВ
 #define VOLTAGE_MAX					15000	// в мВ
+//
+#define LCSU_AMOUNT_MIN				1
+#define LCSU_AMOUNT_MAX				2
+//
+#define SVTU_WAIT_MIN				10		// в мс
+#define SVTU_WAIT_MAX				50		// в мс
+#define SVTU_WAIT_DEF				30		// в мс
+//
+#define PULSE_TIME_MIN				1		// в мс
+#define PULSE_TIME_MAX				10		// в мс
+#define PULSE_TIME_DEF				3		// в мс
 
 // Types
 typedef struct __TableItemConstraint

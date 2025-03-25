@@ -20,7 +20,7 @@ float RegulatorQp = 0;
 float RegulatorQi = 0;
 float RegulatorQimax = 0;
 float GateVoltageSetpoint = 0;
-float dVg = 0;
+float dUg = 0;
 float RegulatorAlowedError = 0;
 float GateVoltage = 0;
 Int16U FollowingErrorCounterMax = 0;
@@ -29,19 +29,19 @@ Int16U RegulatorCounter = 0;
 Int16U GateValues_Counter = 0;
 
 // Forward functions
-Int16U GATE_ConvertVgToDAC(float Value);
+Int16U GATE_ConvertUgToDAC(float Value);
 void GATE_SaveToEndpoints(float Voltage, float Current, float Error);
 
 // Functions
 //
-Int16U GATE_ConvertVgToDAC(float Value)
+Int16U GATE_ConvertUgToDAC(float Value)
 {
-	float Offset = DataTable[REG_VG_SET_B];
-	float K = DataTable[REG_VG_SET_K];
+	float Offset = DataTable[REG_UG_SET_B];
+	float K = DataTable[REG_UG_SET_K];
 	
-	float P0 = DataTable[REG_VG_SET_P0];
-	float P1 = DataTable[REG_VG_SET_P1];
-	float P2 = DataTable[REG_VG_SET_P2];
+	float P0 = DataTable[REG_UG_SET_P0];
+	float P1 = DataTable[REG_UG_SET_P1];
+	float P2 = DataTable[REG_UG_SET_P2];
 	
 	// Квадратичная корректировка
 	float tmp = (float)Value;
@@ -58,9 +58,9 @@ Int16U GATE_ConvertVgToDAC(float Value)
 }
 //------------------------------------
 
-void GATE_SetVg(float Value)
+void GATE_SetUg(float Value)
 {
-	Value ? LL_WriteDAC(GATE_ConvertVgToDAC(Value)) : LL_WriteDAC(0);
+	Value ? LL_WriteDAC(GATE_ConvertUgToDAC(Value)) : LL_WriteDAC(0);
 }
 //------------------------------------
 
@@ -74,7 +74,7 @@ void GATE_StartProcess()
 void GATE_StopProcess()
 {
 	TIM_Stop(TIM2);
-	GATE_SetVg(0);
+	GATE_SetUg(0);
 }
 //------------------------------------
 
@@ -83,8 +83,8 @@ void GATE_CacheVariables()
 	RegulatorQp = DataTable[REG_REGULATOR_QP];
 	RegulatorQi = DataTable[REG_REGULATOR_QI];
 	RegulatorQimax = DataTable[REG_REGULATOR_QI_MAX];
-	GateVoltageSetpoint = DataTable[REG_VG_SETPOINT];
-	dVg = DataTable[REG_VG_SETPOINT]/(DataTable[REG_VG_EDGE_TIME] / TIMER2_uS);
+	GateVoltageSetpoint = DataTable[REG_UG_SETPOINT];
+	dUg = DataTable[REG_UG_SETPOINT]/(DataTable[REG_UG_EDGE_TIME] / TIMER2_uS);
 	RegulatorAlowedError = DataTable[REG_REGULATOR_ALLOWED_ERR];
 	FollowingErrorCounterMax = (Int16U)DataTable[REG_FOLLOWING_ERR_CNT];
 	//
@@ -105,7 +105,7 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 	// Формирование линейно нарастающего фронта импульса напряжения
 	if(GateVoltage < GateVoltageSetpoint)
 	{
-		GateVoltage += dVg;
+		GateVoltage += dUg;
 		GATE_RegulatorState = RS_InProcess;
 	}
 	else
@@ -144,7 +144,7 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 
 	RegulatorOut = GateVoltage + Qp +Qi;
 
-	GATE_SetVg(RegulatorOut);
+	GATE_SetUg(RegulatorOut);
 
 	if(IsImpulse)
 	{
@@ -164,9 +164,9 @@ void GATE_SaveToEndpoints(float Voltage, float Current, float Error)
 {
 	if(GateValues_Counter < VALUES_x_SIZE)
 	{
-		MEMBUF_EP_Vg[GateValues_Counter] = Voltage;
+		MEMBUF_EP_Ug[GateValues_Counter] = Voltage;
 		MEMBUF_EP_Ig[GateValues_Counter] = Current;
-		MEMBUF_EP_VgErr[GateValues_Counter] = Error;
+		MEMBUF_EP_UgErr[GateValues_Counter] = Error;
 
 		GateValues_Counter++;
 	}

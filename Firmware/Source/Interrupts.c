@@ -10,17 +10,43 @@
 #include "Measurement.h"
 #include "MemBuffers.h"
 #include "GateDriver.h"
+#include "Constraints.h"
 
 // Variables
 //
-static volatile bool IdCompleted, VdCompleted;
+static volatile bool ItCompleted, UTCompleted;
 
 // Functions
 //
 void ADC1_2_IRQHandler()
 {
-	float GateVoltage = MEASURE_Vg(ADC_Read(ADC2));
-	float GateCurrent = MEASURE_Ig(ADC_Read(ADC1));
+	float GateVoltage, GateCurrent;
+	switch((Int16U)DataTable[REG_PCB_VERSION])
+	{
+		case PCB_VERSION_10:
+			GateVoltage = MEASURE_Ug(ADC_Read(ADC2));
+			GateCurrent = MEASURE_Ig(ADC_Read(ADC1));
+			break;
+
+		/*case PCB_VERSION_20:
+			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
+			{
+				TIM_Start(TIM3);
+				GateVoltage = MEASURE_Ug(MEMBUF_DMA_Ut2_UgIg,);
+				GateCurrent = MEASURE_Ig(ADC_Read(ADC1));
+				TIM_Stop(TIM3);
+			}
+			else if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
+			{
+				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
+				GateVoltage = MEASURE_Ug(ADC_Read(ADC2));
+				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_IG_CH, 2);
+				GateCurrent = MEASURE_Ig(ADC_Read(ADC2));
+			}
+			break;*/
+	}
+	/*float GateVoltage = MEASURE_Ug(ADC_Read(ADC2));
+	float GateCurrent = MEASURE_Ig(ADC_Read(ADC1));*/
 
 	GATE_RegulatorProcess(GateVoltage, GateCurrent);
 }
@@ -28,22 +54,22 @@ void ADC1_2_IRQHandler()
 
 bool IT_DMASampleCompleted()
 {
-	return IdCompleted && VdCompleted;
+	return ItCompleted && UTCompleted;
 }
 //-----------------------------------------
 
 void IT_DMAFlagsReset()
 {
-	IdCompleted = VdCompleted = false;
+	ItCompleted = UTCompleted = false;
 }
 //-----------------------------------------
 
 void DMA2_Channel5_IRQHandler()
 {
-	// Id
+	// It
 	if(DMA_IsTransferComplete(DMA2, DMA_ISR_TCIF5))
 	{
-		IdCompleted = true;
+		ItCompleted = true;
 		DMA_TransferCompleteReset(DMA2, DMA_IFCR_CTCIF5);
 	}
 }
@@ -51,10 +77,10 @@ void DMA2_Channel5_IRQHandler()
 
 void DMA2_Channel2_IRQHandler()
 {
-	// Vd
+	// UT
 	if(DMA_IsTransferComplete(DMA2, DMA_ISR_TCIF2))
 	{
-		VdCompleted = true;
+		UTCompleted = true;
 		DMA_TransferCompleteReset(DMA2, DMA_IFCR_CTCIF2);
 	}
 }

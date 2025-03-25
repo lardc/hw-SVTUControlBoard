@@ -33,7 +33,7 @@ typedef struct __LCSUStructData
 
 // Variables
 //
-LCSUData LCSU_DataArray[LCSU_COUNT_MAX] = {0};
+LCSUData LCSU_DataArray[LCSU_AMOUNT_MAX] = {0};
 static Int16U ActiveLCSUCounter = 0, CachedLCSUStartNid = 0, CachedLCSUMaxCurrent = 0;
 
 // Forward functions
@@ -48,7 +48,7 @@ bool LOGIC_FindLCSU()
 	CachedLCSUStartNid = DataTable[REG_LCSU_START_NID];
 	CachedLCSUMaxCurrent = DataTable[REG_LCSU_MAX_CURRENT];
 	
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_DEV_STATE, NULL))
 		{
@@ -60,7 +60,7 @@ bool LOGIC_FindLCSU()
 	}
 	
 	DataTable[REG_LCSU_DETECTED] = ActiveLCSUCounter;
-	DataTable[REG_ID_MAX] = CachedLCSUMaxCurrent * ActiveLCSUCounter;
+	DataTable[REG_IT_READ_MAX] = CachedLCSUMaxCurrent * ActiveLCSUCounter;
 	
 	return ActiveLCSUCounter;
 }
@@ -70,7 +70,7 @@ bool LOGIC_UpdateLCSUState()
 {
 	Int16U Register;
 	
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -87,7 +87,7 @@ bool LOGIC_UpdateLCSUState()
 
 bool LOGIC_CallCommandForLCSU(Int16U Command)
 {
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -102,7 +102,7 @@ bool LOGIC_CallCommandForLCSU(Int16U Command)
 
 bool LOGIC_PowerEnableLCSU()
 {
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -125,7 +125,7 @@ bool LOGIC_AreLCSUInStateX(Int16U State)
 {
 	bool result = true;
 	
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State != State)
 			result = false;
@@ -137,7 +137,7 @@ bool LOGIC_AreLCSUInStateX(Int16U State)
 
 bool LOGIC_IsLCSUInFaultOrDisabled(Int16U Fault, Int16U Disabled)
 {
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].State == Fault || LCSU_DataArray[i].State == Disabled)
 			return true;
@@ -149,7 +149,7 @@ bool LOGIC_IsLCSUInFaultOrDisabled(Int16U Fault, Int16U Disabled)
 
 bool LOGIC_WriteLCSUConfig()
 {
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -165,7 +165,7 @@ bool LOGIC_WriteLCSUConfig()
 bool LOGIC_SetCurrentForCertainLCSU(Int16U Nid, float Current)
 {
 	// Nid вне диапазона
-	if(Nid < CachedLCSUStartNid || Nid >= (CachedLCSUStartNid + LCSU_COUNT_MAX))
+	if(Nid < CachedLCSUStartNid || Nid >= (CachedLCSUStartNid + DataTable[REG_LCSU_COUNT_MAX]))
 		return false;
 	
 	// Выбранный блок LCSU не активен
@@ -196,7 +196,7 @@ bool LOGIC_DistributeCurrent(float Current)
 	LOGIC_ResetLCSUCurrent();
 
 	// Запись значений и формы импульса тока
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
@@ -217,7 +217,7 @@ bool LOGIC_DistributeCurrent(float Current)
 float LOGIC_GetCurrentSetpoint()
 {
 	float P0, P1, P2;
-	float current = DataTable[REG_ID_SETPOINT];
+	float current = DataTable[REG_IT_SETPOINT];
 
 	if (current <= DataTable[REG_I_R0_THRESHOLD])
 	{
@@ -240,7 +240,7 @@ float LOGIC_GetCurrentSetpoint()
 
 void LOGIC_ResetLCSUCurrent()
 {
-	for(Int16U i = 0; i < LCSU_COUNT_MAX; ++i)
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 			LCSU_DataArray[i].Current = 0;
@@ -250,7 +250,7 @@ void LOGIC_ResetLCSUCurrent()
 
 void LOGIC_SelectCurrentRange(float Current)
 {
-	(Current <= DataTable[REG_I_R0_THRESHOLD]) ? LL_SetIdRange(true) : LL_SetIdRange(false);
+	(Current <= DataTable[REG_I_R0_THRESHOLD]) ? LL_SetItRange(true) : LL_SetItRange(false);
 }
 // ----------------------------------------
 
@@ -258,12 +258,12 @@ void LOGIC_StartPulse()
 {
 	// Подготовка оцифровки
 	IT_DMAFlagsReset();
-	DMA_ChannelReload(DMA_ADC_ID_CH, VALUES_POWER_DMA_SIZE);
-	DMA_ChannelReload(DMA_ADC_VD_CH, VALUES_POWER_DMA_SIZE);
-	DMA_ChannelReload(DMA_ADC_UT_CH2, VALUES_POWER_DMA_SIZE);
-	DMA_ChannelEnable(DMA_ADC_ID_CH, true);
-	DMA_ChannelEnable(DMA_ADC_VD_CH, true);
-	DMA_ChannelEnable(DMA_ADC_UT_CH2, true);
+	DMA_ChannelReload(DMA_ADC_IT_CH, VALUES_POWER_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_UT_CH, VALUES_POWER_DMA_SIZE);
+	DMA_ChannelReload(DMA_ADC_UT2_UGIG, VALUES_POWER_DMA_SIZE);
+	DMA_ChannelEnable(DMA_ADC_IT_CH, true);
+	DMA_ChannelEnable(DMA_ADC_UT_CH, true);
+	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
 
 	// Запуск оцифровки импульса тока и напряжения в силовой цепи
 	ADC_SamplingStart(ADC3);
@@ -290,11 +290,11 @@ bool LOGIC_FinishProcess()
 		GATE_StopProcess();
 
 		// Пересчёт значений
-		MEASURE_ConvertVd(MEMBUF_DMA_Vd, VALUES_POWER_DMA_SIZE);
-		MEASURE_ConvertId(MEMBUF_DMA_Id, VALUES_POWER_DMA_SIZE, LL_IdGetRange());
+		MEASURE_ConvertUt(MEMBUF_DMA_Ut, VALUES_POWER_DMA_SIZE);
+		MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
 		if (DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
 		{
-			MEASURE_ConvertUt2(MEMBUF_DMA_Ut_Ch2, VALUES_POWER_DMA_SIZE);
+			MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
 		}
 
 		return true;
@@ -320,27 +320,29 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	float UtResult = MEASURE_CollectorAverageVoltage();
+	float UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut);
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
-			DataTable[REG_RESULT_VD] = UtResult;
+			DataTable[REG_RESULT_UT] = UtResult;
 			break;
 
 		case PCB_VERSION_20:
 			{
-				float UtCh2Result = MEASURE_CollectorAverageVoltageCh2();
-				DataTable[REG_RESULT_VD] = UtResult > (Int16U)DataTable[REG_UT_MAX] ? UtCh2Result : UtResult;
+				float UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg);
+				DataTable[REG_RESULT_UT] = UtResult > (Int16U)DataTable[REG_UT_MAX] ? UtCh2Result : UtResult;
 			}
 			break;
 	}
-	DataTable[REG_RESULT_ID] = MEASURE_CollectorAverageCurrent();
-	DataTable[REG_RESULT_VG] = MEASURE_GateAverageVoltage();
 
-	if((DataTable[REG_RESULT_VD] > VD_MAX_VALUE) || (DataTable[REG_RESULT_VD] < VD_MIN_VALUE))
+	float ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It);
+	DataTable[REG_RESULT_IT] = ItResult;
+	DataTable[REG_RESULT_UG] = MEASURE_GateAverageVoltage();
+
+	if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
 		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
 
-	if((DataTable[REG_RESULT_ID] > ID_MAX_VALUE) || (DataTable[REG_RESULT_ID] < ID_MIN_VALUE))
+	if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
 			DataTable[REG_WARNING] = WARNING_CURRENT_OUT_OF_RANGE;
 }
 // ----------------------------------------
