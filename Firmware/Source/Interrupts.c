@@ -14,7 +14,7 @@
 
 // Variables
 //
-static volatile bool ItCompleted, UTCompleted;
+static volatile bool ItCompleted, UTCompleted, UT2Completed;
 
 // Functions
 //
@@ -32,18 +32,43 @@ void ADC1_2_IRQHandler()
 
 bool IT_DMASampleCompleted()
 {
-	return ItCompleted && UTCompleted;
+	switch((Int16U)DataTable[REG_PCB_VERSION])
+	{
+		case PCB_VERSION_10:
+			return ItCompleted && UTCompleted;
+
+		case PCB_VERSION_20:
+			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
+			{
+				return ItCompleted && UTCompleted;
+				break;
+			}
+			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
+			{
+				return ItCompleted && UTCompleted && UT2Completed;
+			}
+
+		default:
+			return 0;
+	}
 }
 //-----------------------------------------
 
 void IT_DMAFlagsReset()
 {
-	ItCompleted = UTCompleted = false;
+	ItCompleted = UTCompleted = UT2Completed = false;
 }
 //-----------------------------------------
 
 void DMA1_Channel1_IRQHandler()
 {
+	// UT2
+	if(DMA_IsTransferComplete(DMA1, DMA_ISR_TCIF1))
+	{
+		UT2Completed = true;
+		DMA_TransferCompleteReset(DMA1, DMA_IFCR_CTCIF1);
+	}
+
 	// Расчеты производятся только для версии платы 2.0 с тиристором
 	float GateVoltage, GateCurrent;
 
