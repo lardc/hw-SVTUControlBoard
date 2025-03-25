@@ -14,39 +14,17 @@
 
 // Variables
 //
-static volatile bool ItCompleted, UTCompleted;
+static volatile bool ItCompleted, UTCompleted, UT2Completed;
 
 // Functions
 //
 void ADC1_2_IRQHandler()
 {
+	// Расчеты производятся только для версии платы 1.0
 	float GateVoltage, GateCurrent;
-	switch((Int16U)DataTable[REG_PCB_VERSION])
-	{
-		case PCB_VERSION_10:
-			GateVoltage = MEASURE_Ug(ADC_Read(ADC2));
-			GateCurrent = MEASURE_Ig(ADC_Read(ADC1));
-			break;
 
-		/*case PCB_VERSION_20:
-			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
-			{
-				TIM_Start(TIM3);
-				GateVoltage = MEASURE_Ug(MEMBUF_DMA_Ut2_UgIg,);
-				GateCurrent = MEASURE_Ig(ADC_Read(ADC1));
-				TIM_Stop(TIM3);
-			}
-			else if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
-			{
-				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
-				GateVoltage = MEASURE_Ug(ADC_Read(ADC2));
-				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_IG_CH, 2);
-				GateCurrent = MEASURE_Ig(ADC_Read(ADC2));
-			}
-			break;*/
-	}
-	/*float GateVoltage = MEASURE_Ug(ADC_Read(ADC2));
-	float GateCurrent = MEASURE_Ig(ADC_Read(ADC1));*/
+	GateVoltage = MEASURE_Ug_ADC_Direct(ADC_Read(ADC2));
+	GateCurrent = MEASURE_Ig_ADC_Direct(ADC_Read(ADC1));
 
 	GATE_RegulatorProcess(GateVoltage, GateCurrent);
 }
@@ -54,13 +32,66 @@ void ADC1_2_IRQHandler()
 
 bool IT_DMASampleCompleted()
 {
-	return ItCompleted && UTCompleted;
+	switch((Int16U)DataTable[REG_PCB_VERSION])
+	{
+		case PCB_VERSION_10:
+			return ItCompleted && UTCompleted;
+
+		case PCB_VERSION_20:
+			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
+			{
+				return ItCompleted && UTCompleted;
+				break;
+			}
+			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
+			{
+				return ItCompleted && UTCompleted && UT2Completed;
+			}
+
+		default:
+			return 0;
+	}
 }
 //-----------------------------------------
 
 void IT_DMAFlagsReset()
 {
-	ItCompleted = UTCompleted = false;
+	ItCompleted = UTCompleted = UT2Completed = false;
+}
+//-----------------------------------------
+
+void DMA1_Channel1_IRQHandler()
+{
+	// UT2
+	if(DMA_IsTransferComplete(DMA1, DMA_ISR_TCIF1))
+	{
+		UT2Completed = true;
+		DMA_TransferCompleteReset(DMA1, DMA_IFCR_CTCIF1);
+	}
+
+	// Расчеты производятся только для версии платы 2.0 с тиристором
+	float GateVoltage, GateCurrent;
+
+	DMA_ChannelReload(DMA_ADC_UT2_UGIG, 2);
+	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
+	GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_Ut2_UgIg, 0);
+	GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_Ut2_UgIg, 1);
+
+	GATE_RegulatorProcess(GateVoltage, GateCurrent);
+}
+//-----------------------------------------
+
+void DMA1_Channel2_IRQHandler()
+{
+	// Расчеты производятся только для версии платы 2.0 с IGBT
+	float GateVoltage, GateCurrent;
+
+	DMA_ChannelReload(DMA_ADC_IGBT_UGIG, 2);
+	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
+	GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_IGBT_UgIg, 0);
+	GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_IGBT_UgIg, 1);
+
+	GATE_RegulatorProcess(GateVoltage, GateCurrent);
 }
 //-----------------------------------------
 
