@@ -38,7 +38,7 @@ bool IT_DMASampleCompleted()
 			return ItCompleted && UTCompleted;
 
 		case PCB_VERSION_20:
-			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
+			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_THYRIS)
 			{
 				return ItCompleted && UTCompleted;
 				break;

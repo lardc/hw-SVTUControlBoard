@@ -107,7 +107,7 @@ void INITCFG_ConfigADC()
 			break;
 
 		case PCB_VERSION_20:
-			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
+			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_THYRIS)
 			{
 				ADC_TrigConfig(ADC1, ADC12_TIM2_TRGO, RISE);
 				ADC_ChannelSet_Sequence(ADC1, ADC1_UGT, 1);
@@ -229,7 +229,7 @@ void INITCFG_ConfigDMA()
 				DMAChannelX_DataConfig(DMA_ADC_UT2_UGIG, (Int32U)(MEMBUF_DMA_Ut2_UgIg), (Int32U)(&ADC1->DR),
 				VALUES_POWER_DMA_SIZE);
 			}
-			else if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_TIRIS)
+			else if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_THYRIS)
 			{
 				DMAChannelX_DataConfig(DMA_ADC_UT2_UGIG, (Int32U)(MEMBUF_DMA_Ut2_UgIg), (Int32U)(&ADC1->DR), 2);
 			}
