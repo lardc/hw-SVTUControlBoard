@@ -46,7 +46,7 @@
 #define ADC2_IGBT_UG_CH					4			// АЦП2 номер канала измерения Ug IGBT
 #define ADC2_IGBT_IG_CH					12			// АЦП2 номер канала измерения Ig IGBT для версии платы 2.0
 #define ADC3_UD_CH						5			// АЦП3 номер канала измерения Ud
-#define ADC4_IT_CH						3			// АЦП4 номер канала измерения It
+#define ADC4_IT_CH						4			// АЦП4 номер канала измерения It
 // ----------------------------------------------
 
 #endif // __SYSCONFIG_H

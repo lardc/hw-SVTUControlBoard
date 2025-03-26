@@ -571,7 +571,8 @@ void CONTROL_FinishedWithProblem(Int16U Problem)
 
 void CONTROL_SafetyProcess()
 {
-	if(CONTROL_IsSafetyEvent() && CONTROL_State == DS_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge && SUB_State != SS_PowerOff)
+	if(CONTROL_IsSafetyEvent() && CONTROL_State == DS_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge
+			&& SUB_State != SS_PowerOff && !DataTable[REG_MUTE_SAFETY])
 	{
 		CONTROL_ResetHardware();
 		CONTROL_FinishedWithProblem(PROBLEM_SAFETY);
