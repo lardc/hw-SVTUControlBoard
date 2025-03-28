@@ -258,12 +258,12 @@ void LOGIC_StartPulse()
 {
 	// Подготовка оцифровки
 	IT_DMAFlagsReset();
+
 	DMA_ChannelReload(DMA_ADC_IT_CH, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_UT_CH, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_UT2_UGIG, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelEnable(DMA_ADC_IT_CH, true);
 	DMA_ChannelEnable(DMA_ADC_UT_CH, true);
-	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
 
 	// Запуск оцифровки импульса тока и напряжения в силовой цепи
 	ADC_SamplingStart(ADC3);

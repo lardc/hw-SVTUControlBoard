@@ -182,6 +182,7 @@
 #define EP_UG							3	// Оцифрованные данные Ug
 #define EP_UG_ERR						4	// Ошибка регулятора Ug
 #define EP_IG							5	// Оцифрованные данные Ig
+#define EP_UT2							6	// Оцифрованные данные Ut со второго канала
 
 #define EP_ExtInfoData					20	// External information from flash
 

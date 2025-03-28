@@ -12,7 +12,7 @@
 #define	BCCIM_TIMEOUT_TICKS			50				// Таймаут протоколоа мастер BCCI (в мс)
 #define EP_WRITE_COUNT				0				// Количество массивов для записи
 #define EP_COUNT					0				// Количество массивов для чтения
-#define FEP_COUNT					6				// Количество массивов для чтения типа float
+#define FEP_COUNT					7				// Количество массивов для чтения типа float
 #define ENABLE_LOCKING				FALSE			// Защита паролем
 #define VALUES_x_SIZE				75				// Размер выходных массивов
 #define VALUES_EXT_INFO_SIZE		300				// Размер массива диагностических и выходных данных
