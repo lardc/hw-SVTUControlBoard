@@ -400,9 +400,6 @@ void CONTROL_HandlePulse()
 						Timeout = 0;
 
 						CONTROL_SetDeviceState(DS_InProcess, SS_GateVoltageProcess);
-						// Запуск DMA для версий платы 2.0
-						DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
-						DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
 					}
 					else
 						CONTROL_HandleFaultLCSUEvents(Timeout);

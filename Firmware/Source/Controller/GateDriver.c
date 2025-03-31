@@ -67,12 +67,19 @@ void GATE_SetUg(float Value)
 void GATE_StartProcess()
 {
 	ADC_SamplingStart(ADC1);
+	ADC_SamplingStart(ADC2);
 	TIM_Start(TIM2);
+
+	// Запуск DMA для версий платы 2.0
+	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
+	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
 }
 //------------------------------------
 
 void GATE_StopProcess()
 {
+	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, false);
+	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, false);
 	TIM_Stop(TIM2);
 	GATE_SetUg(0);
 }

@@ -261,7 +261,11 @@ void LOGIC_StartPulse()
 
 	DMA_ChannelReload(DMA_ADC_IT_CH, VALUES_POWER_DMA_SIZE);
 	DMA_ChannelReload(DMA_ADC_UT_CH, VALUES_POWER_DMA_SIZE);
-	DMA_ChannelReload(DMA_ADC_UT2_UGIG, VALUES_POWER_DMA_SIZE);
+	if (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
+	{
+		DMA_ChannelReload(DMA_ADC_UT2_UGIG, VALUES_POWER_DMA_SIZE);
+		DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
+	}
 	DMA_ChannelEnable(DMA_ADC_IT_CH, true);
 	DMA_ChannelEnable(DMA_ADC_UT_CH, true);
 
@@ -294,7 +298,10 @@ bool LOGIC_FinishProcess()
 		MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
 		if (DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
 		{
-			MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
+			if (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
+			{
+				MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
+			}
 		}
 
 		return true;
@@ -313,7 +320,7 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 	else
 		BufferCompression = 1;
 
-	for(int i = 0; i < InputArraySize; i += BufferCompression)
+	for(int i = 0; i <= InputArraySize; i += BufferCompression)
 		*(OutputArray + i / BufferCompression) = *(InputArray + i);
 }
 // ----------------------------------------

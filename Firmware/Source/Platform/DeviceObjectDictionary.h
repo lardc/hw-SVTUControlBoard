@@ -90,7 +90,7 @@
 #define REG_LAMP_CTRL					43	// Запрет управление блоком внешнего индикатора
 #define REG_R_SHUNT						44	// Сопротивление шунта (в мкОм)
 #define REG_I_R0_THRESHOLD				45	// Граница нижнего диапазона тока (в А)
-#define REG_IG_THRESHOLD				46	// Значчение тока Ig при выставлении PROBLEM_GATE_SHORT
+#define REG_IG_THRESHOLD				46	// Значение тока Ig при выставлении PROBLEM_GATE_SHORT
 #define REG_MSR_DELAY					47	// Задержка измерения Uce, Ice (в тиках)
 #define REG_MSR_TIME					48	// Время измерения Uce, Ice (в тиках)
 #define REG_EMULATION					49  // Включение режима эмуляции

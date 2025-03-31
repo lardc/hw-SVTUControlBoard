@@ -62,7 +62,6 @@ void IT_DMAFlagsReset()
 
 void DMA1_Channel1_IRQHandler()
 {
-	float GateVoltage, GateCurrent;
 	switch((Int16U)DataTable[REG_PCB_TIRIS_IGBT])
 	{
 		case PCB_IGBT:
@@ -75,28 +74,50 @@ void DMA1_Channel1_IRQHandler()
 			break;
 
 		case PCB_THYRIS:
-			DMA_ChannelReload(DMA_ADC_UT2_UGIG, 2);
-			DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
-			GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_Ut2_UgIg, 0);
-			GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_Ut2_UgIg, 1);
+			if(DMA_IsTransferComplete(DMA1, DMA_ISR_TCIF1))
+				{
+				float GateVoltage, GateCurrent;
 
-			GATE_RegulatorProcess(GateVoltage, GateCurrent);
+				DMA_TransferCompleteReset(DMA1, DMA_IFCR_CTCIF1);
+				DMA_ChannelReload(DMA_ADC_UT2_UGIG, 2);
+				DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
+
+				MEMBUF_DMA_Ut2_UgIg[0] = ((pInt32U)MEMBUF_DMA_Ut2_UgIg)[0];
+				MEMBUF_DMA_Ut2_UgIg[1] = ((pInt32U)MEMBUF_DMA_Ut2_UgIg)[1];
+
+				GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_Ut2_UgIg, 0);
+				GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_Ut2_UgIg, 1);
+
+				GATE_RegulatorProcess(GateVoltage, GateCurrent);
+
+				ADC_SamplingStart(ADC1);
+				}
 			break;
 	}
 }
 //-----------------------------------------
 
-void DMA1_Channel2_IRQHandler()
+void DMA2_Channel1_IRQHandler()
 {
 	// Расчеты производятся только для версии платы 2.0 с IGBT
-	float GateVoltage, GateCurrent;
+	if(DMA_IsTransferComplete(DMA2, DMA_ISR_TCIF1))
+	{
+		float GateVoltage, GateCurrent;
 
-	DMA_ChannelReload(DMA_ADC_IGBT_UGIG, 2);
-	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
-	GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_IGBT_UgIg, 0);
-	GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_IGBT_UgIg, 1);
+		DMA_TransferCompleteReset(DMA2, DMA_IFCR_CTCIF1);
+		DMA_ChannelReload(DMA_ADC_IGBT_UGIG, 2);
+		DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
 
-	GATE_RegulatorProcess(GateVoltage, GateCurrent);
+		MEMBUF_DMA_IGBT_UgIg[0] = ((pInt32U)MEMBUF_DMA_IGBT_UgIg)[0];
+		MEMBUF_DMA_IGBT_UgIg[1] = ((pInt32U)MEMBUF_DMA_IGBT_UgIg)[1];
+
+		GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_IGBT_UgIg, 0);
+		GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_IGBT_UgIg, 1);
+
+		GATE_RegulatorProcess(GateVoltage, GateCurrent);
+
+		ADC_SamplingStart(ADC2);
+	}
 }
 //-----------------------------------------
 
