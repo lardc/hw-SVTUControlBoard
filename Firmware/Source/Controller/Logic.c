@@ -320,7 +320,7 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 	else
 		BufferCompression = 1;
 
-	for(int i = 0; i <= InputArraySize; i += BufferCompression)
+	for(int i = 0; i < InputArraySize; i += BufferCompression)
 		*(OutputArray + i / BufferCompression) = *(InputArray + i);
 }
 // ----------------------------------------
