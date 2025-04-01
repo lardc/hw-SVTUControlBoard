@@ -90,7 +90,7 @@
 #define MSR_TIME_DEF				4
 //
 #define IG_THRESHOLD_MIN			10
-#define IG_THRESHOLD_MAX			10000
+#define IG_THRESHOLD_MAX			100
 #define IG_THRESHOLD_DEF			30
 //
 #define COEF_IT_R0_K_DEF			1
