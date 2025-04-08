@@ -125,7 +125,8 @@ float MEASURE_GateAverageVoltage()
 {
 	Int16U StartIndex, Points;
 
-	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + DataTable[REG_MSR_DELAY];
+	//Умножение на 1000, чтобы преобразовать мс в мкс
+	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
 	Points = DataTable[REG_MSR_TIME];
 
 	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Ug, StartIndex, Points);
@@ -136,7 +137,7 @@ float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary)
 {
 	Int16U StartIndex, Points;
 
-	StartIndex = DataTable[REG_MSR_DELAY] * TIMER2_uS / TIMER1_uS;
+	StartIndex = (DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS) * TIMER2_uS / TIMER1_uS;
 	Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
 
 	return MEASURE_ExtractAverageValues(MEMBUF_DMA_Intermediary, StartIndex, Points);

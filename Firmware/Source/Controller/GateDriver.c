@@ -27,6 +27,7 @@ Int16U FollowingErrorCounterMax = 0;
 Int16U FollowingErrorCounter = 0;
 Int16U RegulatorCounter = 0;
 Int16U GateValues_Counter = 0;
+float DelayInMeasure = 0;
 
 // Forward functions
 Int16U GATE_ConvertUgToDAC(float Value);
@@ -100,6 +101,9 @@ void GATE_CacheVariables()
 	FollowingErrorCounter = 0;
 	GateValues_Counter = 0;
 
+	//Умножение на 1000, чтобы преобразовать мс в мкс
+	DelayInMeasure = DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
+
 	GATE_RegulatorState = RS_None;
 }
 //------------------------------------
@@ -159,7 +163,7 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 			LL_SyncScope(true);
 	}
 	else
-		SyncDelayCounter = RegulatorCounter + DataTable[REG_MSR_DELAY];
+		SyncDelayCounter = RegulatorCounter + DelayInMeasure;
 
 	RegulatorCounter++;
 

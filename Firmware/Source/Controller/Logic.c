@@ -29,6 +29,7 @@ typedef struct __LCSUStructData
 	bool IsActive;
 	LCSUState State;
 	float Current;
+	Int16U PulseDuration;
 } LCSUData, *pLCSUData;
 
 // Variables
@@ -154,7 +155,8 @@ bool LOGIC_WriteLCSUConfig()
 		if(LCSU_DataArray[i].IsActive)
 		{
 			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
-				return false;
+				if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, LCSU_DataArray[i].PulseDuration))
+					return false;
 		}
 	}
 	
