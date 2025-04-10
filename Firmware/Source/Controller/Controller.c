@@ -561,11 +561,7 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 
 bool CONTROL_IsSafetyEvent()
 {
-	if (!DataTable[REG_MUTE_SAFETY])
-	{
-		return LL_GetSafetyState();
-	}
-	else return FALSE;
+	return (!DataTable[REG_MUTE_SAFETY]) ? LL_GetSafetyState() : FALSE;
 }
 //-----------------------------------------------
 

@@ -41,7 +41,6 @@ bool IT_DMASampleCompleted()
 			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_THYRIS)
 			{
 				return ItCompleted && UTCompleted;
-				break;
 			}
 			if((Int16U)DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
 			{
@@ -75,7 +74,7 @@ void DMA1_Channel1_IRQHandler()
 
 		case PCB_THYRIS:
 			if(DMA_IsTransferComplete(DMA1, DMA_ISR_TCIF1))
-				{
+			{
 				float GateVoltage, GateCurrent;
 
 				DMA_TransferCompleteReset(DMA1, DMA_IFCR_CTCIF1);
@@ -91,7 +90,7 @@ void DMA1_Channel1_IRQHandler()
 				GATE_RegulatorProcess(GateVoltage, GateCurrent);
 
 				ADC_SamplingStart(ADC1);
-				}
+			}
 			break;
 	}
 }

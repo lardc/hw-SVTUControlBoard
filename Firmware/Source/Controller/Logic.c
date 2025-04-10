@@ -29,7 +29,6 @@ typedef struct __LCSUStructData
 	bool IsActive;
 	LCSUState State;
 	float Current;
-	Int16U PulseDuration;
 } LCSUData, *pLCSUData;
 
 // Variables
@@ -155,7 +154,7 @@ bool LOGIC_WriteLCSUConfig()
 		if(LCSU_DataArray[i].IsActive)
 		{
 			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
-				if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, LCSU_DataArray[i].PulseDuration))
+				if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, DataTable[REG_PULSE_DURATION]))
 					return false;
 		}
 	}
@@ -329,7 +328,7 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	float UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut);
+	float UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut, true);
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
@@ -338,13 +337,13 @@ void LOGIC_SaveResults()
 
 		case PCB_VERSION_20:
 			{
-				float UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg);
+				float UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg, false);
 				DataTable[REG_RESULT_UT] = UtResult > (Int16U)DataTable[REG_UT_MAX] ? UtCh2Result : UtResult;
 			}
 			break;
 	}
 
-	float ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It);
+	float ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It, true);
 	DataTable[REG_RESULT_IT] = ItResult;
 	DataTable[REG_RESULT_UG] = MEASURE_GateAverageVoltage();
 

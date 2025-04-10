@@ -132,6 +132,7 @@
 #define PULSE_TIME_MIN				1		// в мс
 #define PULSE_TIME_MAX				10		// в мс
 #define PULSE_TIME_DEF				1		// в мс
+#define PULSE_TIME_DELAY_DEF		3		// в мс
 
 // Types
 typedef struct __TableItemConstraint
