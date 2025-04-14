@@ -110,7 +110,7 @@
 #define	PCB_VERSION_10				0
 #define PCB_VERSION_20				1
 //
-#define PCB_TIRIS					0
+#define PCB_THYRIS					0
 #define PCB_IGBT					1
 //
 #define COEF_UT2_K_DEF				1
@@ -131,7 +131,8 @@
 //
 #define PULSE_TIME_MIN				1		// в мс
 #define PULSE_TIME_MAX				10		// в мс
-#define PULSE_TIME_DEF				3		// в мс
+#define PULSE_TIME_DEF				1		// в мс
+#define PULSE_TIME_DELAY_DEF		3		// в мс
 
 // Types
 typedef struct __TableItemConstraint

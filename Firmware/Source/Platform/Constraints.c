@@ -88,9 +88,9 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, CURRENT_MAX, 0},													// 82
 		{0, CURRENT_MAX, 0},													// 83
 		{0, VOLTAGE_MAX, 0},													// 84
-		{LCSU_AMOUNT_MIN, LCSU_AMOUNT_MAX, LCSU_AMOUNT_MIN},						// 85
+		{LCSU_AMOUNT_MIN, LCSU_AMOUNT_MAX, LCSU_AMOUNT_MIN},					// 85
 		{SVTU_WAIT_MIN, SVTU_WAIT_MAX, SVTU_WAIT_DEF},							// 86
-		{0, 0, 0},																// 87
+		{PULSE_TIME_MIN, PULSE_TIME_MAX, PULSE_TIME_DELAY_DEF},					// 87
 		{0, 0, 0},																// 88
 		{0, 0, 0},																// 89
 		{0, 0, 0},																// 90
@@ -124,8 +124,8 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 118
 		{0, 0, 0},																// 119
 		{PCB_VERSION_10, PCB_VERSION_20, PCB_VERSION_10},						// 120
-		{PCB_TIRIS, PCB_IGBT, PCB_TIRIS},										// 121
-		{0, 0, 0},																// 122
+		{PCB_THYRIS, PCB_IGBT, PCB_THYRIS},										// 121
+		{NO, YES, NO},															// 122
 		{0, 0, 0},																// 123
 		{0, 0, 0},																// 124
 		{0, 0, 0},																// 125

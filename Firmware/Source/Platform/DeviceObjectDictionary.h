@@ -90,7 +90,7 @@
 #define REG_LAMP_CTRL					43	// Запрет управление блоком внешнего индикатора
 #define REG_R_SHUNT						44	// Сопротивление шунта (в мкОм)
 #define REG_I_R0_THRESHOLD				45	// Граница нижнего диапазона тока (в А)
-#define REG_IG_THRESHOLD				46	// Значчение тока Ig при выставлении PROBLEM_GATE_SHORT
+#define REG_IG_THRESHOLD				46	// Значение тока Ig при выставлении PROBLEM_GATE_SHORT
 #define REG_MSR_DELAY					47	// Задержка измерения Uce, Ice (в тиках)
 #define REG_MSR_TIME					48	// Время измерения Uce, Ice (в тиках)
 #define REG_EMULATION					49  // Включение режима эмуляции
@@ -113,16 +113,18 @@
 //
 #define REG_LCSU_COUNT_MAX				85	// Максимальное количество блоков LCSU в установке
 #define REG_SVTU_WAIT_FINISH_TIME		86	// Время ожидания завершения процесса (в мс)
+#define REG_PULSE_TIME_DELAY			87 	// Время начала пульсации(в мс)
 //
 #define REG_PCB_VERSION					120	// 0 - версия платы 1.0
 											// 1 - версия  2.0
 #define REG_PCB_TIRIS_IGBT				121	// 0 - версия платы с тиристором
 											// 1 - c IGBT
+#define REG_MUTE_SAFETY					122	// Игнорирование контура безопасности
 
 // Несохраняемы регистры чтения-записи
 #define REG_IT_SETPOINT					128	// Уставка силового тока (в А)
 #define REG_UG_SETPOINT					129	// Уставка напряжения управления (в В)
-#define REG_PULSE_TIME					130 // Длительность импульса (в мс)
+#define REG_PULSE_DURATION				130	// Продолжительность пульсации (в мс)
 //
 #define REG_DBG							150	// Отладочный регистр
 
@@ -167,6 +169,7 @@
 
 // Регистры LCSU
 #define REG_LCSU_PULSE_VALUE			128	// Значение амплитуды импульса тока (в А)
+#define REG_LCSU_TRAPEZE_DURATION		129	// Длительность импульса тока (мс)
 
 #define REG_LCSU_DEV_STATE				192	// Состояние блока
 #define REG_LCSU_FAULT_REASON			193
@@ -181,6 +184,7 @@
 #define EP_UG							3	// Оцифрованные данные Ug
 #define EP_UG_ERR						4	// Ошибка регулятора Ug
 #define EP_IG							5	// Оцифрованные данные Ig
+#define EP_UT2							6	// Оцифрованные данные Ut со второго канала
 
 #define EP_ExtInfoData					20	// External information from flash
 

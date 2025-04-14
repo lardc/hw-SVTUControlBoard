@@ -27,6 +27,7 @@ Int16U FollowingErrorCounterMax = 0;
 Int16U FollowingErrorCounter = 0;
 Int16U RegulatorCounter = 0;
 Int16U GateValues_Counter = 0;
+float DelayInMeasure = 0;
 
 // Forward functions
 Int16U GATE_ConvertUgToDAC(float Value);
@@ -67,12 +68,19 @@ void GATE_SetUg(float Value)
 void GATE_StartProcess()
 {
 	ADC_SamplingStart(ADC1);
+	ADC_SamplingStart(ADC2);
 	TIM_Start(TIM2);
+
+	// Запуск DMA для версий платы 2.0
+	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
+	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
 }
 //------------------------------------
 
 void GATE_StopProcess()
 {
+	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, false);
+	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, false);
 	TIM_Stop(TIM2);
 	GATE_SetUg(0);
 }
@@ -92,6 +100,9 @@ void GATE_CacheVariables()
 	RegulatorCounter = 0;
 	FollowingErrorCounter = 0;
 	GateValues_Counter = 0;
+
+	//Умножение на 1000, чтобы преобразовать мс в мкс
+	DelayInMeasure = DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
 
 	GATE_RegulatorState = RS_None;
 }
@@ -152,7 +163,7 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 			LL_SyncScope(true);
 	}
 	else
-		SyncDelayCounter = RegulatorCounter + DataTable[REG_MSR_DELAY];
+		SyncDelayCounter = RegulatorCounter + DelayInMeasure;
 
 	RegulatorCounter++;
 

@@ -61,21 +61,24 @@ void CONTROL_InitJSONPointers();
 void CONTROL_Init()
 {
 	// Переменные для конфигурации EndPoint
-	Int16U FEPIndexes[FEP_COUNT] = {EP_IT, EP_UT, EP_UG, EP_UG_ERR, EP_IG, EP_ExtInfoData};
+	Int16U FEPIndexes[FEP_COUNT] = {EP_IT, EP_UT, EP_UG, EP_UG_ERR, EP_IG, EP_UT2, EP_ExtInfoData};
 
-	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_EXT_INFO_SIZE};
+	Int16U FEPSized[FEP_COUNT] = {VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_x_SIZE, VALUES_EXT_INFO_SIZE};
 
 	pInt16U FEPCounters[FEP_COUNT] = {(pInt16U)&CONTROL_PowerValues_Counter, (pInt16U)&CONTROL_PowerValues_Counter,
-			(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&CONTROL_ExtInfoCounter};
+			(pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter, (pInt16U)&GateValues_Counter,
+			(pInt16U)&CONTROL_PowerValues_Counter, (pInt16U)&CONTROL_ExtInfoCounter};
 
 	pFloat32 FEPDatas[FEP_COUNT] = {(pFloat32)MEMBUF_EP_It, (pFloat32)MEMBUF_EP_Ut, (pFloat32)MEMBUF_EP_Ug,
-			(pFloat32)MEMBUF_EP_UgErr, (pFloat32)MEMBUF_EP_Ig, (pFloat32)&CONTROL_ExtInfoData};
+			(pFloat32)MEMBUF_EP_UgErr, (pFloat32)MEMBUF_EP_Ig, (pFloat32)MEMBUF_EP_Ut_Ch2, (pFloat32)&CONTROL_ExtInfoData};
 	
 	// Конфигурация сервиса работы DataTable и EEPROM
 	EPROMServiceConfig EPROMService = {(FUNC_EPROM_WriteValues)&NFLASH_WriteDT, (FUNC_EPROM_ReadValues)&NFLASH_ReadDT};
 	
-	// Инициализация DataTable
+	// Инициализация DataTable, DMA и АЦП
 	DT_Init(EPROMService, false);
+	INITCFG_ConfigADC();
+	INITCFG_ConfigDMA();
 
 	// Инициализация функций связанных с CAN NodeID
 	DT_SaveFirmwareInfo(CAN_SLAVE_NID, CAN_MASTER_NID);
@@ -405,7 +408,7 @@ void CONTROL_HandlePulse()
 				
 			case SS_GateVoltageProcess:
 				if(GATE_RegulatorStatusCheck(RS_InProcess))
-					Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME];
+					Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME_DELAY];
 
 				if(GATE_RegulatorStatusCheck(RS_TargetReached))
 				{
@@ -558,7 +561,7 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 
 bool CONTROL_IsSafetyEvent()
 {
-	return LL_GetSafetyState();
+	return (!DataTable[REG_MUTE_SAFETY]) ? LL_GetSafetyState() : FALSE;
 }
 //-----------------------------------------------
 
@@ -571,7 +574,8 @@ void CONTROL_FinishedWithProblem(Int16U Problem)
 
 void CONTROL_SafetyProcess()
 {
-	if(CONTROL_IsSafetyEvent() && CONTROL_State == DS_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge && SUB_State != SS_PowerOff)
+	if(CONTROL_IsSafetyEvent() && CONTROL_State == DS_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge
+			&& SUB_State != SS_PowerOff)
 	{
 		CONTROL_ResetHardware();
 		CONTROL_FinishedWithProblem(PROBLEM_SAFETY);

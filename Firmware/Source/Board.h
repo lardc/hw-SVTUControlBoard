@@ -24,7 +24,6 @@ GPIO_PortPinSettingMacro GPIO_MSR_IG				= {GPIOA, Pin_2};
 GPIO_PortPinSettingMacro GPIO_MSR_UT2				= {GPIOA, Pin_3};
 GPIO_PortPinSettingMacro GPIO_MSR_UT 				= {GPIOB, Pin_13};
 GPIO_PortPinSettingMacro GPIO_MSR_IT				= {GPIOB, Pin_12};
-GPIO_PortPinSettingMacro GPIO_IT_RANGE				= {GPIOB, Pin_14};
 
 // Определения для выходных портов
 GPIO_PortPinSettingMacro GPIO_LED 					= {GPIOA, Pin_8};
@@ -34,6 +33,7 @@ GPIO_PortPinSettingMacro GPIO_SYNC_OSC				= {GPIOA, Pin_15};
 GPIO_PortPinSettingMacro GPIO_AIN_ST				= {GPIOB, Pin_15};
 GPIO_PortPinSettingMacro GPIO_SYNC_LCSU				= {GPIOB, Pin_5};
 GPIO_PortPinSettingMacro GPIO_IND_CTRL				= {GPIOB, Pin_6};
+GPIO_PortPinSettingMacro GPIO_IT_RANGE				= {GPIOB, Pin_14};
 
 // Определения для выходных портов
 GPIO_PortPinSettingMacro GPIO_SAFETY				= {GPIOB, Pin_4};
