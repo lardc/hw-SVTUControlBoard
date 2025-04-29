@@ -28,6 +28,9 @@ Int16U FollowingErrorCounter = 0;
 Int16U RegulatorCounter = 0;
 Int16U GateValues_Counter = 0;
 float DelayInMeasure = 0;
+float DiagVoltThreshold = 0;
+float DiagCurrentThreshold = 0;
+Int16U DiagCounterThreshold = 0;
 
 // Forward functions
 Int16U GATE_ConvertUgToDAC(float Value);
@@ -95,7 +98,8 @@ void GATE_CacheVariables()
 	dUg = DataTable[REG_UG_SETPOINT]/(DataTable[REG_UG_EDGE_TIME] / TIMER2_uS);
 	RegulatorAlowedError = DataTable[REG_REGULATOR_ALLOWED_ERR];
 	FollowingErrorCounterMax = (Int16U)DataTable[REG_FOLLOWING_ERR_CNT];
-
+	DiagVoltThreshold = DataTable[REG_DIAG_U_LIMIT];
+	DiagCurrentThreshold = DataTable[REG_DIAG_I_LIMIT];
 	//
 	GateVoltage = 0;
 	RegulatorCounter = 0;
@@ -104,6 +108,8 @@ void GATE_CacheVariables()
 
 	//Умножение на 1000, чтобы преобразовать мс в мкс
 	DelayInMeasure = DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
+
+	DiagCounterThreshold = DataTable[REG_DIAG_DURATION] * 1000 / TIMER2_uS;
 
 	GATE_RegulatorState = RS_None;
 }
@@ -169,6 +175,37 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 	RegulatorCounter++;
 
 	GATE_SaveToEndpoints(VoltageSample, CurrentSample, RegulatorError);
+}
+//------------------------------------
+
+void GATE_Diagnostic(float VoltageSample, float CurrentSample)
+{
+	static Int16U DiagErrorCounter = 0;
+
+	if((VoltageSample < UT_MIN_VALUE * DiagVoltThreshold) && (CurrentSample > IT_MAX_VALUE * DiagCurrentThreshold))
+	{
+		if(DiagErrorCounter < DiagCounterThreshold)
+			DiagErrorCounter++;
+		if(DiagErrorCounter == DiagCounterThreshold)
+			DataTable[REG_PROBLEM] = PROBLEM_GATE_SHORT;
+	}
+
+	if((VoltageSample > UT_MAX_VALUE * DiagVoltThreshold) && (CurrentSample < IT_MIN_VALUE * DiagCurrentThreshold))
+	{
+		if(DiagErrorCounter < DiagCounterThreshold)
+			DiagErrorCounter++;
+		if(DiagErrorCounter == DiagCounterThreshold)
+			DataTable[REG_PROBLEM] = PROBLEM_GATE_CONNECTION;
+	}
+
+	if((VoltageSample > UT_MAX_VALUE * DiagVoltThreshold) && (CurrentSample < IT_MIN_VALUE * DiagCurrentThreshold))
+	{
+		if(DiagErrorCounter < DiagCounterThreshold)
+			DiagErrorCounter++;
+		if(DiagErrorCounter == DiagCounterThreshold)
+			DataTable[REG_PROBLEM] = PROBLEM_GATE_CLOSED;
+	}
+
 }
 //------------------------------------
 
