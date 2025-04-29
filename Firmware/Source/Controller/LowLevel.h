@@ -16,5 +16,6 @@ void LL_WriteDAC(Int16U Data);
 bool LL_GetSafetyState();
 void LL_SetItRange(bool Range);
 bool LL_ItGetRange();
+void LL_AnalogInputsDiagGate(bool State);
 
 #endif // __LOWLEVEL_H

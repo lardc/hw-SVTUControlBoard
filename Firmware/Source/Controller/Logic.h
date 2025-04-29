@@ -27,5 +27,6 @@ bool LOGIC_FinishProcess();
 
 void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, Int16U InputArraySize);
 void LOGIC_SaveResults();
+bool LOGIC_CheckResults();
 
 #endif //__LOGIC_H

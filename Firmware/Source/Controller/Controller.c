@@ -49,7 +49,6 @@ void CONTROL_HandlePowerOn();
 void CONTROL_HandlePulse();
 void CONTROL_HandlePowerOff();
 void CONTROL_SaveDataToEndpoint();
-void CONTROL_SaveResults();
 Int16U CONTROL_CheckSelfTestResults();
 bool CONTROL_IsSafetyEvent();
 void CONTROL_FinishedWithProblem(Int16U Problem);
@@ -472,7 +471,14 @@ void CONTROL_HandlePulse()
 			case SS_PostPulseCheck:
 				{
 					CONTROL_SaveDataToEndpoint();
-					CONTROL_SaveResults();
+					LOGIC_SaveResults();
+					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
+						if(LOGIC_CheckResults())
+						{
+							TIM_Stop(TIM15);
+							LL_AnalogInputsDiagGate(true);
+							GATE_StartProcess();
+						}
 
 					if(SelfTest)
 					{
@@ -525,12 +531,6 @@ void CONTROL_SaveDataToEndpoint()
 	LOGIC_SaveToEndpoint(MEMBUF_DMA_It, MEMBUF_EP_It, VALUES_POWER_DMA_SIZE);
 	LOGIC_SaveToEndpoint(MEMBUF_DMA_Ut2_UgIg, MEMBUF_EP_Ut_Ch2, VALUES_POWER_DMA_SIZE);
 	CONTROL_PowerValues_Counter = VALUES_x_SIZE;
-}
-//-----------------------------------------------
-
-void CONTROL_SaveResults()
-{
-	LOGIC_SaveResults();
 }
 //-----------------------------------------------
 

@@ -35,6 +35,8 @@ typedef struct __LCSUStructData
 //
 LCSUData LCSU_DataArray[LCSU_AMOUNT_MAX] = {0};
 static Int16U ActiveLCSUCounter = 0, CachedLCSUStartNid = 0, CachedLCSUMaxCurrent = 0;
+float UtResult = 0;
+float ItResult = 0;
 
 // Forward functions
 //
@@ -328,7 +330,7 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_SaveResults()
 {
-	float UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut, true);
+	UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut, true);
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
@@ -343,14 +345,26 @@ void LOGIC_SaveResults()
 			break;
 	}
 
-	float ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It, true);
+	ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It, true);
 	DataTable[REG_RESULT_IT] = ItResult;
 	DataTable[REG_RESULT_UG] = MEASURE_GateAverageVoltage();
 
-	if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
-		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
+	if(DataTable[REG_PCB_VERSION] == PCB_VERSION_10)
+	{
+		if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
+			DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
 
-	if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
+		if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
 			DataTable[REG_WARNING] = WARNING_CURRENT_OUT_OF_RANGE;
+	}
+}
+// ----------------------------------------
+
+bool LOGIC_CheckResults()
+{
+	if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE) || ((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE)))
+		return true;
+	else
+		return false;
 }
 // ----------------------------------------
