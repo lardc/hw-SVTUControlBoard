@@ -95,6 +95,7 @@ void GATE_CacheVariables()
 	dUg = DataTable[REG_UG_SETPOINT]/(DataTable[REG_UG_EDGE_TIME] / TIMER2_uS);
 	RegulatorAlowedError = DataTable[REG_REGULATOR_ALLOWED_ERR];
 	FollowingErrorCounterMax = (Int16U)DataTable[REG_FOLLOWING_ERR_CNT];
+
 	//
 	GateVoltage = 0;
 	RegulatorCounter = 0;

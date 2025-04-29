@@ -114,12 +114,16 @@
 #define REG_LCSU_COUNT_MAX				85	// Максимальное количество блоков LCSU в установке
 #define REG_SVTU_WAIT_FINISH_TIME		86	// Время ожидания завершения процесса (в мс)
 #define REG_PULSE_TIME_DELAY			87 	// Время начала пульсации(в мс)
+#define REG_DIAG_DURATION				88	// Длительность диагностического импульса(в мс)
+#define REG_DIAG_U_LIMIT				89	// Относительное пороговое значение напряжения для дигностики(в %)
+#define REG_DIAG_I_LIMIT				90	// Относительное пороговое значение сила тока для дигностики(в %)
 //
 #define REG_PCB_VERSION					120	// 0 - версия платы 1.0
 											// 1 - версия  2.0
 #define REG_PCB_TIRIS_IGBT				121	// 0 - версия платы с тиристором
 											// 1 - c IGBT
 #define REG_MUTE_SAFETY					122	// Игнорирование контура безопасности
+#define REG_DIAG_ACT					123	// Активация диагностического функционала
 
 // Несохраняемы регистры чтения-записи
 #define REG_IT_SETPOINT					128	// Уставка силового тока (в А)
@@ -215,6 +219,8 @@
 #define PROBLEM_SAFETY					2	// Сработала система безопасности
 #define PROBLEM_GATE_SHORT				3	// КЗ в цепи управления
 #define PROBLEM_GATE_VOLTAGE			4	// Проблема с формирователем напряжения управления
+#define PROBLEM_GATE_CONNECTION			5	// Нет соединения с DUT
+#define PROBLEM_GATE_CLOSED				6	// Проводник в запертом положении
 
 // User Errors
 #define ERR_NONE						0

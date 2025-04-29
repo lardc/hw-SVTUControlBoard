@@ -133,6 +133,18 @@
 #define PULSE_TIME_MAX				10		// в мс
 #define PULSE_TIME_DEF				1		// в мс
 #define PULSE_TIME_DELAY_DEF		3		// в мс
+//
+#define DIAG_TIME_MIN				5		// в мс
+#define DIAG_TIME_MAX				10		// в мс
+#define DIAG_TIME_DEF				5		// в мс
+//
+#define DIAG_U_THRESHOLD_MIN		1		// В %
+#define DIAG_U_THRESHOLD_MAX		100		// В %
+#define DIAG_U_THRESHOLD_DEF		15		// В %
+//
+#define DIAG_I_THRESHOLD_MIN		1		// В %
+#define DIAG_I_THRESHOLD_MAX		100		// В %
+#define DIAG_I_THRESHOLD_DEF		15		// В %
 
 // Types
 typedef struct __TableItemConstraint

@@ -91,9 +91,9 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{LCSU_AMOUNT_MIN, LCSU_AMOUNT_MAX, LCSU_AMOUNT_MIN},					// 85
 		{SVTU_WAIT_MIN, SVTU_WAIT_MAX, SVTU_WAIT_DEF},							// 86
 		{PULSE_TIME_MIN, PULSE_TIME_MAX, PULSE_TIME_DELAY_DEF},					// 87
-		{0, 0, 0},																// 88
-		{0, 0, 0},																// 89
-		{0, 0, 0},																// 90
+		{DIAG_TIME_MIN, DIAG_TIME_MAX, DIAG_TIME_DEF},							// 88
+		{DIAG_U_THRESHOLD_MIN, DIAG_U_THRESHOLD_MAX, DIAG_U_THRESHOLD_DEF},		// 89
+		{DIAG_I_THRESHOLD_MIN, DIAG_I_THRESHOLD_MAX, DIAG_I_THRESHOLD_DEF},		// 90
 		{0, 0, 0},																// 91
 		{0, 0, 0},																// 92
 		{0, 0, 0},																// 93
@@ -126,7 +126,7 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{PCB_VERSION_10, PCB_VERSION_20, PCB_VERSION_10},						// 120
 		{PCB_THYRIS, PCB_IGBT, PCB_THYRIS},										// 121
 		{NO, YES, NO},															// 122
-		{0, 0, 0},																// 123
+		{NO, YES, NO},															// 123
 		{0, 0, 0},																// 124
 		{0, 0, 0},																// 125
 		{0, 0, 0},																// 126
