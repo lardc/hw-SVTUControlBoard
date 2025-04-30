@@ -37,6 +37,12 @@ void LL_AnalogInputsDiagGate(bool State)
 }
 //------------------------------------
 
+bool LL_GetDiagState()
+{
+	return GPIO_GetState(GPIO_UGT_ST);
+}
+//------------------------------------
+
 void LL_ExtIndication(bool State)
 {
 	GPIO_SetState(GPIO_IND_CTRL, State);

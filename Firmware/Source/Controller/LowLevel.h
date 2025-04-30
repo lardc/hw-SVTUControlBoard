@@ -17,5 +17,6 @@ bool LL_GetSafetyState();
 void LL_SetItRange(bool Range);
 bool LL_ItGetRange();
 void LL_AnalogInputsDiagGate(bool State);
+bool LL_GetDiagState();
 
 #endif // __LOWLEVEL_H

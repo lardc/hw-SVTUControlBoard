@@ -5,7 +5,6 @@
 #include "DataTable.h"
 #include "Board.h"
 #include "Global.h"
-#include "DataTable.h"
 #include "DeviceObjectDictionary.h"
 #include "LowLevel.h"
 #include "Delay.h"
@@ -31,6 +30,8 @@ float DelayInMeasure = 0;
 float DiagVoltThreshold = 0;
 float DiagCurrentThreshold = 0;
 Int16U DiagCounterThreshold = 0;
+float DiagVoltage = 0;
+float DiagCurrent = 0;
 
 // Forward functions
 Int16U GATE_ConvertUgToDAC(float Value);
@@ -100,6 +101,9 @@ void GATE_CacheVariables()
 	FollowingErrorCounterMax = (Int16U)DataTable[REG_FOLLOWING_ERR_CNT];
 	DiagVoltThreshold = DataTable[REG_DIAG_U_LIMIT];
 	DiagCurrentThreshold = DataTable[REG_DIAG_I_LIMIT];
+	DiagVoltage = DataTable[REG_DIAG_U];
+	DiagCurrent = DataTable[REG_DIAG_I];
+
 	//
 	GateVoltage = 0;
 	RegulatorCounter = 0;
@@ -181,31 +185,31 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 {
 	static Int16U DiagErrorCounter = 0;
+	GATE_RegulatorState = RS_Diagnostic;
 
-	if((VoltageSample < UT_MIN_VALUE * DiagVoltThreshold) && (CurrentSample > IT_MAX_VALUE * DiagCurrentThreshold))
+	if((VoltageSample < DiagVoltage * DiagVoltThreshold) && (CurrentSample > DiagCurrent * DiagCurrentThreshold))
 	{
 		if(DiagErrorCounter < DiagCounterThreshold)
 			DiagErrorCounter++;
 		if(DiagErrorCounter == DiagCounterThreshold)
+		{
 			DataTable[REG_PROBLEM] = PROBLEM_GATE_SHORT;
+			DiagErrorCounter = 0;
+			GATE_RegulatorState = RS_GateProblem;
+		}
 	}
 
-	if((VoltageSample > UT_MAX_VALUE * DiagVoltThreshold) && (CurrentSample < IT_MIN_VALUE * DiagCurrentThreshold))
+	if((VoltageSample > DiagVoltage * DiagVoltThreshold) && (CurrentSample < DiagCurrent * DiagCurrentThreshold))
 	{
 		if(DiagErrorCounter < DiagCounterThreshold)
 			DiagErrorCounter++;
 		if(DiagErrorCounter == DiagCounterThreshold)
+		{
 			DataTable[REG_PROBLEM] = PROBLEM_GATE_CONNECTION;
+			DiagErrorCounter = 0;
+			GATE_RegulatorState = RS_GateProblem;
+		}
 	}
-
-	if((VoltageSample > UT_MAX_VALUE * DiagVoltThreshold) && (CurrentSample < IT_MIN_VALUE * DiagCurrentThreshold))
-	{
-		if(DiagErrorCounter < DiagCounterThreshold)
-			DiagErrorCounter++;
-		if(DiagErrorCounter == DiagCounterThreshold)
-			DataTable[REG_PROBLEM] = PROBLEM_GATE_CLOSED;
-	}
-
 }
 //------------------------------------
 
@@ -225,5 +229,20 @@ void GATE_SaveToEndpoints(float Voltage, float Current, float Error)
 bool GATE_RegulatorStatusCheck(RegulatorState State)
 {
 	return (GATE_RegulatorState == State) ? true : false;
+}
+//------------------------------------
+
+void GATE_RegulatorWorkingProcess(float VoltageSample, float CurrentSample)
+{
+	switch(LL_GetDiagState())
+	{
+		case true:
+			GATE_Diagnostic(VoltageSample, CurrentSample);
+			break;
+
+		case false:
+			GATE_RegulatorProcess(VoltageSample, CurrentSample);
+			break;
+	}
 }
 //------------------------------------

@@ -94,8 +94,8 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{DIAG_TIME_MIN, DIAG_TIME_MAX, DIAG_TIME_DEF},							// 88
 		{DIAG_U_THRESHOLD_MIN, DIAG_U_THRESHOLD_MAX, DIAG_U_THRESHOLD_DEF},		// 89
 		{DIAG_I_THRESHOLD_MIN, DIAG_I_THRESHOLD_MAX, DIAG_I_THRESHOLD_DEF},		// 90
-		{0, 0, 0},																// 91
-		{0, 0, 0},																// 92
+		{DIAG_U_MIN, DIAG_U_MAX, DIAG_U_DEF},									// 91
+		{DIAG_I_MIN, DIAG_I_MAX, DIAG_I_DEF},									// 92
 		{0, 0, 0},																// 93
 		{0, 0, 0},																// 94
 		{0, 0, 0},																// 95

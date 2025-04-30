@@ -472,13 +472,36 @@ void CONTROL_HandlePulse()
 				{
 					CONTROL_SaveDataToEndpoint();
 					LOGIC_SaveResults();
-					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
+					bool DiagProcess = false;
+					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT] && !DiagProcess)
 						if(LOGIC_CheckResults())
 						{
 							TIM_Stop(TIM15);
 							LL_AnalogInputsDiagGate(true);
+							Timeout = CONTROL_TimeCounter + DataTable[REG_DIAG_DURATION];
 							GATE_StartProcess();
+							DiagProcess = true;
 						}
+
+					if(DiagProcess && (CONTROL_TimeCounter >= Timeout))
+					{
+						GATE_StopProcess();
+						LL_AnalogInputsDiagGate(false);
+						TIM_Start(TIM15);
+						DiagProcess = false;
+
+						if (GATE_RegulatorStatusCheck(RS_GateProblem))
+						{
+							CONTROL_ResetHardware();
+							CONTROL_SetDeviceState(DS_Ready, SS_None);
+							DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
+						}
+						else
+						{
+							CONTROL_SetDeviceState(DS_Ready, SS_None);
+							DataTable[REG_OP_RESULT] = OPRESULT_OK;
+						}
+					}
 
 					if(SelfTest)
 					{
@@ -491,7 +514,6 @@ void CONTROL_HandlePulse()
 						{
 							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
 							CONTROL_SwitchToFault(SelfTestResult);
-							break;
 						}
 						else
 						{
@@ -499,10 +521,12 @@ void CONTROL_HandlePulse()
 							CONTROL_SetDeviceState(DS_Ready, SS_None);
 						}
 					}
-					else
-						DataTable[REG_OP_RESULT] = OPRESULT_OK;
 
-					CONTROL_SetDeviceState(DS_Ready, SS_None);
+					if(!DataTable[REG_DIAG_ACT])
+					{
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+						DataTable[REG_OP_RESULT] = OPRESULT_OK;
+					}
 				}
 				break;
 
