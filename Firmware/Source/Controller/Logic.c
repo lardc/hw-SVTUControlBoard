@@ -35,8 +35,8 @@ typedef struct __LCSUStructData
 //
 LCSUData LCSU_DataArray[LCSU_AMOUNT_MAX] = {0};
 static Int16U ActiveLCSUCounter = 0, CachedLCSUStartNid = 0, CachedLCSUMaxCurrent = 0;
-float UtResult = 0;
-float ItResult = 0;
+float volatile UtResult = 0;
+float volatile ItResult = 0;
 
 // Forward functions
 //

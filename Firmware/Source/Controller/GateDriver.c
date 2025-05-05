@@ -29,7 +29,7 @@ Int16U GateValues_Counter = 0;
 float DelayInMeasure = 0;
 float DiagVoltThreshold = 0;
 float DiagCurrentThreshold = 0;
-Int16U DiagCounterThreshold = 0;
+float DiagCounterThreshold = 0;
 float DiagVoltage = 0;
 float DiagCurrent = 0;
 
@@ -99,8 +99,8 @@ void GATE_CacheVariables()
 	dUg = DataTable[REG_UG_SETPOINT]/(DataTable[REG_UG_EDGE_TIME] / TIMER2_uS);
 	RegulatorAlowedError = DataTable[REG_REGULATOR_ALLOWED_ERR];
 	FollowingErrorCounterMax = (Int16U)DataTable[REG_FOLLOWING_ERR_CNT];
-	DiagVoltThreshold = DataTable[REG_DIAG_U_LIMIT];
-	DiagCurrentThreshold = DataTable[REG_DIAG_I_LIMIT];
+	DiagVoltThreshold = DataTable[REG_DIAG_U_LIMIT]*0.01f;
+	DiagCurrentThreshold = DataTable[REG_DIAG_I_LIMIT]*0.01f;
 	DiagVoltage = DataTable[REG_DIAG_U];
 	DiagCurrent = DataTable[REG_DIAG_I];
 
