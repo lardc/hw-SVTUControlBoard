@@ -11,7 +11,8 @@ typedef enum __RegulatorState
 	RS_FollowingError	= 3,
 	RS_GateShort		= 4,
 	RS_Diagnostic		= 5,
-	RS_GateProblem		= 6
+	RS_DiagShort		= 6,
+	RS_DiagDisconnected = 7
 } RegulatorState;
 
 // Variables

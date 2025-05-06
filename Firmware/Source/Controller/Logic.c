@@ -330,7 +330,10 @@ void LOGIC_GetResults(float *UtResult, float *UtCh2Result, float *ItResult)
 {
 	*UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut, true);
 	if((Int16U)DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
+	{
 		*UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg, false);
+		*UtResult = *UtResult > (Int16U)DataTable[REG_UT_MAX] ? *UtCh2Result : *UtResult;
+	}
 	*ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It, true);
 }
 // ----------------------------------------
@@ -345,22 +348,12 @@ void LOGIC_SaveResults(float UtResult, float UtCh2Result, float ItResult)
 			break;
 
 		case PCB_VERSION_20:
-			UtResult = UtResult > (Int16U)DataTable[REG_UT_MAX] ? UtCh2Result : UtResult;
 			DataTable[REG_RESULT_UT] = UtResult;
 			break;
 	}
 
 	DataTable[REG_RESULT_IT] = ItResult;
 	DataTable[REG_RESULT_UG] = MEASURE_GateAverageVoltage();
-
-	if(DataTable[REG_PCB_VERSION] == PCB_VERSION_10)
-	{
-		if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
-			DataTable[REG_WARNING] = PROBLEM_VOLTAGE_OUT_OF_RANGE;
-
-		if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
-			DataTable[REG_WARNING] = PROBLEM_CURRENT_OUT_OF_RANGE;
-	}
 }
 // ----------------------------------------
 

@@ -338,6 +338,7 @@ void CONTROL_HandlePowerOn()
 
 void CONTROL_HandlePulse()
 {
+	float UtResult, UtCh2Result, ItResult;
 	static Int64U Timeout = 0;
 	
 	if(CONTROL_State == DS_InProcess)
@@ -459,7 +460,7 @@ void CONTROL_HandlePulse()
 				if(CONTROL_TimeCounter < CONTROL_Timeout)
 				{
 					if(LOGIC_FinishProcess())
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheckStart);
 				}
 				else
 				{
@@ -468,68 +469,91 @@ void CONTROL_HandlePulse()
 				}
 				break;
 
-			case SS_PostPulseCheck:
+			case SS_PostPulseCheckStart:
 				{
 					CONTROL_SaveDataToEndpoint();
-					float UtResult, UtCh2Result, ItResult;
 					LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult);
-					LOGIC_SaveResults(UtResult, UtCh2Result, ItResult);
-					bool DiagProcess = false;
-					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT] && !DiagProcess)
+
+					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
+					{
 						if(LOGIC_CheckResults(UtResult))
 						{
 							TIM_Stop(TIM15);
+							GATE_RegulatorState = RS_Diagnostic;
 							LL_AnalogInputsDiagGate(true);
 							Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
 							GATE_StartProcess();
-							DiagProcess = true;
-						}
-
-					if(DiagProcess && (CONTROL_TimeCounter >= Timeout))
-					{
-						GATE_StopProcess();
-						LL_AnalogInputsDiagGate(false);
-						TIM_Start(TIM15);
-						DiagProcess = false;
-
-						if (GATE_RegulatorStatusCheck(RS_GateProblem))
-						{
-							CONTROL_ResetHardware();
-							CONTROL_SetDeviceState(DS_Ready, SS_None);
-							DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
+							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheckProcess);
 						}
 						else
-						{
-							CONTROL_SetDeviceState(DS_Ready, SS_None);
-							DataTable[REG_OP_RESULT] = OPRESULT_OK;
-						}
+							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheckFinish);
 					}
+					else
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheckFinish);
+				}
+				break;
 
-					if(SelfTest)
+			case SS_PostPulseCheckProcess:
+				if(CONTROL_TimeCounter >= Timeout)
+				{
+					GATE_StopProcess();
+					LL_AnalogInputsDiagGate(false);
+					TIM_Start(TIM15);
+
+					if(GATE_RegulatorStatusCheck(RS_DiagDisconnected))
 					{
-						SelfTest = false;
-						LL_AnalogInputsSelftTest(SelfTest);
-
-						Int16U SelfTestResult = CONTROL_CheckSelfTestResults();
-
-						if(SelfTestResult)
-						{
-							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
-							CONTROL_SwitchToFault(SelfTestResult);
-						}
-						else
-						{
-							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_OK;
-							CONTROL_SetDeviceState(DS_Ready, SS_None);
-						}
-					}
-
-					if(!DataTable[REG_DIAG_ACT])
-					{
+						CONTROL_ResetHardware();
+						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_LINE_DISCON);
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
-						DataTable[REG_OP_RESULT] = OPRESULT_OK;
+					}
+					else if(GATE_RegulatorStatusCheck(RS_DiagShort))
+					{
+						CONTROL_ResetHardware();
+						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_SHORT);
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+					else
+					{
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheckFinish);
 					}
 				}
+				break;
+
+			case SS_PostPulseCheckFinish:
+				if(SelfTest)
+				{
+					SelfTest = false;
+					LL_AnalogInputsSelftTest(SelfTest);
+
+					Int16U SelfTestResult = CONTROL_CheckSelfTestResults();
+
+					if(SelfTestResult)
+					{
+						DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
+						CONTROL_SwitchToFault(SelfTestResult);
+					}
+					else
+					{
+						DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_OK;
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+				}
+				if(DataTable[REG_PCB_VERSION] == PCB_VERSION_10)
+				{
+					if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
+					{
+						CONTROL_FinishedWithProblem(PROBLEM_VOLTAGE_OUT_OF_RANGE);
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+					if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
+					{
+						CONTROL_FinishedWithProblem(PROBLEM_CURRENT_OUT_OF_RANGE);
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+				}
+				LOGIC_SaveResults(UtResult, UtCh2Result, ItResult);
+				CONTROL_SetDeviceState(DS_Ready, SS_None);
+				DataTable[REG_OP_RESULT] = OPRESULT_OK;
 				break;
 
 			default:

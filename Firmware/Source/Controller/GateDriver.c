@@ -10,6 +10,7 @@
 #include "Delay.h"
 #include "math.h"
 #include "MemBuffers.h"
+#include "Controller.h"
 
 // Variables
 //
@@ -185,7 +186,6 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 {
 	static Int16U DiagErrorCounter = 0;
-	GATE_RegulatorState = RS_Diagnostic;
 
 	if((VoltageSample < DiagVoltage * DiagVoltThreshold) && (CurrentSample > DiagCurrent * DiagCurrentThreshold))
 	{
@@ -193,9 +193,8 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 			DiagErrorCounter++;
 		if(DiagErrorCounter == DiagCounterThreshold)
 		{
-			DataTable[REG_PROBLEM] = PROBLEM_EXT_DIAG_SHORT;
 			DiagErrorCounter = 0;
-			GATE_RegulatorState = RS_GateProblem;
+			GATE_RegulatorState = RS_DiagShort;
 		}
 	}
 
@@ -205,9 +204,8 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 			DiagErrorCounter++;
 		if(DiagErrorCounter == DiagCounterThreshold)
 		{
-			DataTable[REG_PROBLEM] = PROBLEM_EXT_DIAG_LINE_DISCON;
 			DiagErrorCounter = 0;
-			GATE_RegulatorState = RS_GateProblem;
+			GATE_RegulatorState = RS_DiagDisconnected;
 		}
 	}
 }
@@ -234,15 +232,9 @@ bool GATE_RegulatorStatusCheck(RegulatorState State)
 
 void GATE_RegulatorWorkingProcess(float VoltageSample, float CurrentSample)
 {
-	switch(LL_GetDiagState())
-	{
-		case true:
-			GATE_Diagnostic(VoltageSample, CurrentSample);
-			break;
-
-		case false:
-			GATE_RegulatorProcess(VoltageSample, CurrentSample);
-			break;
-	}
+	if(GATE_RegulatorStatusCheck(RS_Diagnostic))
+		GATE_Diagnostic(VoltageSample, CurrentSample);
+	else
+		GATE_RegulatorProcess(VoltageSample, CurrentSample);
 }
 //------------------------------------
