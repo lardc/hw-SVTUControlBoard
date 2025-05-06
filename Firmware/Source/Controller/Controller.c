@@ -471,14 +471,16 @@ void CONTROL_HandlePulse()
 			case SS_PostPulseCheck:
 				{
 					CONTROL_SaveDataToEndpoint();
-					LOGIC_SaveResults();
+					float UtResult, UtCh2Result, ItResult;
+					LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult);
+					LOGIC_SaveResults(UtResult, UtCh2Result, ItResult);
 					bool DiagProcess = false;
 					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT] && !DiagProcess)
-						if(LOGIC_CheckResults())
+						if(LOGIC_CheckResults(UtResult))
 						{
 							TIM_Stop(TIM15);
 							LL_AnalogInputsDiagGate(true);
-							Timeout = CONTROL_TimeCounter + DataTable[REG_DIAG_DURATION];
+							Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
 							GATE_StartProcess();
 							DiagProcess = true;
 						}

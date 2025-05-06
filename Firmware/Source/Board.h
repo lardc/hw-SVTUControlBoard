@@ -34,7 +34,7 @@ GPIO_PortPinSettingMacro GPIO_AIN_ST				= {GPIOB, Pin_15};
 GPIO_PortPinSettingMacro GPIO_SYNC_LCSU				= {GPIOB, Pin_5};
 GPIO_PortPinSettingMacro GPIO_IND_CTRL				= {GPIOB, Pin_6};
 GPIO_PortPinSettingMacro GPIO_IT_RANGE				= {GPIOB, Pin_14};
-GPIO_PortPinSettingMacro GPIO_UGT_ST				= {GPIOB, Pin_10};
+GPIO_PortPinSettingMacro GPIO_UGT_SELF_TEST			= {GPIOB, Pin_10};
 
 // Определения для выходных портов
 GPIO_PortPinSettingMacro GPIO_SAFETY				= {GPIOB, Pin_4};

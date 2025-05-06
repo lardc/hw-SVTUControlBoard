@@ -146,13 +146,13 @@
 #define DIAG_I_THRESHOLD_MAX		100		// В %
 #define DIAG_I_THRESHOLD_DEF		15		// В %
 //
-#define DIAG_I_MIN					5 		// в А
-#define DIAG_I_MAX					30	 	// в А
-#define DIAG_I_DEF					20		// в A
+#define EXT_DIAG_I_REF_MIN			5 		// в А
+#define EXT_DIAG_I_REF_MAX			30	 	// в А
+#define EXT_DIAG_I_REF_DEF			20		// в A
 //
-#define DIAG_U_MIN					5 		// в В
-#define DIAG_U_MAX					30	 	// в В
-#define DIAG_U_DEF					20		// в В
+#define EXT_DIAG_U_REF_MIN	 		5 		// в В
+#define EXT_DIAG_U_REF_MAX			30	 	// в В
+#define EXT_DIAG_U_REF_DEF			20		// в В
 
 // Types
 typedef struct __TableItemConstraint

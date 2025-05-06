@@ -114,11 +114,11 @@
 #define REG_LCSU_COUNT_MAX				85	// Максимальное количество блоков LCSU в установке
 #define REG_SVTU_WAIT_FINISH_TIME		86	// Время ожидания завершения процесса (в мс)
 #define REG_PULSE_TIME_DELAY			87 	// Время начала пульсации(в мс)
-#define REG_DIAG_DURATION				88	// Длительность диагностического импульса(в мс)
-#define REG_DIAG_U_LIMIT				89	// Относительное пороговое значение напряжения для диагностики(в %)
-#define REG_DIAG_I_LIMIT				90	// Относительное пороговое значение сила тока для диагностики(в %)
-#define REG_DIAG_U						91	// Значение напряжения с которым идет сравнение в процессе диагностики
-#define REG_DIAG_I						92	// Значение силы тока с которым идет сравнение в процессе диагностики
+#define REG_EXT_DIAG_DURATION			88	// Длительность диагностического импульса(в мс)
+#define REG_EXT_DIAG_U_THRESHOLD		89	// Относительное пороговое значение напряжения для диагностики(в %)
+#define REG_EXT_DIAG_I_THRESHOLD		90	// Относительное пороговое значение сила тока для диагностики(в %)
+#define REG_EXT_DIAG_U_REF				91	// Значение напряжения с которым идет сравнение в процессе диагностики (в мВ)
+#define REG_EXT_DIAG_I_REF				92	// Значение силы тока с которым идет сравнение в процессе диагностики (в мА)
 //
 #define REG_PCB_VERSION					120	// 0 - версия платы 1.0
 											// 1 - версия  2.0
@@ -212,8 +212,6 @@
 
 // Warning
 #define WARNING_NONE					0	// Предупреждений нет
-#define WARNING_VOLTAGE_OUT_OF_RANGE	1	// Измеренное напряжение вне рабочего диапазона
-#define WARNING_CURRENT_OUT_OF_RANGE	2	// Измеренный ток вне рабочего диапазона
 
 // Problem
 #define PROBLEM_NONE					0
@@ -221,8 +219,11 @@
 #define PROBLEM_SAFETY					2	// Сработала система безопасности
 #define PROBLEM_GATE_SHORT				3	// КЗ в цепи управления
 #define PROBLEM_GATE_VOLTAGE			4	// Проблема с формирователем напряжения управления
-#define PROBLEM_GATE_CONNECTION			5	// Нет соединения с DUT
-#define PROBLEM_GATE_CLOSED				6	// Проводник в запертом положении
+#define PROBLEM_EXT_DIAG_LINE_DISCON	5	// Нет соединения с DUT
+#define PROBLEM_EXT_DIAG_CLOSED_SWITCH	6	// Проводник в запертом положении
+#define PROBLEM_EXT_DIAG_SHORT			7	// КЗ в цепи измерения
+#define PROBLEM_VOLTAGE_OUT_OF_RANGE	8	// Измеренное напряжение вне рабочего диапазона (только для платы 1.0)
+#define PROBLEM_CURRENT_OUT_OF_RANGE	9	// Измеренный ток вне рабочего диапазона (только для платы 1.0)
 
 // User Errors
 #define ERR_NONE						0

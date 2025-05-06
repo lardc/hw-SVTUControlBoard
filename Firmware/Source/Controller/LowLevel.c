@@ -33,13 +33,13 @@ void LL_AnalogInputsSelftTest(bool State)
 
 void LL_AnalogInputsDiagGate(bool State)
 {
-	GPIO_SetState(GPIO_UGT_ST, State);
+	GPIO_SetState(GPIO_UGT_SELF_TEST, State);
 }
 //------------------------------------
 
 bool LL_GetDiagState()
 {
-	return GPIO_GetState(GPIO_UGT_ST);
+	return GPIO_GetState(GPIO_UGT_SELF_TEST);
 }
 //------------------------------------
 
