@@ -340,7 +340,6 @@ void LOGIC_GetResults(float *UtResult, float *UtCh2Result, float *ItResult)
 
 void LOGIC_SaveResults(float UtResult, float UtCh2Result, float ItResult)
 {
-	UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut, true);
 	switch((Int16U)DataTable[REG_PCB_VERSION])
 	{
 		case PCB_VERSION_10:
