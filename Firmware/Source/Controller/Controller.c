@@ -460,7 +460,7 @@ void CONTROL_HandlePulse()
 				if(CONTROL_TimeCounter < CONTROL_Timeout)
 				{
 					if(LOGIC_FinishProcess())
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheckStart);
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseConfig);
 				}
 				else
 				{
@@ -469,7 +469,7 @@ void CONTROL_HandlePulse()
 				}
 				break;
 
-			case SS_PostPulseCheckStart:
+			case SS_PostPulseConfig:
 				{
 					CONTROL_SaveDataToEndpoint();
 					LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult);
@@ -483,17 +483,17 @@ void CONTROL_HandlePulse()
 							LL_AnalogInputsDiagGate(true);
 							Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
 							GATE_StartProcess();
-							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheckProcess);
+							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseProcess);
 						}
 						else
-							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheckFinish);
+							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 					}
 					else
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheckFinish);
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 				}
 				break;
 
-			case SS_PostPulseCheckProcess:
+			case SS_PostPulseProcess:
 				if(CONTROL_TimeCounter >= Timeout)
 				{
 					GATE_StopProcess();
@@ -514,12 +514,12 @@ void CONTROL_HandlePulse()
 					}
 					else
 					{
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheckFinish);
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 					}
 				}
 				break;
 
-			case SS_PostPulseCheckFinish:
+			case SS_PostPulseSaveResults:
 				if(SelfTest)
 				{
 					SelfTest = false;
