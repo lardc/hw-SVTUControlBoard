@@ -460,7 +460,7 @@ void CONTROL_HandlePulse()
 				if(CONTROL_TimeCounter < CONTROL_Timeout)
 				{
 					if(LOGIC_FinishProcess())
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseConfig);
+						CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
 				}
 				else
 				{
@@ -469,7 +469,7 @@ void CONTROL_HandlePulse()
 				}
 				break;
 
-			case SS_PostPulseConfig:
+			case SS_CheckResultAndPostPulseConfig:
 				{
 					CONTROL_SaveDataToEndpoint();
 					LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult);

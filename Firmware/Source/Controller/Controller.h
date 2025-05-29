@@ -39,7 +39,7 @@ typedef enum __SubState
 	SS_GateVoltageProcess = 7,
 	SS_CurrentPulseStart = 8,
 	SS_WaitFinishProcess = 9,
-	SS_PostPulseConfig = 10,
+	SS_CheckResultAndPostPulseConfig = 10,
 	SS_PostPulseProcess = 11,
 	SS_PostPulseSaveResults = 12,
 
