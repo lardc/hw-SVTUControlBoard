@@ -42,6 +42,10 @@ bool DIAG_HandleDiagnosticAction(Int16U ActionID, Int16U *pUserError)
 		DELAY_MS(500);
 		LL_ExtIndication(false);
 		break;
+
+	case ACT_DBG_IT_RANGE:
+		LL_SetItRange(DataTable[REG_DBG]);
+		break;
 			
 		default:
 			return false;

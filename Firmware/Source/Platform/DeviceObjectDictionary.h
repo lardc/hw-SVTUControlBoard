@@ -12,6 +12,7 @@
 #define ACT_DBG_VIN_ST					12	// Переключение канала напряжения в режим самотестирования
 #define ACT_DBG_PULSE_SYNC_LCSU			13	// Импульс синхронизации LCSU
 #define ACT_DBG_EXT_INDICATION			14	// Управление внешней индикацией
+#define ACT_DBG_IT_RANGE				15	// Включение оптопары при измерении тока Id
 //
 #define ACT_START_TEST					100	// Запуск процесса измерения
 #define ACT_STOP_TEST					101	// Остановка процесса измерения
