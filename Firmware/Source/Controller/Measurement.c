@@ -139,7 +139,7 @@ float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary, bool Timer
 
 	if(TimerConversion)
 	{
-		StartIndex = DataTable[REG_PULSE_DURATION] * 1000 * TIMER2_uS / TIMER1_uS;
+		StartIndex = DataTable[REG_PULSE_DURATION] * 1000 / TIMER1_uS;
 		Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
 	}
 	else
@@ -156,7 +156,7 @@ float MEASURE_ExtractAverageValues(pFloat32 InputArray, Int16U StartAverage, Int
 	float SumArray = 0;
 
 	for (int i = StartAverage; i < (StartAverage + Points); i++)
-		SumArray += *(InputArray + i);
+		SumArray += InputArray[i];
 
 	return (SumArray / Points);
 }
