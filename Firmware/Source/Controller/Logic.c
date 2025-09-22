@@ -353,6 +353,7 @@ void LOGIC_SaveResults(float UtResult, float UtCh2Result, float ItResult)
 
 	DataTable[REG_RESULT_IT] = ItResult;
 	DataTable[REG_RESULT_UG] = MEASURE_GateAverageVoltage();
+	DataTable[REG_RESULT_IG] = MEASURE_GateAverageCurrent();
 }
 // ----------------------------------------
 

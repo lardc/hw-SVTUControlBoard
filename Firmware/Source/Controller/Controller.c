@@ -115,6 +115,7 @@ void CONTROL_ResetData()
 	DataTable[REG_RESULT_UT] = 0;
 	DataTable[REG_RESULT_IT] = 0;
 	DataTable[REG_RESULT_UG] = 0;
+	DataTable[REG_RESULT_IG] = 0;
 
 	DataTable[REG_BHL_ERROR_CODE] = 0;
 	DataTable[REG_BHL_DEVICE] = 0;

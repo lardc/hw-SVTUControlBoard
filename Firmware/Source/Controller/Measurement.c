@@ -133,6 +133,18 @@ float MEASURE_GateAverageVoltage()
 }
 //------------------------------------
 
+float MEASURE_GateAverageCurrent()
+{
+	Int16U StartIndex, Points;
+
+	//Умножение на 1000, чтобы преобразовать мс в мкс
+	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS - DataTable[REG_MSR_TIME];
+	Points = DataTable[REG_MSR_TIME];
+
+	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Ig, StartIndex, Points);
+}
+//------------------------------------
+
 float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary, bool TimerConversion)
 {
 	Int16U StartIndex, Points;
