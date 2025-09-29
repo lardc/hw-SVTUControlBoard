@@ -152,11 +152,11 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 	{
 		FollowingErrorCounter++;
 
-		if(FollowingErrorCounter >= FollowingErrorCounterMax && !DataTable[REG_FOLLOWING_ERR_MUTE])
-				GATE_RegulatorState = RS_FollowingError;
-
 		if(CurrentSample >= DataTable[REG_IG_THRESHOLD])
 				GATE_RegulatorState = RS_GateShort;
+
+		else if(FollowingErrorCounter >= FollowingErrorCounterMax && !DataTable[REG_FOLLOWING_ERR_MUTE])
+				GATE_RegulatorState = RS_FollowingError;
 	}
 
 	Qi += RegulatorError * RegulatorQi;

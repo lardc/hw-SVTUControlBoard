@@ -80,7 +80,7 @@
 #define REG_REGULATOR_QP				33	// Пропорциональный коэффициент регулятора
 #define REG_REGULATOR_QI				34	// Интегральный коэффициент регулятора
 #define REG_REGULATOR_QI_MAX			35	// Максимальное значение интегрального коэффициента регулятора
-#define REG_REGULATOR_ALLOWED_ERR		36	// Максимально допустимая ошибка регулятора
+#define REG_REGULATOR_ALLOWED_ERR		36	// Максимально допустимая ошибка регулятора (в %)
 #define REG_FOLLOWING_ERR_CNT			37	// Максимальное значение счетчика FollowingError
 #define REG_FOLLOWING_ERR_MUTE			38	// Выключение слежения за FollowingError
 //
@@ -91,7 +91,7 @@
 #define REG_LAMP_CTRL					43	// Запрет управление блоком внешнего индикатора
 #define REG_R_SHUNT						44	// Сопротивление шунта (в мкОм)
 #define REG_I_R0_THRESHOLD				45	// Граница нижнего диапазона тока (в А)
-#define REG_IG_THRESHOLD				46	// Значение тока Ig при выставлении PROBLEM_GATE_SHORT
+#define REG_IG_THRESHOLD				46	// Значение тока Ig при выставлении PROBLEM_GATE_SHORT (мА)
 #define REG_MSR_DELAY					47	// Задержка измерения Uce, Ice (в тиках)
 #define REG_MSR_TIME					48	// Время измерения Uce, Ice (в тиках)
 #define REG_EMULATION					49  // Включение режима эмуляции
