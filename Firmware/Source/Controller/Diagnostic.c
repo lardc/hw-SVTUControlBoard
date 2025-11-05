@@ -46,6 +46,10 @@ bool DIAG_HandleDiagnosticAction(Int16U ActionID, Int16U *pUserError)
 	case ACT_DBG_IT_RANGE:
 		LL_SetItRange(DataTable[REG_DBG]);
 		break;
+
+	case ACT_DBG_UG_ST:
+		LL_AnalogInputsDiagGate(DataTable[REG_DBG]);
+		break;
 			
 		default:
 			return false;
