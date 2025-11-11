@@ -176,7 +176,11 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 	if(IsImpulse)
 	{
 		if(RegulatorCounter >= SyncDelayCounter)
+		{
 			LL_SyncScope(true);
+			LL_SyncLCSU(false);
+			IsImpulse = false;
+		}
 	}
 	else
 		SyncDelayCounter = RegulatorCounter + DelayInMeasure;

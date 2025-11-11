@@ -289,8 +289,6 @@ bool LOGIC_FinishProcess()
 
 		TIM_Stop(TIM7);
 
-		IsImpulse = false;
-		LL_SyncLCSU(false);
 		LL_SyncScope(false);
 		GATE_StopProcess();
 

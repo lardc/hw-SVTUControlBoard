@@ -617,15 +617,14 @@ bool CONTROL_IsSafetyEvent()
 {
 	if (DataTable[REG_MUTE_SAFETY])
 	{
-		LL_SetSafetyState(true);
+		LL_SetSafetyState(false);
 		return false;
 	}
 	else
 	{
-		LL_SetSafetyState(false);
+		LL_SetSafetyState(true);
 		return LL_GetSafetyState();
 	}
-	return (!DataTable[REG_MUTE_SAFETY]) ? LL_GetSafetyState() : FALSE;
 }
 //-----------------------------------------------
 

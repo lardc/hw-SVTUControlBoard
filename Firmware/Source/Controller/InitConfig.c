@@ -59,6 +59,9 @@ void INITCFG_ConfigGPIO()
 	GPIO_InitAltFunction(GPIO_ALT_CAN_TX, AltFn_9);
 	GPIO_InitAltFunction(GPIO_ALT_UART_RX, AltFn_7);
 	GPIO_InitAltFunction(GPIO_ALT_UART_TX, AltFn_7);
+
+	// Выходы с OpenDrain
+	GPIO_InitOpenDrainOutput(GPIO_SAFETY, NoPull);
 }
 //------------------------------------
 
