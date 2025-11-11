@@ -28,7 +28,7 @@ bool DIAG_HandleDiagnosticAction(Int16U ActionID, Int16U *pUserError)
 		break;
 
 	case ACT_DBG_VIN_ST:
-		LL_AnalogInputsSelftTest(DataTable[REG_DBG]);
+		LL_AnalogInputsSelfTest(DataTable[REG_DBG]);
 		break;
 
 	case ACT_DBG_PULSE_SYNC_LCSU:

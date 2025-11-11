@@ -347,7 +347,7 @@ void LOGIC_SaveResults(float UtResult, float UtCh2Result, float ItResult)
 			break;
 
 		case PCB_VERSION_20:
-			DataTable[REG_RESULT_UT] = UtResult;
+			DataTable[REG_RESULT_UT] = UtCh2Result;
 			break;
 	}
 

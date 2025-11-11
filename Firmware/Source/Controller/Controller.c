@@ -131,7 +131,7 @@ void CONTROL_ResetHardware()
 {
 	LL_SyncLCSU(false);
 	LL_SyncScope(false);
-	LL_AnalogInputsSelftTest(false);
+	LL_AnalogInputsSelfTest(false);
 	LL_ExtIndication(false);
 	LL_SetItRange(false);
 	GATE_StopProcess();
@@ -339,7 +339,7 @@ void CONTROL_HandlePowerOn()
 
 void CONTROL_HandlePulse()
 {
-	float UtResult, UtCh2Result, ItResult;
+	static float UtResult, UtCh2Result, ItResult;
 	static Int64U Timeout = 0;
 	
 	if(CONTROL_State == DS_InProcess)
@@ -349,6 +349,7 @@ void CONTROL_HandlePulse()
 			case SS_PulseInit:
 				{
 					CONTROL_ResetData();
+					UtResult = UtCh2Result = ItResult = 0.0f;
 
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
@@ -372,7 +373,7 @@ void CONTROL_HandlePulse()
 					{
 						bool NoError = false;
 						LOGIC_SelectCurrentRange(CurrentAmplitude);
-						LL_AnalogInputsSelftTest(SelfTest);
+						LL_AnalogInputsSelfTest(SelfTest);
 						
 						if(LOGIC_WriteLCSUConfig())
 						{
@@ -482,6 +483,7 @@ void CONTROL_HandlePulse()
 							TIM_Stop(TIM15);
 							GATE_RegulatorState = RS_Diagnostic;
 							LL_AnalogInputsDiagGate(true);
+							LL_AnalogInputsSelfTest(true);
 							Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
 							GATE_StartProcess();
 							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseProcess);
@@ -499,6 +501,7 @@ void CONTROL_HandlePulse()
 				{
 					GATE_StopProcess();
 					LL_AnalogInputsDiagGate(false);
+					LL_AnalogInputsSelfTest(false);
 					TIM_Start(TIM15);
 
 					if(GATE_RegulatorStatusCheck(RS_DiagDisconnected))
@@ -524,7 +527,7 @@ void CONTROL_HandlePulse()
 				if(SelfTest)
 				{
 					SelfTest = false;
-					LL_AnalogInputsSelftTest(SelfTest);
+					LL_AnalogInputsSelfTest(SelfTest);
 
 					Int16U SelfTestResult = CONTROL_CheckSelfTestResults();
 
@@ -612,6 +615,16 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 
 bool CONTROL_IsSafetyEvent()
 {
+	if (DataTable[REG_MUTE_SAFETY])
+	{
+		LL_SetSafetyState(true);
+		return false;
+	}
+	else
+	{
+		LL_SetSafetyState(false);
+		return LL_GetSafetyState();
+	}
 	return (!DataTable[REG_MUTE_SAFETY]) ? LL_GetSafetyState() : FALSE;
 }
 //-----------------------------------------------
