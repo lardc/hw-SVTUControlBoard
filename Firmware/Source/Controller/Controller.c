@@ -555,7 +555,7 @@ void CONTROL_HandlePulse()
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					}
 				}
-				LOGIC_SaveResults(UtResult, UtCh2Result, ItResult);
+				LOGIC_SaveResults(UtResult, ItResult);
 				CONTROL_SetDeviceState(DS_Ready, SS_None);
 				DataTable[REG_OP_RESULT] = OPRESULT_OK;
 				break;

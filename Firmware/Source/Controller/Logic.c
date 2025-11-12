@@ -336,19 +336,9 @@ void LOGIC_GetResults(float *UtResult, float *UtCh2Result, float *ItResult)
 }
 // ----------------------------------------
 
-void LOGIC_SaveResults(float UtResult, float UtCh2Result, float ItResult)
+void LOGIC_SaveResults(float UtResult, float ItResult)
 {
-	switch((Int16U)DataTable[REG_PCB_VERSION])
-	{
-		case PCB_VERSION_10:
-			DataTable[REG_RESULT_UT] = UtResult;
-			break;
-
-		case PCB_VERSION_20:
-			DataTable[REG_RESULT_UT] = UtCh2Result;
-			break;
-	}
-
+	DataTable[REG_RESULT_UT] = UtResult;
 	DataTable[REG_RESULT_IT] = ItResult;
 	DataTable[REG_RESULT_UG] = MEASURE_GateAverageVoltage();
 	DataTable[REG_RESULT_IG] = MEASURE_GateAverageCurrent();
