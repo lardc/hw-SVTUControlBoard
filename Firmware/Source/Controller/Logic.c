@@ -295,13 +295,8 @@ bool LOGIC_FinishProcess()
 		// Пересчёт значений
 		MEASURE_ConvertUt(MEMBUF_DMA_Ut, VALUES_POWER_DMA_SIZE);
 		MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
-		if (DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
-		{
-			if (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
-			{
-				MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
-			}
-		}
+		if ((DataTable[REG_PCB_VERSION] == PCB_VERSION_20) && (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT))
+			MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
 
 		return true;
 	}
@@ -326,13 +321,13 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 
 void LOGIC_GetResults(float *UtResult, float *UtCh2Result, float *ItResult)
 {
-	*UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut, true);
+	*UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut);
 	if((Int16U)DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
 	{
-		*UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg, false);
+		*UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg);
 		*UtResult = *UtResult > (Int16U)DataTable[REG_UT_MAX] ? *UtCh2Result : *UtResult;
 	}
-	*ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It, true);
+	*ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It);
 }
 // ----------------------------------------
 

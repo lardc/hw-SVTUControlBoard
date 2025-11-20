@@ -145,20 +145,10 @@ float MEASURE_GateAverageCurrent()
 }
 //------------------------------------
 
-float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary, bool TimerConversion)
+float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary)
 {
-	Int16U StartIndex, Points;
-
-	if(TimerConversion)
-	{
-		StartIndex = DataTable[REG_PULSE_DURATION] * 1000 / TIMER1_uS;
-		Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
-	}
-	else
-	{
-		StartIndex = DataTable[REG_PULSE_DURATION] * 1000;
-		Points = DataTable[REG_MSR_TIME];
-	}
+	Int16U StartIndex = DataTable[REG_PULSE_DURATION] * 1000 / TIMER1_uS;
+	Int16U Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
 	return MEASURE_ExtractAverageValues(MEMBUF_DMA_Intermediary, StartIndex, Points);
 }
 //------------------------------------
