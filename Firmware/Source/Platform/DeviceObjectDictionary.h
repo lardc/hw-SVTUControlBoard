@@ -19,6 +19,7 @@
 #define ACT_STOP_TEST					101	// Остановка процесса измерения
 //
 #define ACT_START_SELF_TEST				105	// Запуск самотестирования
+#define	ACT_START_DIAGNOSTIC			106 // Запуск диагностики (только для плат версии 2.0)
 //
 #define ACT_SAVE_TO_ROM					200	// Сохранение пользовательских данных во FLASH процессора
 #define ACT_RESTORE_FROM_ROM			201	// Восстановление данных из FLASH
@@ -223,10 +224,9 @@
 #define PROBLEM_GATE_SHORT				3	// КЗ в цепи управления
 #define PROBLEM_GATE_VOLTAGE			4	// Проблема с формирователем напряжения управления
 #define PROBLEM_EXT_DIAG_LINE_DISCON	5	// Нет соединения с DUT
-#define PROBLEM_EXT_DIAG_CLOSED_SWITCH	6	// Проводник в запертом положении
-#define PROBLEM_EXT_DIAG_SHORT			7	// КЗ в цепи измерения
-#define PROBLEM_VOLTAGE_OUT_OF_RANGE	8	// Измеренное напряжение вне рабочего диапазона (только для платы 1.0)
-#define PROBLEM_CURRENT_OUT_OF_RANGE	9	// Измеренный ток вне рабочего диапазона (только для платы 1.0)
+#define PROBLEM_EXT_DIAG_SHORT			6	// КЗ в цепи измерения
+#define PROBLEM_VOLTAGE_OUT_OF_RANGE	7	// Измеренное напряжение вне рабочего диапазона (только для платы 1.0)
+#define PROBLEM_CURRENT_OUT_OF_RANGE	8	// Измеренный ток вне рабочего диапазона (только для платы 1.0)
 
 // User Errors
 #define ERR_NONE						0

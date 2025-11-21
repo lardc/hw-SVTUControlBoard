@@ -29,6 +29,7 @@ static Boolean CycleActive = false;
 SubState SUB_State = SS_None;
 bool IsImpulse = false;
 bool SelfTest = false;
+bool Diagnostic = false;
 static Boolean RequestSaveToFlash = false;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
@@ -208,6 +209,18 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 					SelfTest = true;
 					DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_NONE;
 					CONTROL_SetDeviceState(DS_InProcess, SS_PulseInit);
+				}
+				else
+					*pUserError = ERR_DEVICE_NOT_READY;
+			}
+			break;
+
+		case ACT_START_DIAGNOSTIC:
+			{
+				if(CONTROL_State == DS_Ready)
+				{
+					Diagnostic = true;
+					CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
 				}
 				else
 					*pUserError = ERR_DEVICE_NOT_READY;
@@ -478,7 +491,7 @@ void CONTROL_HandlePulse()
 
 					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
 					{
-						if(LOGIC_CheckResults(UtResult))
+						if((LOGIC_CheckResults(UtResult)) || Diagnostic == true)
 						{
 							TIM_Stop(TIM15);
 							GATE_RegulatorState = RS_Diagnostic;
@@ -503,6 +516,7 @@ void CONTROL_HandlePulse()
 					LL_AnalogInputsDiagGate(false);
 					LL_AnalogInputsSelfTest(false);
 					TIM_Start(TIM15);
+					Diagnostic = false;
 
 					if(GATE_RegulatorStatusCheck(RS_DiagDisconnected))
 					{
