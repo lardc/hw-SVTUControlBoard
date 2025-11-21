@@ -123,6 +123,7 @@ void CONTROL_ResetData()
 	DataTable[REG_BHL_FUNCTION] = 0;
 	DataTable[REG_BHL_EXT_DATA] = 0;
 
+	Diagnostic = false;
 	DEVPROFILE_ResetScopes(0);
 	DEVPROFILE_ResetEPReadState();
 }
