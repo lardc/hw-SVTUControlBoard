@@ -28,7 +28,6 @@ float GateVoltageDiag = 0;					// Напряжение, которое долж�
 Int16U FollowingErrorCounterMax = 0;
 Int16U FollowingErrorCounter = 0;
 Int16U RegulatorCounter = 0;
-Int16U RegulatorDiagCounter = 0;
 Int16U GateValues_Counter = 0;
 float DelayInMeasure = 0;
 float DiagVoltThreshold = 0;
@@ -113,7 +112,6 @@ void GATE_CacheVariables()
 	GateVoltage = 0;
 	GateVoltageDiag = 0;
 	RegulatorCounter = 0;
-	RegulatorDiagCounter = 0;
 	FollowingErrorCounter = 0;
 	GateValues_Counter = 0;
 
@@ -227,7 +225,7 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 		}
 	}
 
-	RegulatorError = (RegulatorDiagCounter == 0) ? 0 : (GateVoltageDiag - VoltageSample);
+	RegulatorError = (RegulatorCounter == 0) ? 0 : (GateVoltageDiag - VoltageSample);
 
 	Qi += RegulatorError * RegulatorQi;
 
@@ -243,7 +241,7 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 
 	GATE_SetUg(RegulatorOut);
 
-	RegulatorDiagCounter++;
+	RegulatorCounter++;
 }
 //------------------------------------
 

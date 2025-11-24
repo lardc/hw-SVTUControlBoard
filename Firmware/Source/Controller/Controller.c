@@ -500,6 +500,7 @@ void CONTROL_HandlePulse()
 							LL_AnalogInputsDiagGate(true);
 							LL_AnalogInputsSelfTest(true);
 							Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
+							GATE_CacheVariables();
 							GATE_StartProcess();
 							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseProcess);
 						}
