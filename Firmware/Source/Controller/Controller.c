@@ -493,7 +493,7 @@ void CONTROL_HandlePulse()
 
 					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
 					{
-						if((LOGIC_CheckResults(UtResult)) || Diagnostic == true)
+						if((LOGIC_CheckResults(UtResult)) || Diagnostic)
 						{
 							TIM_Stop(TIM15);
 							GATE_RegulatorState = RS_Diagnostic;
@@ -535,7 +535,8 @@ void CONTROL_HandlePulse()
 					}
 					else
 					{
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
+						DataTable[REG_OP_RESULT] = OPRESULT_OK;
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					}
 				}
 				break;
