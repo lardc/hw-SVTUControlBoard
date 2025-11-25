@@ -202,22 +202,22 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 	{
 		GateVoltageDiag = DiagVoltage;
 
-		if((VoltageSample < DiagVoltage * DiagVoltThreshold) && (CurrentSample > DiagCurrent * DiagCurrentThreshold))
+		if((VoltageSample < DiagVoltage * (DiagVoltThreshold + 1) ) && (CurrentSample > DiagCurrent * (DiagCurrentThreshold + 1)))
 		{
-			if(DiagErrorCounter < DiagCounterThreshold)
+			if(DiagErrorCounter < DiagCounterThreshold*0.1)
 				DiagErrorCounter++;
-			if(DiagErrorCounter == DiagCounterThreshold)
+			if(DiagErrorCounter == DiagCounterThreshold*0.1)
 			{
 				DiagErrorCounter = 0;
 				GATE_RegulatorState = RS_DiagShort;
 			}
 		}
 
-		if((VoltageSample > DiagVoltage * DiagVoltThreshold) && (CurrentSample < DiagCurrent * DiagCurrentThreshold))
+		if((VoltageSample > DiagVoltage * (DiagVoltThreshold + 1)) && (CurrentSample < DiagCurrent * (DiagCurrentThreshold + 1)))
 		{
-			if(DiagErrorCounter < DiagCounterThreshold)
+			if(DiagErrorCounter < DiagCounterThreshold*0.1)
 				DiagErrorCounter++;
-			if(DiagErrorCounter == DiagCounterThreshold)
+			if(DiagErrorCounter == DiagCounterThreshold*0.1)
 			{
 				DiagErrorCounter = 0;
 				GATE_RegulatorState = RS_DiagDisconnected;
@@ -242,6 +242,8 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 	GATE_SetUg(RegulatorOut);
 
 	RegulatorCounter++;
+
+	GATE_SaveToEndpoints(VoltageSample, CurrentSample, RegulatorError);
 }
 //------------------------------------
 
@@ -266,7 +268,9 @@ bool GATE_RegulatorStatusCheck(RegulatorState State)
 
 void GATE_RegulatorWorkingProcess(float VoltageSample, float CurrentSample)
 {
-	if(GATE_RegulatorStatusCheck(RS_Diagnostic))
+	if(GATE_RegulatorStatusCheck(RS_Diagnostic) ||
+		GATE_RegulatorStatusCheck(RS_DiagShort) ||
+		GATE_RegulatorStatusCheck(RS_DiagDisconnected))
 		GATE_Diagnostic(VoltageSample, CurrentSample);
 	else
 		GATE_RegulatorProcess(VoltageSample, CurrentSample);

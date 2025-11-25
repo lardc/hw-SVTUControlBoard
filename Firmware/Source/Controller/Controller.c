@@ -17,6 +17,7 @@
 #include "Constraints.h"
 #include "JSONDescription.h"
 #include "SaveToFlash.h"
+#include "Delay.h"
 
 // Types
 //
@@ -496,11 +497,12 @@ void CONTROL_HandlePulse()
 						if((LOGIC_CheckResults(UtResult)) || Diagnostic)
 						{
 							TIM_Stop(TIM15);
+							GATE_CacheVariables();
 							GATE_RegulatorState = RS_Diagnostic;
 							LL_AnalogInputsDiagGate(true);
-							LL_AnalogInputsSelfTest(true);
+							//LL_AnalogInputsSelfTest(true);
+							DELAY_MS(3);
 							Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
-							GATE_CacheVariables();
 							GATE_StartProcess();
 							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseProcess);
 						}
