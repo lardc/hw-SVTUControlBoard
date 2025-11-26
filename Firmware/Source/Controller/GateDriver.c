@@ -207,7 +207,7 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 		{
 			if(DiagErrorCounter < DiagCounterThreshold)
 				DiagErrorCounter++;
-			if(DiagErrorCounter == DiagCounterThreshold)
+			if(DiagErrorCounter >= DiagCounterThreshold)
 			{
 				DiagErrorCounter = 0;
 				GATE_RegulatorState = RS_DiagShort;
@@ -218,7 +218,7 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 		{
 			if(DiagErrorCounter < DiagCounterThreshold)
 				DiagErrorCounter++;
-			if(DiagErrorCounter == DiagCounterThreshold)
+			if(DiagErrorCounter >= DiagCounterThreshold)
 			{
 				DiagErrorCounter = 0;
 				GATE_RegulatorState = RS_DiagDisconnected;
