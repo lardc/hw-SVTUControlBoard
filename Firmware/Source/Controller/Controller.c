@@ -500,7 +500,7 @@ void CONTROL_HandlePulse()
 							GATE_CacheVariables();
 							GATE_RegulatorState = RS_Diagnostic;
 							LL_AnalogInputsDiagGate(true);
-							//LL_AnalogInputsSelfTest(true);
+							LL_AnalogInputsSelfTest(true);
 							DELAY_MS(3);
 							Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
 							GATE_StartProcess();

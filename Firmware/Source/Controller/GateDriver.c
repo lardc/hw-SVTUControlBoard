@@ -118,7 +118,8 @@ void GATE_CacheVariables()
 	//Умножение на 1000, чтобы преобразовать мс в мкс
 	DelayInMeasure = DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
 
-	DiagCounterThreshold = DataTable[REG_EXT_DIAG_DURATION] * 1000 / TIMER2_uS;
+	DiagCounterThreshold = (DataTable[REG_EXT_DIAG_DURATION] * 1000 / TIMER2_uS) * 0.1; // Взята 1\10 часть от макс ошибки,
+																						// т.к иначе она не успевает накопиться за время работы
 
 	GATE_RegulatorState = RS_None;
 }
@@ -204,9 +205,9 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 
 		if((VoltageSample < DiagVoltage * (DiagVoltThreshold + 1) ) && (CurrentSample > DiagCurrent * (DiagCurrentThreshold + 1)))
 		{
-			if(DiagErrorCounter < DiagCounterThreshold*0.1)
+			if(DiagErrorCounter < DiagCounterThreshold)
 				DiagErrorCounter++;
-			if(DiagErrorCounter == DiagCounterThreshold*0.1)
+			if(DiagErrorCounter == DiagCounterThreshold)
 			{
 				DiagErrorCounter = 0;
 				GATE_RegulatorState = RS_DiagShort;
@@ -215,9 +216,9 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 
 		if((VoltageSample > DiagVoltage * (DiagVoltThreshold + 1)) && (CurrentSample < DiagCurrent * (DiagCurrentThreshold + 1)))
 		{
-			if(DiagErrorCounter < DiagCounterThreshold*0.1)
+			if(DiagErrorCounter < DiagCounterThreshold)
 				DiagErrorCounter++;
-			if(DiagErrorCounter == DiagCounterThreshold*0.1)
+			if(DiagErrorCounter == DiagCounterThreshold)
 			{
 				DiagErrorCounter = 0;
 				GATE_RegulatorState = RS_DiagDisconnected;
