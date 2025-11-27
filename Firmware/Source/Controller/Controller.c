@@ -425,17 +425,17 @@ void CONTROL_HandlePulse()
 				break;
 				
 			case SS_GateVoltageProcess:
-				if(GATE_RegulatorStatusCheck(RS_InProcess))
+				if(GATE_RegulatorState == RS_InProcess)
 					Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME_DELAY];
 
-				if(GATE_RegulatorStatusCheck(RS_TargetReached))
+				if(GATE_RegulatorState == RS_TargetReached)
 				{
 					if(CONTROL_TimeCounter >= Timeout)
 						CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
 				}
 				else
 				{
-					if(GATE_RegulatorStatusCheck(RS_FollowingError))
+					if(GATE_RegulatorState == RS_FollowingError)
 					{
 						if (SelfTest)
 						{
@@ -450,7 +450,7 @@ void CONTROL_HandlePulse()
 						}
 					}
 
-					if(GATE_RegulatorStatusCheck(RS_GateShort))
+					if(GATE_RegulatorState == RS_GateShort)
 					{
 						if (SelfTest)
 						{
@@ -523,13 +523,13 @@ void CONTROL_HandlePulse()
 					TIM_Start(TIM15);
 					Diagnostic = false;
 
-					if(GATE_RegulatorStatusCheck(RS_DiagDisconnected))
+					if(GATE_RegulatorState == RS_DiagDisconnected)
 					{
 						CONTROL_ResetHardware();
 						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_LINE_DISCON);
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					}
-					else if(GATE_RegulatorStatusCheck(RS_DiagShort))
+					else if(GATE_RegulatorState == RS_DiagShort)
 					{
 						CONTROL_ResetHardware();
 						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_SHORT);

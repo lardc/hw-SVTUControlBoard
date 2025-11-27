@@ -154,10 +154,10 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 		FollowingErrorCounter++;
 
 		if(CurrentSample >= DataTable[REG_IG_THRESHOLD])
-				GATE_RegulatorState = RS_GateShort;
+			GATE_RegulatorState = RS_GateShort;
 
 		else if(FollowingErrorCounter >= FollowingErrorCounterMax && !DataTable[REG_FOLLOWING_ERR_MUTE])
-				GATE_RegulatorState = RS_FollowingError;
+			GATE_RegulatorState = RS_FollowingError;
 	}
 
 	Qi += RegulatorError * RegulatorQi;
@@ -203,7 +203,7 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 	{
 		GateVoltageDiag = DiagVoltage;
 
-		if((VoltageSample < DiagVoltage * (DiagVoltThreshold + 1) ) && (CurrentSample > DiagCurrent * (DiagCurrentThreshold + 1)))
+		if((VoltageSample < DiagVoltage * (DiagVoltThreshold + 1))	&& (CurrentSample > DiagCurrent * (DiagCurrentThreshold + 1)))
 		{
 			if(DiagErrorCounter < DiagCounterThreshold)
 				DiagErrorCounter++;
@@ -214,7 +214,7 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 			}
 		}
 
-		if((VoltageSample > DiagVoltage * (DiagVoltThreshold + 1)) && (CurrentSample < DiagCurrent * (DiagCurrentThreshold + 1)))
+		if((VoltageSample > DiagVoltage * (DiagVoltThreshold + 1))	&& (CurrentSample < DiagCurrent * (DiagCurrentThreshold + 1)))
 		{
 			if(DiagErrorCounter < DiagCounterThreshold)
 				DiagErrorCounter++;
@@ -238,7 +238,7 @@ void GATE_Diagnostic(float VoltageSample, float CurrentSample)
 
 	Qp = RegulatorError * RegulatorQp;
 
-	RegulatorOut = GateVoltageDiag + Qp +Qi;
+	RegulatorOut = GateVoltageDiag + Qp + Qi;
 
 	GATE_SetUg(RegulatorOut);
 
@@ -261,17 +261,10 @@ void GATE_SaveToEndpoints(float Voltage, float Current, float Error)
 }
 //------------------------------------
 
-bool GATE_RegulatorStatusCheck(RegulatorState State)
-{
-	return (GATE_RegulatorState == State) ? true : false;
-}
-//------------------------------------
-
 void GATE_RegulatorWorkingProcess(float VoltageSample, float CurrentSample)
 {
-	if(GATE_RegulatorStatusCheck(RS_Diagnostic) ||
-		GATE_RegulatorStatusCheck(RS_DiagShort) ||
-		GATE_RegulatorStatusCheck(RS_DiagDisconnected))
+	if(GATE_RegulatorState == RS_Diagnostic || GATE_RegulatorState == RS_DiagShort
+			|| GATE_RegulatorState == RS_DiagDisconnected)
 		GATE_Diagnostic(VoltageSample, CurrentSample);
 	else
 		GATE_RegulatorProcess(VoltageSample, CurrentSample);

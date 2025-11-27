@@ -27,6 +27,5 @@ void GATE_StartProcess();
 void GATE_RegulatorWorkingProcess(float VoltageSample, float CurrentSample);
 void GATE_StopProcess();
 void GATE_CacheVariables();
-bool GATE_RegulatorStatusCheck(RegulatorState State);
 
 #endif // __GATE_DRIVER_H
