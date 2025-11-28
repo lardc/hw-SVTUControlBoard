@@ -425,18 +425,18 @@ void CONTROL_HandlePulse()
 				break;
 				
 			case SS_GateVoltageProcess:
-				if(GATE_RegulatorState == RS_InProcess)
-					Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME_DELAY];
+				switch (GATE_RegulatorState)
+				{
+					case RS_InProcess:
+						Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME_DELAY];
+						break;
 
-				if(GATE_RegulatorState == RS_TargetReached)
-				{
-					if(CONTROL_TimeCounter >= Timeout)
-						CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
-				}
-				else
-				{
-					if(GATE_RegulatorState == RS_FollowingError)
-					{
+					case RS_TargetReached:
+						if(CONTROL_TimeCounter >= Timeout)
+							CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
+						break;
+
+					case RS_FollowingError:
 						if (SelfTest)
 						{
 							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
@@ -448,10 +448,9 @@ void CONTROL_HandlePulse()
 							CONTROL_FinishedWithProblem(PROBLEM_GATE_VOLTAGE);
 							CONTROL_SetDeviceState(DS_Ready, SS_None);
 						}
-					}
+						break;
 
-					if(GATE_RegulatorState == RS_GateShort)
-					{
+					case RS_GateShort:
 						if (SelfTest)
 						{
 							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
@@ -463,7 +462,10 @@ void CONTROL_HandlePulse()
 							CONTROL_FinishedWithProblem(PROBLEM_GATE_SHORT);
 							CONTROL_SetDeviceState(DS_Ready, SS_None);
 						}
-					}
+						break;
+
+					default:
+						break;
 				}
 				break;
 

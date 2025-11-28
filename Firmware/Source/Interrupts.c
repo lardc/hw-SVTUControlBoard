@@ -26,7 +26,7 @@ void ADC1_2_IRQHandler()
 	GateVoltage = MEASURE_Ug_ADC_Direct(ADC_Read(ADC2));
 	GateCurrent = MEASURE_Ig_ADC_Direct(ADC_Read(ADC1));
 
-	GATE_RegulatorWorkingProcess(GateVoltage, GateCurrent);
+	GATE_RegulatorProcess(GateVoltage, GateCurrent);
 }
 //-----------------------------------------
 
@@ -87,7 +87,7 @@ void DMA1_Channel1_IRQHandler()
 				GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_Ut2_UgIg, 0);
 				GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_Ut2_UgIg, 1);
 
-				GATE_RegulatorWorkingProcess(GateVoltage, GateCurrent);
+				GATE_RegulatorProcess(GateVoltage, GateCurrent);
 
 				ADC_SamplingStart(ADC1);
 			}
@@ -113,7 +113,7 @@ void DMA2_Channel1_IRQHandler()
 		GateVoltage = MEASURE_Ug_DMA(MEMBUF_DMA_IGBT_UgIg, 0);
 		GateCurrent = MEASURE_Ig_DMA(MEMBUF_DMA_IGBT_UgIg, 1);
 
-		GATE_RegulatorWorkingProcess(GateVoltage, GateCurrent);
+		GATE_RegulatorProcess(GateVoltage, GateCurrent);
 
 		ADC_SamplingStart(ADC2);
 	}
