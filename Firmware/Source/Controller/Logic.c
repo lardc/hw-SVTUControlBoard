@@ -282,26 +282,39 @@ void LOGIC_StartPulse()
 
 bool LOGIC_FinishProcess()
 {
+	static bool DMADataProcessed = false;
 	// Завершение оцифровки
 	if(IT_DMASampleCompleted())
 	{
-		TIM_Stop(TIM1);
+		if(!DMADataProcessed)
+		{
+			TIM_Stop(TIM1);
+			TIM_Stop(TIM7);
+			LL_SyncScope(false);
+			// Пересчёт значений
+			MEASURE_ConvertUt(MEMBUF_DMA_Ut, VALUES_POWER_DMA_SIZE);
+			MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
+			if ((DataTable[REG_PCB_VERSION] == PCB_VERSION_20) && (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT))
+				MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
 
-		TIM_Stop(TIM7);
-
-		LL_SyncScope(false);
-		GATE_StopProcess();
-
-		// Пересчёт значений
-		MEASURE_ConvertUt(MEMBUF_DMA_Ut, VALUES_POWER_DMA_SIZE);
-		MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
-		if ((DataTable[REG_PCB_VERSION] == PCB_VERSION_20) && (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT))
-			MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
-
-		return true;
+			DMADataProcessed = true;
+		}
+		// Завершение процесса только после отключения синхронизации по таймеру регулятора
+		if(!IsImpulse)
+		{
+			GATE_StopProcess();
+			DMADataProcessed = false; // Сброс флага для следующего цикла
+			return true;
+		}
+		else
+			// DMA завершен, но синхронизация еще работает - ждем отключения через регулятор
+			return false;
 	}
 	else
+	{
+		DMADataProcessed = false; // Сброс флага если DMA еще не завершен
 		return false;
+	}
 }
 // ----------------------------------------
 
