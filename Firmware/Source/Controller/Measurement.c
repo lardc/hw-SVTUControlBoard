@@ -126,7 +126,8 @@ float MEASURE_GateAverageVoltage()
 	Int16U StartIndex, Points;
 
 	//Умножение на 1000, чтобы преобразовать мс в мкс
-	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS - DataTable[REG_MSR_TIME];
+	Int16U Coef = (DataTable[REG_PULSE_DURATION] <= 4) ? (6 - DataTable[REG_PULSE_DURATION]) : 1;
+	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + Coef * DataTable[REG_PULSE_DURATION] * 1000 / (TIMER2_uS * TIMER1_uS) - DataTable[REG_MSR_TIME];
 	Points = DataTable[REG_MSR_TIME];
 
 	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Ug, StartIndex, Points);
@@ -138,7 +139,8 @@ float MEASURE_GateAverageCurrent()
 	Int16U StartIndex, Points;
 
 	//Умножение на 1000, чтобы преобразовать мс в мкс
-	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS - DataTable[REG_MSR_TIME];
+	Int16U Coef = (DataTable[REG_PULSE_DURATION] <= 4) ? (6 - DataTable[REG_PULSE_DURATION]) : 1;
+	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + Coef * DataTable[REG_PULSE_DURATION] * 1000 / (TIMER2_uS * TIMER1_uS) - DataTable[REG_MSR_TIME];
 	Points = DataTable[REG_MSR_TIME];
 
 	return MEASURE_ExtractAverageValues((pFloat32)MEMBUF_EP_Ig, StartIndex, Points);
@@ -147,7 +149,9 @@ float MEASURE_GateAverageCurrent()
 
 float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary)
 {
-	Int16U StartIndex = DataTable[REG_PULSE_DURATION] * 1000 / TIMER1_uS;
+	//  Рассчет начальной точки сделан костыльно, опираясь только на макс размер массива
+	Int16U Coef = (DataTable[REG_PULSE_DURATION] <= 5) ? (7 - DataTable[REG_PULSE_DURATION]) : 1;
+	Int16U StartIndex = DataTable[REG_UG_EDGE_TIME] / ( TIMER2_uS / TIMER1_uS) + Coef * DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS - DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
 	Int16U Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
 	return MEASURE_ExtractAverageValues(MEMBUF_DMA_Intermediary, StartIndex, Points);
 }

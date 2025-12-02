@@ -24,7 +24,7 @@ extern RegulatorState GATE_RegulatorState;
 //
 void GATE_SetUg(float Value);
 void GATE_StartProcess();
-void GATE_RegulatorWorkingProcess(float VoltageSample, float CurrentSample);
+void GATE_RegulatorProcess(float VoltageSample, float CurrentSample);
 void GATE_StopProcess();
 void GATE_CacheVariables();
 

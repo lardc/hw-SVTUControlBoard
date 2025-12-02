@@ -127,9 +127,10 @@ void GATE_CacheVariables()
 
 void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 {
-	float RegulatorError, RegulatorOut, Qp, RegulatorVoltage, Qi = 0;
+	float RegulatorError, RegulatorOut, Qp, RegulatorVoltage = 0;
 	static Int16U SyncDelayCounter = 0;
 	static Int16U DiagErrorCounter = 0;
+	static float Qi = 0;
 
 	// Формирование линейно нарастающего фронта импульса напряжения
 	switch(GATE_RegulatorState)
@@ -154,7 +155,7 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 			RegulatorVoltage = GateVoltage;
 			RegulatorError = (RegulatorCounter == 0) ? 0 : (RegulatorVoltage - VoltageSample);
 
-			if(fabsf(RegulatorError / GateVoltage * 100) < RegulatorAlowedError)
+			if(fabsf(RegulatorError / RegulatorVoltage * 100) < RegulatorAlowedError)
 			{
 				if(FollowingErrorCounter)
 					FollowingErrorCounter--;
@@ -209,6 +210,9 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 		}
 		break;
 	}
+
+	if (RegulatorCounter == 0)
+		Qi = 0;
 
 	Qi += RegulatorError * RegulatorQi;
 
