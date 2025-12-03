@@ -35,6 +35,7 @@ float DiagCurrentThreshold = 0;
 float DiagCounterThreshold = 0;
 float DiagVoltage = 0;						// Устанавливаемое напряжение с которым идет сравнение в процессе диагностики
 float DiagCurrent = 0;
+Int16U DiagErrorCounter = 0;
 
 // Forward functions
 Int16U GATE_ConvertUgToDAC(float Value);
@@ -114,6 +115,7 @@ void GATE_CacheVariables()
 	RegulatorCounter = 0;
 	FollowingErrorCounter = 0;
 	GateValues_Counter = 0;
+	DiagErrorCounter = 0;
 
 	//Умножение на 1000, чтобы преобразовать мс в мкс
 	DelayInMeasure = DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
@@ -129,7 +131,6 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 {
 	float RegulatorError, RegulatorOut, Qp, RegulatorVoltage = 0;
 	static Int16U SyncDelayCounter = 0;
-	static Int16U DiagErrorCounter = 0;
 	static float Qi = 0;
 
 	// Формирование линейно нарастающего фронта импульса напряжения
@@ -224,7 +225,7 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 
 	Qp = RegulatorError * RegulatorQp;
 
-	RegulatorOut = RegulatorVoltage + Qp +Qi;
+	RegulatorOut = RegulatorVoltage + Qp + Qi;
 
 	GATE_SetUg(RegulatorOut);
 

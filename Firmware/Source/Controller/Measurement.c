@@ -125,6 +125,7 @@ float MEASURE_GateAverageVoltage()
 {
 	Int16U StartIndex, Points;
 
+	//  Рассчет начальной точки сделан костыльно, опираясь только на макс размер массива
 	//Умножение на 1000, чтобы преобразовать мс в мкс
 	Int16U Coef = (DataTable[REG_PULSE_DURATION] <= 4) ? (6 - DataTable[REG_PULSE_DURATION]) : 1;
 	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + Coef * DataTable[REG_PULSE_DURATION] * 1000 / (TIMER2_uS * TIMER1_uS) - DataTable[REG_MSR_TIME];
@@ -138,7 +139,8 @@ float MEASURE_GateAverageCurrent()
 {
 	Int16U StartIndex, Points;
 
-	//Умножение на 1000, чтобы преобразовать мс в мкс
+	// Умножение на 1000, чтобы преобразовать мс в мкс
+	//  Рассчет начальной точки сделан костыльно, опираясь только на макс размер массива
 	Int16U Coef = (DataTable[REG_PULSE_DURATION] <= 4) ? (6 - DataTable[REG_PULSE_DURATION]) : 1;
 	StartIndex = DataTable[REG_UG_EDGE_TIME] / TIMER2_uS + Coef * DataTable[REG_PULSE_DURATION] * 1000 / (TIMER2_uS * TIMER1_uS) - DataTable[REG_MSR_TIME];
 	Points = DataTable[REG_MSR_TIME];
@@ -150,10 +152,13 @@ float MEASURE_GateAverageCurrent()
 float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary)
 {
 	//  Рассчет начальной точки сделан костыльно, опираясь только на макс размер массива
+	Int16U MearusingPoints = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
 	Int16U Coef = (DataTable[REG_PULSE_DURATION] <= 5) ? (7 - DataTable[REG_PULSE_DURATION]) : 1;
-	Int16U StartIndex = DataTable[REG_UG_EDGE_TIME] / ( TIMER2_uS / TIMER1_uS) + Coef * DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS - DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
-	Int16U Points = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
-	return MEASURE_ExtractAverageValues(MEMBUF_DMA_Intermediary, StartIndex, Points);
+	Int16U Offset = DataTable[REG_UG_EDGE_TIME] / ( TIMER2_uS / TIMER1_uS) + Coef * DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
+	Int16U StartIndex = Offset - MearusingPoints;
+	if (StartIndex < 0)
+		StartIndex = 0;
+	return MEASURE_ExtractAverageValues(MEMBUF_DMA_Intermediary, StartIndex, MearusingPoints);
 }
 //------------------------------------
 
