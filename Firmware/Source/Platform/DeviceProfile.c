@@ -18,6 +18,7 @@
 #include "FormatOutputJSON.h"
 #include "MemBuffers.h"
 #include "ZwIWDG.h"
+#include "ZwNFLASH.h"
 
 // Types
 //

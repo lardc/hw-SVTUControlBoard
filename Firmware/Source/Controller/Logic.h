@@ -26,6 +26,8 @@ void LOGIC_StartPulse();
 bool LOGIC_FinishProcess();
 
 void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, Int16U InputArraySize);
-void LOGIC_SaveResults();
+void LOGIC_GetResults(float *UtResult, float *UtCh2Result, float *ItResult);
+void LOGIC_SaveResults(float UtResult, float ItResult);
+bool LOGIC_CheckResults(float UtResult);
 
 #endif //__LOGIC_H

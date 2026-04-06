@@ -9,14 +9,17 @@
 //
 #define ACT_DBG_PULSE_V_GATE			10	// Импульс напряжения управления IGBT
 #define ACT_DBG_PULSE_SYNC_OSC			11	// Импульс синхронизации для осциллографа
-#define ACT_DBG_VIN_ST					12	// Переключение канала напряжения в режим самотестирования
+#define ACT_DBG_VIN_ST					12	// Переключение канала измерения Idut и Udut в режим самотестирования
 #define ACT_DBG_PULSE_SYNC_LCSU			13	// Импульс синхронизации LCSU
 #define ACT_DBG_EXT_INDICATION			14	// Управление внешней индикацией
+#define ACT_DBG_IT_RANGE				15	// Включение оптопары при измерении тока Id
+#define ACT_DBG_UG_ST					16	// Переключение канала измерения Ug в режим самотестирования
 //
 #define ACT_START_TEST					100	// Запуск процесса измерения
 #define ACT_STOP_TEST					101	// Остановка процесса измерения
 //
 #define ACT_START_SELF_TEST				105	// Запуск самотестирования
+#define	ACT_START_DIAGNOSTIC			106 // Запуск диагностики (только для плат версии 2.0)
 //
 #define ACT_SAVE_TO_ROM					200	// Сохранение пользовательских данных во FLASH процессора
 #define ACT_RESTORE_FROM_ROM			201	// Восстановление данных из FLASH
@@ -79,7 +82,7 @@
 #define REG_REGULATOR_QP				33	// Пропорциональный коэффициент регулятора
 #define REG_REGULATOR_QI				34	// Интегральный коэффициент регулятора
 #define REG_REGULATOR_QI_MAX			35	// Максимальное значение интегрального коэффициента регулятора
-#define REG_REGULATOR_ALLOWED_ERR		36	// Максимально допустимая ошибка регулятора
+#define REG_REGULATOR_ALLOWED_ERR		36	// Максимально допустимая ошибка регулятора (в %)
 #define REG_FOLLOWING_ERR_CNT			37	// Максимальное значение счетчика FollowingError
 #define REG_FOLLOWING_ERR_MUTE			38	// Выключение слежения за FollowingError
 //
@@ -90,7 +93,7 @@
 #define REG_LAMP_CTRL					43	// Запрет управление блоком внешнего индикатора
 #define REG_R_SHUNT						44	// Сопротивление шунта (в мкОм)
 #define REG_I_R0_THRESHOLD				45	// Граница нижнего диапазона тока (в А)
-#define REG_IG_THRESHOLD				46	// Значение тока Ig при выставлении PROBLEM_GATE_SHORT
+#define REG_IG_THRESHOLD				46	// Значение тока Ig при выставлении PROBLEM_GATE_SHORT (мА)
 #define REG_MSR_DELAY					47	// Задержка измерения Uce, Ice (в тиках)
 #define REG_MSR_TIME					48	// Время измерения Uce, Ice (в тиках)
 #define REG_EMULATION					49  // Включение режима эмуляции
@@ -114,12 +117,18 @@
 #define REG_LCSU_COUNT_MAX				85	// Максимальное количество блоков LCSU в установке
 #define REG_SVTU_WAIT_FINISH_TIME		86	// Время ожидания завершения процесса (в мс)
 #define REG_PULSE_TIME_DELAY			87 	// Время начала пульсации(в мс)
+#define REG_EXT_DIAG_DURATION			88	// Длительность диагностического импульса(в мс)
+#define REG_EXT_DIAG_U_THRESHOLD		89	// Относительное пороговое значение напряжения для диагностики(в %)
+#define REG_EXT_DIAG_I_THRESHOLD		90	// Относительное пороговое значение сила тока для диагностики(в %)
+#define REG_EXT_DIAG_U_REF				91	// Значение напряжения с которым идет сравнение в процессе диагностики (в В)
+#define REG_EXT_DIAG_I_REF				92	// Значение силы тока с которым идет сравнение в процессе диагностики (в мА)
 //
 #define REG_PCB_VERSION					120	// 0 - версия платы 1.0
 											// 1 - версия  2.0
 #define REG_PCB_TIRIS_IGBT				121	// 0 - версия платы с тиристором
 											// 1 - c IGBT
 #define REG_MUTE_SAFETY					122	// Игнорирование контура безопасности
+#define REG_DIAG_ACT					123	// Активация диагностического функционала
 
 // Несохраняемы регистры чтения-записи
 #define REG_IT_SETPOINT					128	// Уставка силового тока (в А)
@@ -141,6 +150,7 @@
 #define REG_RESULT_UT					200	// Измеренное значение прямого напряжения (в мВ)
 #define REG_RESULT_IT					201	// Измеренное значение прямого тока (в А)
 #define REG_RESULT_UG					202	// Измеренное значение напряжения цепи управления (в В)
+#define REG_RESULT_IG					203	// Измеренное значение тока цепи управления (в мА)
 //
 #define REG_LCSU_DETECTED				205	// Обнаруженное количество силовых ячеек
 #define REG_IT_READ_MAX					206	// Максимальный ток, получаемый с установки (в А)
@@ -206,8 +216,6 @@
 
 // Warning
 #define WARNING_NONE					0	// Предупреждений нет
-#define WARNING_VOLTAGE_OUT_OF_RANGE	1	// Измеренное напряжение вне рабочего диапазона
-#define WARNING_CURRENT_OUT_OF_RANGE	2	// Измеренный ток вне рабочего диапазона
 
 // Problem
 #define PROBLEM_NONE					0
@@ -215,6 +223,10 @@
 #define PROBLEM_SAFETY					2	// Сработала система безопасности
 #define PROBLEM_GATE_SHORT				3	// КЗ в цепи управления
 #define PROBLEM_GATE_VOLTAGE			4	// Проблема с формирователем напряжения управления
+#define PROBLEM_EXT_DIAG_LINE_DISCON	5	// Нет соединения с DUT
+#define PROBLEM_EXT_DIAG_SHORT			6	// КЗ в цепи измерения
+#define PROBLEM_VOLTAGE_OUT_OF_RANGE	7	// Измеренное напряжение вне рабочего диапазона (только для платы 1.0)
+#define PROBLEM_CURRENT_OUT_OF_RANGE	8	// Измеренный ток вне рабочего диапазона (только для платы 1.0)
 
 // User Errors
 #define ERR_NONE						0

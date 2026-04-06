@@ -58,7 +58,7 @@
 #define LCSU_START_NID_DEF			110
 //
 #define LONG_TIMEOUT_MIN			1000
-#define LONG_TIMEOUT_MAX			30000
+#define LONG_TIMEOUT_MAX			50000
 #define LONG_TIMEOUT_DEF			1000
 //
 #define UG_EDGE_TIME_MIN			500
@@ -74,7 +74,7 @@
 #define I_THRESHOLD_DEF				300
 //
 #define IT_SETPOINT_MIN				50
-#define IT_SETPOINT_MAX				1700
+#define IT_SETPOINT_MAX				6500
 #define IT_SETPOINT_DEF				500
 //
 #define UG_SETPOINT_MIN				5
@@ -133,6 +133,26 @@
 #define PULSE_TIME_MAX				10		// в мс
 #define PULSE_TIME_DEF				1		// в мс
 #define PULSE_TIME_DELAY_DEF		3		// в мс
+//
+#define DIAG_TIME_MIN				5		// в мс
+#define DIAG_TIME_MAX				10		// в мс
+#define DIAG_TIME_DEF				5		// в мс
+//
+#define DIAG_U_THRESHOLD_MIN		1		// В %
+#define DIAG_U_THRESHOLD_MAX		100		// В %
+#define DIAG_U_THRESHOLD_DEF		15		// В %
+//
+#define DIAG_I_THRESHOLD_MIN		1		// В %
+#define DIAG_I_THRESHOLD_MAX		100		// В %
+#define DIAG_I_THRESHOLD_DEF		15		// В %
+//
+#define EXT_DIAG_I_REF_MIN			5 		// в А
+#define EXT_DIAG_I_REF_MAX			30	 	// в А
+#define EXT_DIAG_I_REF_DEF			20		// в A
+//
+#define EXT_DIAG_U_REF_MIN	 		5 		// в В
+#define EXT_DIAG_U_REF_MAX			30	 	// в В
+#define EXT_DIAG_U_REF_DEF			20		// в В
 
 // Types
 typedef struct __TableItemConstraint

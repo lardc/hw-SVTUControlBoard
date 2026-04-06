@@ -17,6 +17,7 @@
 #include "Constraints.h"
 #include "JSONDescription.h"
 #include "SaveToFlash.h"
+#include "Delay.h"
 
 // Types
 //
@@ -29,6 +30,7 @@ static Boolean CycleActive = false;
 SubState SUB_State = SS_None;
 bool IsImpulse = false;
 bool SelfTest = false;
+bool Diagnostic = false;
 static Boolean RequestSaveToFlash = false;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
@@ -49,7 +51,6 @@ void CONTROL_HandlePowerOn();
 void CONTROL_HandlePulse();
 void CONTROL_HandlePowerOff();
 void CONTROL_SaveDataToEndpoint();
-void CONTROL_SaveResults();
 Int16U CONTROL_CheckSelfTestResults();
 bool CONTROL_IsSafetyEvent();
 void CONTROL_FinishedWithProblem(Int16U Problem);
@@ -116,12 +117,14 @@ void CONTROL_ResetData()
 	DataTable[REG_RESULT_UT] = 0;
 	DataTable[REG_RESULT_IT] = 0;
 	DataTable[REG_RESULT_UG] = 0;
+	DataTable[REG_RESULT_IG] = 0;
 
 	DataTable[REG_BHL_ERROR_CODE] = 0;
 	DataTable[REG_BHL_DEVICE] = 0;
 	DataTable[REG_BHL_FUNCTION] = 0;
 	DataTable[REG_BHL_EXT_DATA] = 0;
 
+	Diagnostic = false;
 	DEVPROFILE_ResetScopes(0);
 	DEVPROFILE_ResetEPReadState();
 }
@@ -131,7 +134,7 @@ void CONTROL_ResetHardware()
 {
 	LL_SyncLCSU(false);
 	LL_SyncScope(false);
-	LL_AnalogInputsSelftTest(false);
+	LL_AnalogInputsSelfTest(false);
 	LL_ExtIndication(false);
 	LL_SetItRange(false);
 	GATE_StopProcess();
@@ -208,6 +211,19 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 					SelfTest = true;
 					DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_NONE;
 					CONTROL_SetDeviceState(DS_InProcess, SS_PulseInit);
+				}
+				else
+					*pUserError = ERR_DEVICE_NOT_READY;
+			}
+			break;
+
+		case ACT_START_DIAGNOSTIC:
+			{
+				if(CONTROL_State == DS_Ready)
+				{
+					CONTROL_ResetData();
+					Diagnostic = true;
+					CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
 				}
 				else
 					*pUserError = ERR_DEVICE_NOT_READY;
@@ -339,6 +355,7 @@ void CONTROL_HandlePowerOn()
 
 void CONTROL_HandlePulse()
 {
+	static float UtResult, UtCh2Result, ItResult;
 	static Int64U Timeout = 0;
 	
 	if(CONTROL_State == DS_InProcess)
@@ -348,6 +365,7 @@ void CONTROL_HandlePulse()
 			case SS_PulseInit:
 				{
 					CONTROL_ResetData();
+					UtResult = UtCh2Result = ItResult = 0.0f;
 
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
@@ -371,7 +389,7 @@ void CONTROL_HandlePulse()
 					{
 						bool NoError = false;
 						LOGIC_SelectCurrentRange(CurrentAmplitude);
-						LL_AnalogInputsSelftTest(SelfTest);
+						LL_AnalogInputsSelfTest(SelfTest);
 						
 						if(LOGIC_WriteLCSUConfig())
 						{
@@ -407,18 +425,18 @@ void CONTROL_HandlePulse()
 				break;
 				
 			case SS_GateVoltageProcess:
-				if(GATE_RegulatorStatusCheck(RS_InProcess))
-					Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME_DELAY];
+				switch (GATE_RegulatorState)
+				{
+					case RS_InProcess:
+						Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME_DELAY];
+						break;
 
-				if(GATE_RegulatorStatusCheck(RS_TargetReached))
-				{
-					if(CONTROL_TimeCounter >= Timeout)
-						CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
-				}
-				else
-				{
-					if(GATE_RegulatorStatusCheck(RS_FollowingError))
-					{
+					case RS_TargetReached:
+						if(CONTROL_TimeCounter >= Timeout)
+							CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
+						break;
+
+					case RS_FollowingError:
 						if (SelfTest)
 						{
 							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
@@ -430,10 +448,9 @@ void CONTROL_HandlePulse()
 							CONTROL_FinishedWithProblem(PROBLEM_GATE_VOLTAGE);
 							CONTROL_SetDeviceState(DS_Ready, SS_None);
 						}
-					}
+						break;
 
-					if(GATE_RegulatorStatusCheck(RS_GateShort))
-					{
+					case RS_GateShort:
 						if (SelfTest)
 						{
 							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
@@ -445,7 +462,10 @@ void CONTROL_HandlePulse()
 							CONTROL_FinishedWithProblem(PROBLEM_GATE_SHORT);
 							CONTROL_SetDeviceState(DS_Ready, SS_None);
 						}
-					}
+						break;
+
+					default:
+						break;
 				}
 				break;
 
@@ -460,7 +480,7 @@ void CONTROL_HandlePulse()
 				if(CONTROL_TimeCounter < CONTROL_Timeout)
 				{
 					if(LOGIC_FinishProcess())
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseCheck);
+						CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
 				}
 				else
 				{
@@ -469,35 +489,97 @@ void CONTROL_HandlePulse()
 				}
 				break;
 
-			case SS_PostPulseCheck:
+			case SS_CheckResultAndPostPulseConfig:
 				{
 					CONTROL_SaveDataToEndpoint();
-					CONTROL_SaveResults();
+					LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult);
 
-					if(SelfTest)
+					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
 					{
-						SelfTest = false;
-						LL_AnalogInputsSelftTest(SelfTest);
-
-						Int16U SelfTestResult = CONTROL_CheckSelfTestResults();
-
-						if(SelfTestResult)
+						if((LOGIC_CheckResults(UtResult)) || Diagnostic)
 						{
-							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
-							CONTROL_SwitchToFault(SelfTestResult);
-							break;
+							TIM_Stop(TIM15);
+							GATE_CacheVariables();
+							GATE_RegulatorState = RS_Diagnostic;
+							LL_AnalogInputsDiagGate(true);
+							LL_AnalogInputsSelfTest(true);
+							DELAY_MS(3);
+							Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
+							GATE_StartProcess();
+							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseProcess);
 						}
 						else
-						{
-							DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_OK;
-							CONTROL_SetDeviceState(DS_Ready, SS_None);
-						}
+							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 					}
 					else
-						DataTable[REG_OP_RESULT] = OPRESULT_OK;
-
-					CONTROL_SetDeviceState(DS_Ready, SS_None);
+						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 				}
+				break;
+
+			case SS_PostPulseProcess:
+				if(CONTROL_TimeCounter >= Timeout)
+				{
+					GATE_StopProcess();
+					LL_AnalogInputsDiagGate(false);
+					LL_AnalogInputsSelfTest(false);
+					TIM_Start(TIM15);
+					Diagnostic = false;
+
+					if(GATE_RegulatorState == RS_DiagDisconnected)
+					{
+						CONTROL_ResetHardware();
+						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_LINE_DISCON);
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+					else if(GATE_RegulatorState == RS_DiagShort)
+					{
+						CONTROL_ResetHardware();
+						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_SHORT);
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+					else
+					{
+						DataTable[REG_OP_RESULT] = OPRESULT_OK;
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+				}
+				break;
+
+			case SS_PostPulseSaveResults:
+				if(SelfTest)
+				{
+					SelfTest = false;
+					LL_AnalogInputsSelfTest(SelfTest);
+
+					Int16U SelfTestResult = CONTROL_CheckSelfTestResults();
+
+					if(SelfTestResult)
+					{
+						DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
+						CONTROL_SwitchToFault(SelfTestResult);
+					}
+					else
+					{
+						DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_OK;
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+				}
+				if(DataTable[REG_PCB_VERSION] == PCB_VERSION_10)
+				{
+					if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
+					{
+						CONTROL_FinishedWithProblem(PROBLEM_VOLTAGE_OUT_OF_RANGE);
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+					if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
+					{
+						CONTROL_FinishedWithProblem(PROBLEM_CURRENT_OUT_OF_RANGE);
+						CONTROL_SetDeviceState(DS_Ready, SS_None);
+					}
+				}
+				LOGIC_SaveResults(UtResult, ItResult);
+				CONTROL_SetDeviceState(DS_Ready, SS_None);
+				DataTable[REG_OP_RESULT] = OPRESULT_OK;
 				break;
 
 			default:
@@ -528,12 +610,6 @@ void CONTROL_SaveDataToEndpoint()
 }
 //-----------------------------------------------
 
-void CONTROL_SaveResults()
-{
-	LOGIC_SaveResults();
-}
-//-----------------------------------------------
-
 void CONTROL_HandlePowerOff()
 {
 	if(CONTROL_State == DS_None && SUB_State == SS_PowerOff)
@@ -561,7 +637,16 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 
 bool CONTROL_IsSafetyEvent()
 {
-	return (!DataTable[REG_MUTE_SAFETY]) ? LL_GetSafetyState() : FALSE;
+	if (DataTable[REG_MUTE_SAFETY])
+	{
+		LL_SetSafetyState(false);
+		return false;
+	}
+	else
+	{
+		LL_SetSafetyState(true);
+		return LL_GetSafetyState();
+	}
 }
 //-----------------------------------------------
 

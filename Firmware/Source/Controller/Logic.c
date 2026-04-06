@@ -282,33 +282,39 @@ void LOGIC_StartPulse()
 
 bool LOGIC_FinishProcess()
 {
+	static bool DMADataProcessed = false;
 	// Завершение оцифровки
 	if(IT_DMASampleCompleted())
 	{
-		TIM_Stop(TIM1);
-
-		TIM_Stop(TIM7);
-
-		IsImpulse = false;
-		LL_SyncLCSU(false);
-		LL_SyncScope(false);
-		GATE_StopProcess();
-
-		// Пересчёт значений
-		MEASURE_ConvertUt(MEMBUF_DMA_Ut, VALUES_POWER_DMA_SIZE);
-		MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
-		if (DataTable[REG_PCB_VERSION] == PCB_VERSION_20)
+		if(!DMADataProcessed)
 		{
-			if (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT)
-			{
+			TIM_Stop(TIM1);
+			TIM_Stop(TIM7);
+			LL_SyncScope(false);
+			// Пересчёт значений
+			MEASURE_ConvertUt(MEMBUF_DMA_Ut, VALUES_POWER_DMA_SIZE);
+			MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
+			if ((DataTable[REG_PCB_VERSION] == PCB_VERSION_20) && (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT))
 				MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
-			}
-		}
 
-		return true;
+			DMADataProcessed = true;
+		}
+		// Завершение процесса только после отключения синхронизации по таймеру регулятора
+		if(!IsImpulse)
+		{
+			GATE_StopProcess();
+			DMADataProcessed = false; // Сброс флага для следующего цикла
+			return true;
+		}
+		else
+			// DMA завершен, но синхронизация еще работает - ждем отключения через регулятор
+			return false;
 	}
 	else
+	{
+		DMADataProcessed = false; // Сброс флага если DMA еще не завершен
 		return false;
+	}
 }
 // ----------------------------------------
 
@@ -326,31 +332,35 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 }
 // ----------------------------------------
 
-void LOGIC_SaveResults()
+void LOGIC_GetResults(float *UtResult, float *UtCh2Result, float *ItResult)
 {
-	float UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut, true);
-	switch((Int16U)DataTable[REG_PCB_VERSION])
+	float UtMaxVal = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : UT_MAX_VALUE;
+
+	*UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut);
+	if(((Int16U)DataTable[REG_PCB_VERSION] == PCB_VERSION_20) && (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT))
 	{
-		case PCB_VERSION_10:
-			DataTable[REG_RESULT_UT] = UtResult;
-			break;
-
-		case PCB_VERSION_20:
-			{
-				float UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg, false);
-				DataTable[REG_RESULT_UT] = UtResult > (Int16U)DataTable[REG_UT_MAX] ? UtCh2Result : UtResult;
-			}
-			break;
+		*UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg);
+		*UtResult = (*UtResult > UtMaxVal) ? *UtCh2Result : *UtResult;
 	}
+	*ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It);
+}
+// ----------------------------------------
 
-	float ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It, true);
+void LOGIC_SaveResults(float UtResult, float ItResult)
+{
+	DataTable[REG_RESULT_UT] = UtResult;
 	DataTable[REG_RESULT_IT] = ItResult;
 	DataTable[REG_RESULT_UG] = MEASURE_GateAverageVoltage();
+	DataTable[REG_RESULT_IG] = MEASURE_GateAverageCurrent();
+}
+// ----------------------------------------
 
-	if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
-		DataTable[REG_WARNING] = WARNING_VOLTAGE_OUT_OF_RANGE;
+bool LOGIC_CheckResults(float UtResult)
+{
+	float UtMaxVal, UtMinVal;
+	UtMaxVal = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : UT_MAX_VALUE;
+	UtMinVal = DataTable[REG_UT_MIN] ? DataTable[REG_UT_MIN] : UT_MIN_VALUE;
 
-	if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
-			DataTable[REG_WARNING] = WARNING_CURRENT_OUT_OF_RANGE;
+	return ((UtResult > UtMaxVal) || (UtResult < UtMinVal));
 }
 // ----------------------------------------

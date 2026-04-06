@@ -5,12 +5,12 @@
 #include "DataTable.h"
 #include "Board.h"
 #include "Global.h"
-#include "DataTable.h"
 #include "DeviceObjectDictionary.h"
 #include "LowLevel.h"
 #include "Delay.h"
 #include "math.h"
 #include "MemBuffers.h"
+#include "Controller.h"
 
 // Variables
 //
@@ -21,13 +21,21 @@ float RegulatorQi = 0;
 float RegulatorQimax = 0;
 float GateVoltageSetpoint = 0;
 float dUg = 0;
+float dUdiag = 0;
 float RegulatorAlowedError = 0;
-float GateVoltage = 0;
+float GateVoltage = 0; 						// Напряжение, которое должно быть при работе регулятора
+float GateVoltageDiag = 0;					// Напряжение, которое должно быть при работе диагностики
 Int16U FollowingErrorCounterMax = 0;
 Int16U FollowingErrorCounter = 0;
 Int16U RegulatorCounter = 0;
 Int16U GateValues_Counter = 0;
 float DelayInMeasure = 0;
+float DiagVoltThreshold = 0;
+float DiagCurrentThreshold = 0;
+float DiagCounterThreshold = 0;
+float DiagVoltage = 0;						// Устанавливаемое напряжение с которым идет сравнение в процессе диагностики
+float DiagCurrent = 0;
+Int16U DiagErrorCounter = 0;
 
 // Forward functions
 Int16U GATE_ConvertUgToDAC(float Value);
@@ -93,16 +101,27 @@ void GATE_CacheVariables()
 	RegulatorQimax = DataTable[REG_REGULATOR_QI_MAX];
 	GateVoltageSetpoint = DataTable[REG_UG_SETPOINT];
 	dUg = DataTable[REG_UG_SETPOINT]/(DataTable[REG_UG_EDGE_TIME] / TIMER2_uS);
+	dUdiag = DataTable[REG_EXT_DIAG_U_REF]/(DataTable[REG_UG_EDGE_TIME] / TIMER2_uS);
 	RegulatorAlowedError = DataTable[REG_REGULATOR_ALLOWED_ERR];
 	FollowingErrorCounterMax = (Int16U)DataTable[REG_FOLLOWING_ERR_CNT];
+	DiagVoltThreshold = DataTable[REG_EXT_DIAG_U_THRESHOLD]*0.01f;
+	DiagCurrentThreshold = DataTable[REG_EXT_DIAG_I_THRESHOLD]*0.01f;
+	DiagVoltage = DataTable[REG_EXT_DIAG_U_REF];
+	DiagCurrent = DataTable[REG_EXT_DIAG_I_REF];
+
 	//
 	GateVoltage = 0;
+	GateVoltageDiag = 0;
 	RegulatorCounter = 0;
 	FollowingErrorCounter = 0;
 	GateValues_Counter = 0;
+	DiagErrorCounter = 0;
 
 	//Умножение на 1000, чтобы преобразовать мс в мкс
 	DelayInMeasure = DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
+
+	DiagCounterThreshold = (DataTable[REG_EXT_DIAG_DURATION] * 1000 / TIMER2_uS) * 0.1; // Взята 1\10 часть от макс ошибки,
+																						// т.к иначе она не успевает накопиться за время работы
 
 	GATE_RegulatorState = RS_None;
 }
@@ -110,38 +129,91 @@ void GATE_CacheVariables()
 
 void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 {
-	float RegulatorError, RegulatorOut, Qp, Qi = 0;
+	float RegulatorError, RegulatorOut, Qp, RegulatorVoltage = 0;
 	static Int16U SyncDelayCounter = 0;
+	static float Qi = 0;
 
 	// Формирование линейно нарастающего фронта импульса напряжения
-	if(GateVoltage < GateVoltageSetpoint)
+	switch(GATE_RegulatorState)
 	{
-		GateVoltage += dUg;
-		GATE_RegulatorState = RS_InProcess;
-	}
-	else
-	{
-		GateVoltage = GateVoltageSetpoint;
-		GATE_RegulatorState = RS_TargetReached;
+		case RS_None:
+		case RS_InProcess:
+		case RS_TargetReached:
+		case RS_FollowingError:
+		case RS_GateShort:
+		{
+			if(GateVoltage < GateVoltageSetpoint)
+			{
+				GateVoltage += dUg;
+				GATE_RegulatorState = RS_InProcess;
+			}
+			else
+			{
+				GateVoltage = GateVoltageSetpoint;
+				GATE_RegulatorState = RS_TargetReached;
+			}
+
+			RegulatorVoltage = GateVoltage;
+			RegulatorError = (RegulatorCounter == 0) ? 0 : (RegulatorVoltage - VoltageSample);
+
+			if(fabsf(RegulatorError / RegulatorVoltage * 100) < RegulatorAlowedError)
+			{
+				if(FollowingErrorCounter)
+					FollowingErrorCounter--;
+			}
+			else
+			{
+				FollowingErrorCounter++;
+
+				if(CurrentSample >= DataTable[REG_IG_THRESHOLD])
+					GATE_RegulatorState = RS_GateShort;
+
+				else if(FollowingErrorCounter >= FollowingErrorCounterMax && !DataTable[REG_FOLLOWING_ERR_MUTE])
+					GATE_RegulatorState = RS_FollowingError;
+			}
+		}
+		break;
+
+		case RS_Diagnostic:
+		case RS_DiagShort:
+		case RS_DiagDisconnected:
+		{
+			if(GateVoltageDiag < DiagVoltage)
+				GateVoltageDiag += dUdiag;
+			else
+			{
+				GateVoltageDiag = DiagVoltage;
+
+				if((VoltageSample < DiagVoltage * (DiagVoltThreshold + 1))	&& (CurrentSample > DiagCurrent * (DiagCurrentThreshold + 1)))
+				{
+					if(DiagErrorCounter < DiagCounterThreshold)
+						DiagErrorCounter++;
+					if(DiagErrorCounter >= DiagCounterThreshold)
+					{
+						DiagErrorCounter = 0;
+						GATE_RegulatorState = RS_DiagShort;
+					}
+				}
+
+				if((VoltageSample > DiagVoltage * (DiagVoltThreshold + 1))	&& (CurrentSample < DiagCurrent * (DiagCurrentThreshold + 1)))
+				{
+					if(DiagErrorCounter < DiagCounterThreshold)
+						DiagErrorCounter++;
+					if(DiagErrorCounter >= DiagCounterThreshold)
+					{
+						DiagErrorCounter = 0;
+						GATE_RegulatorState = RS_DiagDisconnected;
+					}
+				}
+			}
+			RegulatorVoltage = GateVoltageDiag;
+			RegulatorError = (RegulatorCounter == 0) ? 0 : (RegulatorVoltage - VoltageSample);
+		}
+		break;
 	}
 
-	RegulatorError = (RegulatorCounter == 0) ? 0 : (GateVoltage - VoltageSample);
-
-	if(fabsf(RegulatorError / GateVoltage * 100) < RegulatorAlowedError)
-	{
-		if(FollowingErrorCounter)
-			FollowingErrorCounter--;
-	}
-	else
-	{
-		FollowingErrorCounter++;
-
-		if(FollowingErrorCounter >= FollowingErrorCounterMax && !DataTable[REG_FOLLOWING_ERR_MUTE])
-				GATE_RegulatorState = RS_FollowingError;
-
-		if(CurrentSample >= DataTable[REG_IG_THRESHOLD])
-				GATE_RegulatorState = RS_GateShort;
-	}
+	if (RegulatorCounter == 0)
+		Qi = 0;
 
 	Qi += RegulatorError * RegulatorQi;
 
@@ -153,14 +225,18 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 
 	Qp = RegulatorError * RegulatorQp;
 
-	RegulatorOut = GateVoltage + Qp +Qi;
+	RegulatorOut = RegulatorVoltage + Qp + Qi;
 
 	GATE_SetUg(RegulatorOut);
 
 	if(IsImpulse)
 	{
 		if(RegulatorCounter >= SyncDelayCounter)
+		{
 			LL_SyncScope(true);
+			LL_SyncLCSU(false);
+			IsImpulse = false;
+		}
 	}
 	else
 		SyncDelayCounter = RegulatorCounter + DelayInMeasure;
@@ -181,11 +257,5 @@ void GATE_SaveToEndpoints(float Voltage, float Current, float Error)
 
 		GateValues_Counter++;
 	}
-}
-//------------------------------------
-
-bool GATE_RegulatorStatusCheck(RegulatorState State)
-{
-	return (GATE_RegulatorState == State) ? true : false;
 }
 //------------------------------------

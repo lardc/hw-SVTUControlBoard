@@ -9,8 +9,9 @@ void MEASURE_ConvertUt(pFloat32 InputArray, Int16U DataLength);
 void MEASURE_ConvertUt2(pFloat32 InputArray, Int16U DataLength);
 void MEASURE_ConvertIt(pFloat32 InputArray, Int16U DataLength, Int16U CurrentRange);
 //
-float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary, bool TimerConversion);
+float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary);
 float MEASURE_GateAverageVoltage();
+float MEASURE_GateAverageCurrent();
 //
 float MEASURE_Ug_ADC_Direct(Int16U SampleADC);
 float MEASURE_Ig_ADC_Direct(Int16U SampleADC);

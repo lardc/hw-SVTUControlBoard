@@ -25,9 +25,15 @@ void LL_SyncScope(bool State)
 }
 //------------------------------------
 
-void LL_AnalogInputsSelftTest(bool State)
+void LL_AnalogInputsSelfTest(bool State)
 {
 	GPIO_SetState(GPIO_AIN_ST, State);
+}
+//------------------------------------
+
+void LL_AnalogInputsDiagGate(bool State)
+{
+	GPIO_SetState(GPIO_UGT_SELF_TEST, State);
 }
 //------------------------------------
 
@@ -64,5 +70,11 @@ void LL_SetItRange(bool Range)
 bool LL_ItGetRange()
 {
 	return GPIO_GetState(GPIO_IT_RANGE);
+}
+//------------------------------------
+
+void LL_SetSafetyState(bool State)
+{
+	GPIO_SetState(GPIO_SAFETY, State);
 }
 //------------------------------------

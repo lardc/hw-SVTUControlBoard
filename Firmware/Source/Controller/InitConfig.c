@@ -40,6 +40,7 @@ void INITCFG_ConfigGPIO()
 	GPIO_InitPushPullOutput(GPIO_LED);
 	GPIO_InitPushPullOutput(GPIO_SYNC_OSC);
 	GPIO_InitPushPullOutput(GPIO_AIN_ST);
+	GPIO_InitPushPullOutput(GPIO_UGT_SELF_TEST);
 	GPIO_InitPushPullOutput(GPIO_SYNC_LCSU);
 	GPIO_InitPushPullOutput(GPIO_IND_CTRL);
 	GPIO_InitPushPullOutput(GPIO_IT_RANGE);
@@ -51,12 +52,16 @@ void INITCFG_ConfigGPIO()
 	GPIO_SetState(GPIO_SYNC_LCSU, false);
 	GPIO_SetState(GPIO_IND_CTRL, false);
 	GPIO_SetState(GPIO_IT_RANGE, false);
+	GPIO_SetState(GPIO_UGT_SELF_TEST, false);
 	
 	// Альтернативные функции
 	GPIO_InitAltFunction(GPIO_ALT_CAN_RX, AltFn_9);
 	GPIO_InitAltFunction(GPIO_ALT_CAN_TX, AltFn_9);
 	GPIO_InitAltFunction(GPIO_ALT_UART_RX, AltFn_7);
 	GPIO_InitAltFunction(GPIO_ALT_UART_TX, AltFn_7);
+
+	// Выходы с OpenDrain
+	GPIO_InitOpenDrainOutput(GPIO_SAFETY, NoPull);
 }
 //------------------------------------
 

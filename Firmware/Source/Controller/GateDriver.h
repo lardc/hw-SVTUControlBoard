@@ -9,7 +9,10 @@ typedef enum __RegulatorState
 	RS_InProcess		= 1,
 	RS_TargetReached	= 2,
 	RS_FollowingError	= 3,
-	RS_GateShort		= 4
+	RS_GateShort		= 4,
+	RS_Diagnostic		= 5,
+	RS_DiagShort		= 6,
+	RS_DiagDisconnected = 7
 } RegulatorState;
 
 // Variables
@@ -21,9 +24,8 @@ extern RegulatorState GATE_RegulatorState;
 //
 void GATE_SetUg(float Value);
 void GATE_StartProcess();
-void GATE_RegulatorProcess(float GateVoltageSample, float CurrentSample);
+void GATE_RegulatorProcess(float VoltageSample, float CurrentSample);
 void GATE_StopProcess();
 void GATE_CacheVariables();
-bool GATE_RegulatorStatusCheck(RegulatorState State);
 
 #endif // __GATE_DRIVER_H
