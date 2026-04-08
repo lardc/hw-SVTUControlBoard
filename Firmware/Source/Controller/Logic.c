@@ -153,7 +153,7 @@ bool LOGIC_WriteLCSUConfig()
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
-			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
+			if(!BHL_WriteRegisterFloat(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
 				if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, DataTable[REG_PULSE_DURATION]))
 					return false;
 		}
@@ -207,7 +207,10 @@ bool LOGIC_DistributeCurrent(float Current)
 				Current -= CachedLCSUMaxCurrent;
 			}
 			else
+			{
 				LCSU_DataArray[i].Current = Current;
+				Current = 0;
+			}
 		}
 	}
 	

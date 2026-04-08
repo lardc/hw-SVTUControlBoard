@@ -152,13 +152,19 @@ float MEASURE_GateAverageCurrent()
 float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary)
 {
 	//  Рассчет начальной точки сделан костыльно, опираясь только на макс размер массива
-	Int16U MearusingPoints = DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
-	Int16U Coef = (DataTable[REG_PULSE_DURATION] <= 5) ? (7 - DataTable[REG_PULSE_DURATION]) : 1;
-	Int16U Offset = DataTable[REG_UG_EDGE_TIME] / ( TIMER2_uS / TIMER1_uS) + Coef * DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
-	Int16U StartIndex = Offset - MearusingPoints;
+	int32_t MearusingPoints = (int32_t)DataTable[REG_MSR_TIME] * TIMER2_uS / TIMER1_uS;
+	int32_t Coef = (DataTable[REG_PULSE_DURATION] <= 5) ? (7 - (int32_t)DataTable[REG_PULSE_DURATION]) : 1;
+	int32_t Offset = (int32_t)DataTable[REG_UG_EDGE_TIME] / ( TIMER2_uS / TIMER1_uS) + Coef * (int32_t)DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
+	int32_t StartIndex = Offset - MearusingPoints;
+
 	if (StartIndex < 0)
 		StartIndex = 0;
-	return MEASURE_ExtractAverageValues(MEMBUF_DMA_Intermediary, StartIndex, MearusingPoints);
+	if (StartIndex >= VALUES_POWER_DMA_SIZE)
+		StartIndex = VALUES_POWER_DMA_SIZE - 1;
+	if (StartIndex + MearusingPoints > VALUES_POWER_DMA_SIZE)
+		MearusingPoints = VALUES_POWER_DMA_SIZE - StartIndex;
+
+	return MEASURE_ExtractAverageValues(MEMBUF_DMA_Intermediary, (Int16U)StartIndex, (Int16U)MearusingPoints);
 }
 //------------------------------------
 
