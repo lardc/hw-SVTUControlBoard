@@ -197,8 +197,8 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 			if(CONTROL_State == DS_InProcess)
 			{
 				LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS);
-				CONTROL_ResetToDefaults();
 				CONTROL_FinishedWithProblem(PROBLEM_FORCED_STOP);
+				CONTROL_ResetToDefaults();
 			}
 			break;
 			
@@ -370,7 +370,11 @@ void CONTROL_HandlePulse()
 			case SS_WaitPulsePause:
 				{
 					if(LOGIC_AreLCSUInStateX(LCSU_Ready))
-						CONTROL_SetDeviceState(DS_InProcess, SS_ConfigPulse);
+					{
+						LOGIC_UpdateProblemsOrFaults();
+						if(LOGIC_NoIssuesFromLCSU())
+							CONTROL_SetDeviceState(DS_InProcess, SS_ConfigPulse);
+					}
 					else
 						CONTROL_HandleFaultLCSUEvents(Timeout);
 				}
@@ -431,10 +435,7 @@ void CONTROL_HandlePulse()
 							CONTROL_SwitchToFault(DF_SELFTEST_GATE);
 						}
 						else
-						{
-							CONTROL_ResetHardware();
 							CONTROL_FinishedWithProblem(PROBLEM_GATE_VOLTAGE);
-						}
 						break;
 
 					case RS_GateShort:
@@ -444,10 +445,7 @@ void CONTROL_HandlePulse()
 							CONTROL_SwitchToFault(DF_SELFTEST_GATE);
 						}
 						else
-						{
-							GATE_StopProcess();
 							CONTROL_FinishedWithProblem(PROBLEM_GATE_SHORT);
-						}
 						break;
 
 					default:
@@ -478,27 +476,31 @@ void CONTROL_HandlePulse()
 			case SS_CheckResultAndPostPulseConfig:
 				{
 					CONTROL_SaveDataToEndpoint();
-					LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult);
 
-					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
+					LOGIC_UpdateProblemsOrFaults();
+					if(LOGIC_NoIssuesFromLCSU())
 					{
-						if((LOGIC_CheckResults(UtResult)) || Diagnostic)
+						LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult);
+						if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
 						{
-							TIM_Stop(TIM15);
-							GATE_CacheVariables();
-							GATE_RegulatorState = RS_Diagnostic;
-							LL_AnalogInputsDiagGate(true);
-							LL_AnalogInputsSelfTest(true);
-							DELAY_MS(3);
-							Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
-							GATE_StartProcess();
-							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseProcess);
+							if((LOGIC_CheckResults(UtResult)) || Diagnostic)
+							{
+								TIM_Stop(TIM15);
+								GATE_CacheVariables();
+								GATE_RegulatorState = RS_Diagnostic;
+								LL_AnalogInputsDiagGate(true);
+								LL_AnalogInputsSelfTest(true);
+								DELAY_MS(3);
+								Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
+								GATE_StartProcess();
+								CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseProcess);
+							}
+							else
+								CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 						}
 						else
 							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 					}
-					else
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 				}
 				break;
 
@@ -512,15 +514,9 @@ void CONTROL_HandlePulse()
 					Diagnostic = false;
 
 					if(GATE_RegulatorState == RS_DiagDisconnected)
-					{
-						CONTROL_ResetHardware();
 						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_LINE_DISCON);
-					}
 					else if(GATE_RegulatorState == RS_DiagShort)
-					{
-						CONTROL_ResetHardware();
 						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_SHORT);
-					}
 					else
 					{
 						DataTable[REG_OP_RESULT] = OPRESULT_OK;
@@ -605,7 +601,8 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 	if(LOGIC_IsLCSUInFaultOrDisabled())
 	{
 		LOGIC_UpdateProblemsOrFaults();
-		LOGIC_FindIssueFromLCSU();
+		if(LOGIC_NoIssuesFromLCSU())
+			CONTROL_SwitchToFault(DF_LCSU_UNEXPECTED_STATE);
 	}
 	else if(CONTROL_TimeCounter > Timeout)
 		CONTROL_SwitchToFault(DF_LCSU_STATE_TIMEOUT);
@@ -631,6 +628,7 @@ void CONTROL_FinishedWithProblem(Int16U Problem)
 {
 	DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
 	DataTable[REG_PROBLEM] = Problem;
+	CONTROL_ResetHardware();
 	CONTROL_SetDeviceState(DS_Ready, SS_None);
 }
 //-----------------------------------------------
@@ -639,10 +637,7 @@ void CONTROL_SafetyProcess()
 {
 	if(CONTROL_IsSafetyEvent() && CONTROL_State == DS_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge
 			&& SUB_State != SS_PowerOff)
-	{
-		CONTROL_ResetHardware();
 		CONTROL_FinishedWithProblem(PROBLEM_SAFETY);
-	}
 }
 // ----------------------------------------
 

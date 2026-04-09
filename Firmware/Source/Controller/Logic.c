@@ -177,31 +177,50 @@ bool LOGIC_UpdateProblemsOrFaults()
 }
 // ----------------------------------------
 
-void LOGIC_FindIssueFromLCSU()
+bool LOGIC_NoIssuesFromLCSU()
 {
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
 			if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_FOLLOWING_ERROR)
+			{
 				CONTROL_FinishedWithProblem(PROBLEM_FOLLOWING_ERROR_LCSU);
+				return false;
+			}
 
 			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_SYNC_STOP)
+			{
 				CONTROL_FinishedWithProblem(PROBLEM_SYNC_STOP_LCSU);
+				return false;
+			}
 
 			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_MANUAL_STOP)
+			{
 				CONTROL_FinishedWithProblem(PROBLEM_MANUAL_STOP_LCSU);
+				return false;
+			}
 
 			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_TRAPEZE_INDEX)
+			{
 				CONTROL_FinishedWithProblem(PROBLEM_TRAPEZE_INDEX_LCSU);
+				return false;
+			}
 
 			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_SIN_CALC_FAIL)
+			{
 				CONTROL_FinishedWithProblem(PROBLEM_SIN_CALC_FAIL_LCSU);
+				return false;
+			}
 
 			if(LCSU_DataArray[i].Fault == DF_LCSU_PROBLEM_BATTERY)
+			{
 				CONTROL_SwitchToFault(DF_PROBLEM_BATTERY_LCSU);
+				return false;
+			}
 		}
 	}
+	return true;
 }
 // ----------------------------------------
 
@@ -223,7 +242,6 @@ bool LOGIC_WriteLCSUConfig()
 			}
 		}
 	}
-	
 	return true;
 }
 // ----------------------------------------

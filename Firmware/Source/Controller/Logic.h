@@ -16,7 +16,7 @@ bool LOGIC_WriteLCSUConfig();
 bool LOGIC_AreLCSUInStateX(Int16U State);
 bool LOGIC_IsLCSUInFaultOrDisabled();
 bool LOGIC_UpdateProblemsOrFaults();
-void LOGIC_FindIssueFromLCSU();
+bool LOGIC_NoIssuesFromLCSU();
 
 bool LOGIC_SetCurrentForCertainLCSU(Int16U Nid, float Current);
 bool LOGIC_DistributeCurrent(float Current);
