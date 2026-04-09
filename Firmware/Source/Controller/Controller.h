@@ -57,6 +57,7 @@ extern SubState SUB_State;
 void CONTROL_Init();
 void CONTROL_Idle();
 void CONTROL_SwitchToFault(Int16U Reason);
+void CONTROL_FinishedWithProblem(Int16U Problem);
 void CONTROL_SafetyProcess();
 void CONTROL_HandleExternalLamp(bool IsImpulse);
 void CONTROL_InitJSONPointers();

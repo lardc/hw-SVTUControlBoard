@@ -7,14 +7,16 @@
 
 //Functions
 //
-bool LOGIC_FindLCSU();
+void LOGIC_FindLCSU();
 bool LOGIC_UpdateLCSUState();
 
 bool LOGIC_CallCommandForLCSU(Int16U Command);
 bool LOGIC_PowerEnableLCSU();
 bool LOGIC_WriteLCSUConfig();
 bool LOGIC_AreLCSUInStateX(Int16U State);
-bool LOGIC_IsLCSUInFaultOrDisabled(Int16U Fault, Int16U Disabled);
+bool LOGIC_IsLCSUInFaultOrDisabled();
+bool LOGIC_UpdateProblemsOrFaults();
+void LOGIC_FindIssueFromLCSU();
 
 bool LOGIC_SetCurrentForCertainLCSU(Int16U Nid, float Current);
 bool LOGIC_DistributeCurrent(float Current);

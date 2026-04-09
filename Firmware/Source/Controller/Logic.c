@@ -29,6 +29,8 @@ typedef struct __LCSUStructData
 	bool IsActive;
 	LCSUState State;
 	float Current;
+	Int8U Fault;
+	Int8U Problem;
 } LCSUData, *pLCSUData;
 
 // Variables
@@ -42,7 +44,7 @@ void LOGIC_ResetLCSUCurrent();
 
 // Functions
 //
-bool LOGIC_FindLCSU()
+void LOGIC_FindLCSU()
 {
 	ActiveLCSUCounter = 0;
 	CachedLCSUStartNid = DataTable[REG_LCSU_START_NID];
@@ -61,8 +63,6 @@ bool LOGIC_FindLCSU()
 	
 	DataTable[REG_LCSU_DETECTED] = ActiveLCSUCounter;
 	DataTable[REG_IT_READ_MAX] = CachedLCSUMaxCurrent * ActiveLCSUCounter;
-	
-	return ActiveLCSUCounter;
 }
 // ----------------------------------------
 
@@ -77,10 +77,12 @@ bool LOGIC_UpdateLCSUState()
 			if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_DEV_STATE, &Register))
 				LCSU_DataArray[i].State = Register;
 			else
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
 				return false;
+			}
 		}
 	}
-	
 	return true;
 }
 // ----------------------------------------
@@ -90,60 +92,116 @@ bool LOGIC_CallCommandForLCSU(Int16U Command)
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
-		{
 			if(!BHL_Call(i + CachedLCSUStartNid, Command))
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
 				return false;
-		}
+			}
 	}
-	
 	return true;
 }
 // ----------------------------------------
 
 bool LOGIC_PowerEnableLCSU()
 {
-	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	if(!DataTable[REG_LCSU_DETECTED])
 	{
-		if(LCSU_DataArray[i].IsActive)
-		{
-			if(LCSU_DataArray[i].State == LCSU_None)
-			{
-				if(!BHL_Call(i + CachedLCSUStartNid, ACT_LCSU_ENABLE_POWER))
-					return false;
-			}
-		}
+		CONTROL_SwitchToFault(DF_INTERFACE);
+		return false;
 	}
 
-	if(!DataTable[REG_LCSU_DETECTED])
-		return false;
-	
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	{
+		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State == LCSU_None)
+			if(!BHL_Call(i + CachedLCSUStartNid, ACT_LCSU_ENABLE_POWER))
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
+				return false;
+			}
+	}
 	return true;
 }
 // ----------------------------------------
 
 bool LOGIC_AreLCSUInStateX(Int16U State)
 {
-	bool result = true;
-	
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State != State)
-			result = false;
+			return false;
 	}
 	
-	return result;
+	return true;
 }
 // ----------------------------------------
 
-bool LOGIC_IsLCSUInFaultOrDisabled(Int16U Fault, Int16U Disabled)
+bool LOGIC_IsLCSUInFaultOrDisabled()
 {
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
-		if(LCSU_DataArray[i].State == Fault || LCSU_DataArray[i].State == Disabled)
+		if(LCSU_DataArray[i].State == LCSU_Fault || LCSU_DataArray[i].State == LCSU_Disabled)
 			return true;
 	}
 	
 	return false;
+}
+// ----------------------------------------
+
+bool LOGIC_UpdateProblemsOrFaults()
+{
+	Int16U Register;
+
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	{
+		if(LCSU_DataArray[i].IsActive)
+		{
+			if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_PROBLEM, &Register))
+			{
+				LCSU_DataArray[i].Problem = Register;
+				if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_FAULT_REASON, &Register))
+					LCSU_DataArray[i].Fault = Register;
+				else
+				{
+					CONTROL_SwitchToFault(DF_INTERFACE);
+					return false;
+				}
+			}
+			else
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
+				return false;
+			}
+		}
+	}
+	return true;
+}
+// ----------------------------------------
+
+void LOGIC_FindIssueFromLCSU()
+{
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	{
+		if(LCSU_DataArray[i].IsActive)
+		{
+			if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_FOLLOWING_ERROR)
+				CONTROL_FinishedWithProblem(PROBLEM_FOLLOWING_ERROR_LCSU);
+
+			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_SYNC_STOP)
+				CONTROL_FinishedWithProblem(PROBLEM_SYNC_STOP_LCSU);
+
+			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_MANUAL_STOP)
+				CONTROL_FinishedWithProblem(PROBLEM_MANUAL_STOP_LCSU);
+
+			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_TRAPEZE_INDEX)
+				CONTROL_FinishedWithProblem(PROBLEM_TRAPEZE_INDEX_LCSU);
+
+			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_SIN_CALC_FAIL)
+				CONTROL_FinishedWithProblem(PROBLEM_SIN_CALC_FAIL_LCSU);
+
+			if(LCSU_DataArray[i].Fault == DF_LCSU_PROBLEM_BATTERY)
+				CONTROL_SwitchToFault(DF_PROBLEM_BATTERY_LCSU);
+		}
+	}
 }
 // ----------------------------------------
 
@@ -154,8 +212,15 @@ bool LOGIC_WriteLCSUConfig()
 		if(LCSU_DataArray[i].IsActive)
 		{
 			if(!BHL_WriteRegisterFloat(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
-				if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, DataTable[REG_PULSE_DURATION]))
-					return false;
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
+				return false;
+			}
+			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, DataTable[REG_PULSE_DURATION]))
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
+				return false;
+			}
 		}
 	}
 	

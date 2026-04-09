@@ -53,7 +53,6 @@ void CONTROL_HandlePowerOff();
 void CONTROL_SaveDataToEndpoint();
 Int16U CONTROL_CheckSelfTestResults();
 bool CONTROL_IsSafetyEvent();
-void CONTROL_FinishedWithProblem(Int16U Problem);
 void CONTROL_InitStoragePointers();
 void CONTROL_InitJSONPointers();
 
@@ -200,7 +199,6 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 				LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS);
 				CONTROL_ResetToDefaults();
 				CONTROL_FinishedWithProblem(PROBLEM_FORCED_STOP);
-				CONTROL_SetDeviceState(DS_Ready, SS_None);
 			}
 			break;
 			
@@ -310,8 +308,7 @@ void CONTROL_LCSUStateUpdate()
 		if(CONTROL_TimeCounter > NextUpdate)
 		{
 			NextUpdate = CONTROL_TimeCounter + TIME_LCSU_UPDATE;
-			if(!LOGIC_UpdateLCSUState())
-				CONTROL_SwitchToFault(DF_INTERFACE);
+			LOGIC_UpdateLCSUState();
 		}
 	}
 }
@@ -332,8 +329,6 @@ void CONTROL_HandlePowerOn()
 						Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 						CONTROL_SetDeviceState(DS_InProcess, SS_WaitCharge);
 					}
-					else
-						CONTROL_SwitchToFault(DF_INTERFACE);
 				}
 				break;
 				
@@ -387,22 +382,15 @@ void CONTROL_HandlePulse()
 
 					if(LOGIC_DistributeCurrent(CurrentAmplitude)||DataTable[REG_EMULATION])
 					{
-						bool NoError = false;
 						LOGIC_SelectCurrentRange(CurrentAmplitude);
 						LL_AnalogInputsSelfTest(SelfTest);
 						
 						if(LOGIC_WriteLCSUConfig())
-						{
 							if(LOGIC_CallCommandForLCSU(ACT_LCSU_PULSE_CONFIG))
 							{
-								NoError = true;
 								Timeout = CONTROL_TimeCounter + TIMEOUT_LCSU_SHORT;
 								CONTROL_SetDeviceState(DS_InProcess, SS_WaitConfig);
 							}
-						}
-						
-						if(!NoError)
-							CONTROL_SwitchToFault(DF_INTERFACE);
 					}
 					else
 						CONTROL_SwitchToFault(DF_LCSU_CURRENT_CONFIG);
@@ -446,7 +434,6 @@ void CONTROL_HandlePulse()
 						{
 							CONTROL_ResetHardware();
 							CONTROL_FinishedWithProblem(PROBLEM_GATE_VOLTAGE);
-							CONTROL_SetDeviceState(DS_Ready, SS_None);
 						}
 						break;
 
@@ -460,7 +447,6 @@ void CONTROL_HandlePulse()
 						{
 							GATE_StopProcess();
 							CONTROL_FinishedWithProblem(PROBLEM_GATE_SHORT);
-							CONTROL_SetDeviceState(DS_Ready, SS_None);
 						}
 						break;
 
@@ -529,13 +515,11 @@ void CONTROL_HandlePulse()
 					{
 						CONTROL_ResetHardware();
 						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_LINE_DISCON);
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					}
 					else if(GATE_RegulatorState == RS_DiagShort)
 					{
 						CONTROL_ResetHardware();
 						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_SHORT);
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
 					}
 					else
 					{
@@ -567,15 +551,9 @@ void CONTROL_HandlePulse()
 				if(DataTable[REG_PCB_VERSION] == PCB_VERSION_10)
 				{
 					if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
-					{
 						CONTROL_FinishedWithProblem(PROBLEM_VOLTAGE_OUT_OF_RANGE);
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
-					}
 					if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
-					{
 						CONTROL_FinishedWithProblem(PROBLEM_CURRENT_OUT_OF_RANGE);
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
-					}
 				}
 				LOGIC_SaveResults(UtResult, ItResult);
 				CONTROL_SetDeviceState(DS_Ready, SS_None);
@@ -618,17 +596,16 @@ void CONTROL_HandlePowerOff()
 
 		if(LOGIC_CallCommandForLCSU(ACT_LCSU_DISABLE_POWER))
 			CONTROL_SetDeviceState(DS_None, SS_None);
-		else
-			CONTROL_SwitchToFault(DF_INTERFACE);
 	}
 }
 //-----------------------------------------------
 
 void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 {
-	if(LOGIC_IsLCSUInFaultOrDisabled(LCSU_Fault, LCSU_Disabled))
+	if(LOGIC_IsLCSUInFaultOrDisabled())
 	{
-		CONTROL_SwitchToFault(DF_LCSU_UNEXPECTED_STATE);
+		LOGIC_UpdateProblemsOrFaults();
+		LOGIC_FindIssueFromLCSU();
 	}
 	else if(CONTROL_TimeCounter > Timeout)
 		CONTROL_SwitchToFault(DF_LCSU_STATE_TIMEOUT);
@@ -654,6 +631,7 @@ void CONTROL_FinishedWithProblem(Int16U Problem)
 {
 	DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
 	DataTable[REG_PROBLEM] = Problem;
+	CONTROL_SetDeviceState(DS_Ready, SS_None);
 }
 //-----------------------------------------------
 
@@ -664,7 +642,6 @@ void CONTROL_SafetyProcess()
 	{
 		CONTROL_ResetHardware();
 		CONTROL_FinishedWithProblem(PROBLEM_SAFETY);
-		CONTROL_SetDeviceState(DS_Ready, SS_None);
 	}
 }
 // ----------------------------------------

@@ -187,6 +187,18 @@
 #define REG_LCSU_WARNING				195
 #define REG_LCSU_PROBLEM				196
 // -----------------------------
+//  Fault and disable codes in LCSU
+#define DF_LCSU_NONE					0
+#define DF_LCSU_PROBLEM_BATTERY			1
+
+// Problems in LCSU
+#define PROBLEM_LCSU_NONE				0
+#define PROBLEM_LCSU_FOLLOWING_ERROR	1
+#define PROBLEM_LCSU_SYNC_STOP			2
+#define PROBLEM_LCSU_MANUAL_STOP		3
+#define PROBLEM_LCSU_TRAPEZE_INDEX		4
+#define PROBLEM_LCSU_SIN_CALC_FAIL		5
+// -----------------------------
 
 // Endpoints
 #define EP_IT							1	// Оцифрованные данные It
@@ -213,6 +225,7 @@
 #define DF_SELFTEST_IT					6	// Ошибка измерения тока в режиме самотестирования
 #define DF_SELFTEST_GATE				7	// Ошибка формирования управления в режиме самотестирования
 #define DF_SVTU_WAIT_TIMEOUT			8	// Ошибка превышения времени установления флага готовности данных DMA
+#define DF_PROBLEM_BATTERY_LCSU			9	// Ошибка с батареей в LCSU
 
 // Warning
 #define WARNING_NONE					0	// Предупреждений нет
@@ -227,6 +240,11 @@
 #define PROBLEM_EXT_DIAG_SHORT			6	// КЗ в цепи измерения
 #define PROBLEM_VOLTAGE_OUT_OF_RANGE	7	// Измеренное напряжение вне рабочего диапазона (только для платы 1.0)
 #define PROBLEM_CURRENT_OUT_OF_RANGE	8	// Измеренный ток вне рабочего диапазона (только для платы 1.0)
+#define PROBLEM_FOLLOWING_ERROR_LCSU	9	// На LCSU выставился FE
+#define PROBLEM_SYNC_STOP_LCSU			10	// На LCSU остановился требуемый сигнал синхронизации
+#define PROBLEM_MANUAL_STOP_LCSU		11	// На LCSU была Принудительная остановка процесса
+#define PROBLEM_TRAPEZE_INDEX_LCSU		12	// На LCSU нет наличия индекса завершения полки трапеции
+#define PROBLEM_SIN_CALC_FAIL_LCSU		13	// На LCSU выставился PROBLEM_SIN_CALC_FAIL
 
 // User Errors
 #define ERR_NONE						0
