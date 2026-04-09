@@ -198,7 +198,6 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 			{
 				LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS);
 				CONTROL_FinishedWithProblem(PROBLEM_FORCED_STOP);
-				CONTROL_ResetToDefaults();
 			}
 			break;
 			
@@ -371,8 +370,7 @@ void CONTROL_HandlePulse()
 				{
 					if(LOGIC_AreLCSUInStateX(LCSU_Ready))
 					{
-						LOGIC_UpdateProblemsOrFaults();
-						if(LOGIC_NoIssuesFromLCSU())
+						if(LOGIC_UpdateProblemsOrFaults() && LOGIC_NoIssuesFromLCSU())
 							CONTROL_SetDeviceState(DS_InProcess, SS_ConfigPulse);
 					}
 					else
@@ -477,8 +475,7 @@ void CONTROL_HandlePulse()
 				{
 					CONTROL_SaveDataToEndpoint();
 
-					LOGIC_UpdateProblemsOrFaults();
-					if(LOGIC_NoIssuesFromLCSU())
+					if(LOGIC_UpdateProblemsOrFaults() && LOGIC_NoIssuesFromLCSU())
 					{
 						LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult);
 						if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
@@ -608,10 +605,10 @@ void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 {
 	if(LOGIC_IsLCSUInFaultOrDisabled())
 	{
-		LOGIC_UpdateProblemsOrFaults();
-		if(LOGIC_NoIssuesFromLCSU())
+		if(LOGIC_UpdateProblemsOrFaults() && LOGIC_NoIssuesFromLCSU())
 			CONTROL_SwitchToFault(DF_LCSU_UNEXPECTED_STATE);
 	}
+
 	else if(CONTROL_TimeCounter > Timeout)
 		CONTROL_SwitchToFault(DF_LCSU_STATE_TIMEOUT);
 }
@@ -636,6 +633,7 @@ void CONTROL_FinishedWithProblem(Int16U Problem)
 {
 	DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
 	DataTable[REG_PROBLEM] = Problem;
+	SelfTest = Diagnostic = false;
 	CONTROL_ResetHardware();
 	CONTROL_SetDeviceState(DS_Ready, SS_None);
 }
