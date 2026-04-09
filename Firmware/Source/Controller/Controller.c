@@ -537,19 +537,27 @@ void CONTROL_HandlePulse()
 					{
 						DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
 						CONTROL_SwitchToFault(SelfTestResult);
+						break;
 					}
 					else
 					{
 						DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_OK;
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
+						break;
 					}
 				}
-				if(DataTable[REG_PCB_VERSION] == PCB_VERSION_10)
+				else if(DataTable[REG_PCB_VERSION] == PCB_VERSION_10)
 				{
 					if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
+					{
 						CONTROL_FinishedWithProblem(PROBLEM_VOLTAGE_OUT_OF_RANGE);
+						break;
+					}
 					if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
+					{
 						CONTROL_FinishedWithProblem(PROBLEM_CURRENT_OUT_OF_RANGE);
+						break;
+					}
 				}
 				LOGIC_SaveResults(UtResult, ItResult);
 				CONTROL_SetDeviceState(DS_Ready, SS_None);
