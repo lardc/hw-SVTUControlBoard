@@ -247,6 +247,7 @@
 #define PROBLEM_MANUAL_STOP_LCSU		11	// На LCSU была Принудительная остановка процесса
 #define PROBLEM_TRAPEZE_INDEX_LCSU		12	// На LCSU нет наличия индекса завершения полки трапеции
 #define PROBLEM_SIN_CALC_FAIL_LCSU		13	// На LCSU выставился PROBLEM_SIN_CALC_FAIL
+#define PROBLEM_LCSU_UNKNOWN_PROBLEM	14	// На LCSU новая\неизвестная ошибка
 
 // User Errors
 #define ERR_NONE						0

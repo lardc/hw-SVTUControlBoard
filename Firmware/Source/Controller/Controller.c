@@ -323,7 +323,7 @@ void CONTROL_HandlePowerOn()
 		{
 			case SS_PowerOn:
 				{
-					if(DataTable[REG_EMULATION] || DataTable[REG_EMULATION])
+					if(DataTable[REG_EMULATION] || LOGIC_PowerEnableLCSU())
 					{
 						Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 						CONTROL_SetDeviceState(DS_InProcess, SS_WaitCharge);
