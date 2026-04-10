@@ -23,6 +23,9 @@
 #define TIMEOUT_LCSU_SHORT			1000			// Короткий таймаут по операциям с LCSU (в мс)
 #define TIME_FAULT_LED_BLINK		250				//
 #define TIME_EXT_LAMP_ON_STATE		500				//
+#define TIME_LCSU_DELAY_AFTER_SYNC	0.1f			// Пауза в LCSU перед началом формирования (в мс)
+#define TIME_DELAY_AFTER_PULSE		0.5f			// Пауза после формирования (в мс)
+#define TIME_START_FOR_OSC			0.075f			// Окно оцифровки в конце полки трапеции для осциллографа (в мс)
 
 // Параметры аналоговой подсистемы
 #define ADC_REF_VOLTAGE				3000.0f			// Опорное напряжение (в мВ)

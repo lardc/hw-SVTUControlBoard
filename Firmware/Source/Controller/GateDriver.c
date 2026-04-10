@@ -29,7 +29,6 @@ Int16U FollowingErrorCounterMax = 0;
 Int16U FollowingErrorCounter = 0;
 Int16U RegulatorCounter = 0;
 Int16U GateValues_Counter = 0;
-float DelayInMeasure = 0;
 float DiagVoltThreshold = 0;
 float DiagCurrentThreshold = 0;
 float DiagCounterThreshold = 0;
@@ -117,9 +116,6 @@ void GATE_CacheVariables()
 	GateValues_Counter = 0;
 	DiagErrorCounter = 0;
 
-	//Умножение на 1000, чтобы преобразовать мс в мкс
-	DelayInMeasure = DataTable[REG_PULSE_DURATION] * 1000 / TIMER2_uS;
-
 	DiagCounterThreshold = (DataTable[REG_EXT_DIAG_DURATION] * 1000 / TIMER2_uS) * 0.1; // Взята 1\10 часть от макс ошибки,
 																						// т.к иначе она не успевает накопиться за время работы
 
@@ -130,7 +126,6 @@ void GATE_CacheVariables()
 void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 {
 	float RegulatorError, RegulatorOut, Qp, RegulatorVoltage = 0;
-	static Int16U SyncDelayCounter = 0;
 	static float Qi = 0;
 
 	// Формирование линейно нарастающего фронта импульса напряжения
@@ -228,18 +223,6 @@ void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 	RegulatorOut = RegulatorVoltage + Qp + Qi;
 
 	GATE_SetUg(RegulatorOut);
-
-	if(IsImpulse)
-	{
-		if(RegulatorCounter >= SyncDelayCounter)
-		{
-			LL_SyncScope(true);
-			LL_SyncLCSU(false);
-			IsImpulse = false;
-		}
-	}
-	else
-		SyncDelayCounter = RegulatorCounter + DelayInMeasure;
 
 	RegulatorCounter++;
 

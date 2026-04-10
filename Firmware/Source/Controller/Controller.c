@@ -350,7 +350,8 @@ void CONTROL_HandlePowerOn()
 void CONTROL_HandlePulse()
 {
 	static float UtResult, UtCh2Result, ItResult;
-	static Int64U Timeout = 0;
+	static Int64U Timeout = 0, SyncTimeout = 0, OscTimeout = 0;
+	static Int32U SyncTime = 0, OscSyncTime = 0;
 	
 	if(CONTROL_State == DS_InProcess)
 	{
@@ -360,6 +361,7 @@ void CONTROL_HandlePulse()
 				{
 					CONTROL_ResetData();
 					UtResult = UtCh2Result = ItResult = 0.0f;
+					SyncTime = 0;
 
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
@@ -423,7 +425,13 @@ void CONTROL_HandlePulse()
 
 					case RS_TargetReached:
 						if(CONTROL_TimeCounter >= Timeout)
-							CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
+							if(LOGIC_GetLCSURiseRate())
+							{
+								LOGIC_CalcSyncTime(&SyncTime, &OscSyncTime);
+								SyncTimeout = 0;
+								OscTimeout = 0;
+								CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
+							}
 						break;
 
 					case RS_FollowingError:
@@ -454,6 +462,8 @@ void CONTROL_HandlePulse()
 			case SS_CurrentPulseStart:
 				LOGIC_StartPulse();
 
+				SyncTimeout = CONTROL_TimeCounter + SyncTime;
+				OscTimeout = CONTROL_TimeCounter + OscSyncTime;
 				CONTROL_Timeout = CONTROL_TimeCounter + DataTable[REG_SVTU_WAIT_FINISH_TIME];
 				CONTROL_SetDeviceState(DS_InProcess, SS_WaitFinishProcess);
 				break;
@@ -461,8 +471,11 @@ void CONTROL_HandlePulse()
 			case SS_WaitFinishProcess:
 				if(CONTROL_TimeCounter < CONTROL_Timeout)
 				{
-					if(LOGIC_FinishProcess())
-						CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
+					if(CONTROL_TimeCounter >= OscTimeout && CONTROL_TimeCounter < SyncTimeout)
+						LL_SyncScope(true);
+					else if(CONTROL_TimeCounter >= SyncTimeout)
+						if(LOGIC_FinishProcess())
+							CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
 				}
 				else
 				{

@@ -29,6 +29,7 @@ typedef struct __LCSUStructData
 	bool IsActive;
 	LCSUState State;
 	float Current;
+	float RiseRate;
 	Int8U Fault;
 	Int8U Problem;
 } LCSUData, *pLCSUData;
@@ -224,6 +225,40 @@ bool LOGIC_NoIssuesFromLCSU()
 }
 // ----------------------------------------
 
+bool LOGIC_GetLCSURiseRate()
+{
+	Int16U Register;
+
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	{
+		if(LCSU_DataArray[i].IsActive)
+		{
+			if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_RISE_RATE, &Register))
+				LCSU_DataArray[i].RiseRate = Register;
+			else
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
+				return false;
+			}
+		}
+	}
+	return true;
+}
+// ----------------------------------------
+
+void LOGIC_CalcSyncTime(Int32U *SyncTime, Int32U *OscSyncTime)
+{
+	float TrapezeTime , RisingPart, Flattop;
+
+	RisingPart = LCSU_DataArray[1].Current / LCSU_DataArray[1].RiseRate;
+	Flattop =  DataTable[REG_PULSE_DURATION];
+	TrapezeTime = RisingPart * 2 + Flattop;
+
+	*SyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TrapezeTime + TIME_DELAY_AFTER_PULSE);
+	*OscSyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + RisingPart + Flattop - TIME_START_FOR_OSC);
+}
+// ----------------------------------------
+
 bool LOGIC_WriteLCSUConfig()
 {
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
@@ -368,39 +403,25 @@ void LOGIC_StartPulse()
 
 bool LOGIC_FinishProcess()
 {
-	static bool DMADataProcessed = false;
 	// Завершение оцифровки
 	if(IT_DMASampleCompleted())
 	{
-		if(!DMADataProcessed)
-		{
 			TIM_Stop(TIM1);
 			TIM_Stop(TIM7);
+			IsImpulse = false;
 			LL_SyncScope(false);
+			LL_SyncLCSU(false);
+			GATE_StopProcess();
+
 			// Пересчёт значений
 			MEASURE_ConvertUt(MEMBUF_DMA_Ut, VALUES_POWER_DMA_SIZE);
 			MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
 			if ((DataTable[REG_PCB_VERSION] == PCB_VERSION_20) && (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT))
 				MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
-
-			DMADataProcessed = true;
-		}
-		// Завершение процесса только после отключения синхронизации по таймеру регулятора
-		if(!IsImpulse)
-		{
-			GATE_StopProcess();
-			DMADataProcessed = false; // Сброс флага для следующего цикла
 			return true;
-		}
-		else
-			// DMA завершен, но синхронизация еще работает - ждем отключения через регулятор
-			return false;
 	}
 	else
-	{
-		DMADataProcessed = false; // Сброс флага если DMA еще не завершен
 		return false;
-	}
 }
 // ----------------------------------------
 
