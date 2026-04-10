@@ -196,8 +196,8 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 		case ACT_STOP_TEST:
 			if(CONTROL_State == DS_InProcess)
 			{
-				LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS);
-				CONTROL_FinishedWithProblem(PROBLEM_FORCED_STOP);
+				if(LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS))
+					CONTROL_FinishedWithProblem(PROBLEM_FORCED_STOP);
 			}
 			break;
 			
@@ -323,7 +323,7 @@ void CONTROL_HandlePowerOn()
 		{
 			case SS_PowerOn:
 				{
-					if(LOGIC_PowerEnableLCSU() || DataTable[REG_EMULATION])
+					if(DataTable[REG_EMULATION] || DataTable[REG_EMULATION])
 					{
 						Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 						CONTROL_SetDeviceState(DS_InProcess, SS_WaitCharge);

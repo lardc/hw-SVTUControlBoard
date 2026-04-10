@@ -248,9 +248,14 @@ bool LOGIC_GetLCSURiseRate()
 
 void LOGIC_CalcSyncTime(Int32U *SyncTime, Int32U *OscSyncTime)
 {
-	float TrapezeTime , RisingPart, Flattop;
+	float TrapezeTime , RisingPart = 0, Flattop;
 
-	RisingPart = LCSU_DataArray[1].Current / LCSU_DataArray[1].RiseRate;
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	{
+		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].Current != 0)
+			RisingPart = fmaxf(RisingPart, LCSU_DataArray[i].Current / LCSU_DataArray[i].RiseRate);
+	}
+
 	Flattop =  DataTable[REG_PULSE_DURATION];
 	TrapezeTime = RisingPart * 2 + Flattop;
 
