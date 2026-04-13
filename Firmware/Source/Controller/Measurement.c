@@ -154,10 +154,10 @@ float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary, Int16U Ind
 	Int16U MearusingPoints = 2 * MEASUREMENT_POINTS_IT_UT + 1;
 	Int16U StartIndex = Index - MEASUREMENT_POINTS_IT_UT;
 	// Проверка если индекс близок к концу массива
-	if(StartIndex >= (VALUES_POWER_DMA_SIZE - MEASUREMENT_POINTS_IT_UT))
-		StartIndex = VALUES_POWER_DMA_SIZE - MEASUREMENT_POINTS_IT_UT - 1;
+	if(StartIndex >= (VALUES_POWER_DMA_SIZE - MearusingPoints))
+		StartIndex = VALUES_POWER_DMA_SIZE - MearusingPoints;
 	// Проверка если индекс близок к началу массива
-	if(StartIndex <= MEASUREMENT_POINTS_IT_UT)
+	else if(StartIndex <= MEASUREMENT_POINTS_IT_UT)
 	{
 		StartIndex = 0;
 		MearusingPoints = MEASUREMENT_POINTS_IT_UT;

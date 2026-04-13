@@ -353,7 +353,7 @@ void CONTROL_HandlePulse()
 	static float UtResult, UtCh2Result, ItResult;
 	static Int64U Timeout = 0, SyncTimeout = 0, OscTimeout = 0;
 	static Int32U SyncTime = 0, OscSyncTime = 0;
-	Int16U ItSyncIndex = 0, UtSyncIndex = 0;
+	static Int16U ItSyncIndex = 0, UtSyncIndex = 0;
 	
 	if(CONTROL_State == DS_InProcess)
 	{

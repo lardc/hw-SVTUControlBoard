@@ -208,6 +208,12 @@ bool LOGIC_NoIssuesFromLCSU()
 				return false;
 			}
 
+			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_SIN_CALC_FAIL)
+			{
+				CONTROL_FinishedWithProblem(PROBLEM_SIN_CALC_FAIL_LCSU);
+				return false;
+			}
+
 			else if(LCSU_DataArray[i].Problem != PROBLEM_NONE)
 			{
 				CONTROL_FinishedWithProblem(PROBLEM_LCSU_UNKNOWN_PROBLEM);
