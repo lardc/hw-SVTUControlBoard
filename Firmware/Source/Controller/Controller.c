@@ -150,6 +150,22 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 	
 	switch (ActionID)
 	{
+		case 20:
+			GPIO_SetState(GPIO_AIN_ST, true);
+			GPIO_SetState(GPIO_IND_CTRL, true);
+			GPIO_SetState(GPIO_SYNC_LCSU, true);
+			GPIO_SetState(GPIO_IT_RANGE, true);
+			GPIO_SetState(GPIO_UGT_SELF_TEST, true);
+			GPIO_SetState(GPIO_SAFETY, true);
+			DELAY_US(1000);
+			GPIO_SetState(GPIO_AIN_ST, false);
+			GPIO_SetState(GPIO_IND_CTRL, false);
+			GPIO_SetState(GPIO_SYNC_LCSU, false);
+			GPIO_SetState(GPIO_IT_RANGE, false);
+			GPIO_SetState(GPIO_UGT_SELF_TEST, false);
+			GPIO_SetState(GPIO_SAFETY, false);
+			break;
+
 		case ACT_ENABLE_POWER:
 			{
 				if(CONTROL_State == DS_None)

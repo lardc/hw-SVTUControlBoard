@@ -39,13 +39,13 @@ void LL_AnalogInputsDiagGate(bool State)
 
 void LL_ExtIndication(bool State)
 {
-	GPIO_SetState(GPIO_IND_CTRL, State);
+	//GPIO_SetState(GPIO_IND_CTRL, State);
 }
 //------------------------------------
 
 void LL_ExtIndicationToggle()
 {
-	GPIO_Toggle(GPIO_IND_CTRL);
+	//GPIO_Toggle(GPIO_IND_CTRL);
 }
 //------------------------------------
 
