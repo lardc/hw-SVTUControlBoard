@@ -31,6 +31,7 @@ SubState SUB_State = SS_None;
 bool IsImpulse = false;
 bool SelfTest = false;
 bool Diagnostic = false;
+bool ScopeState = false;
 static Boolean RequestSaveToFlash = false;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
@@ -352,6 +353,7 @@ void CONTROL_HandlePulse()
 	static float UtResult, UtCh2Result, ItResult;
 	static Int64U Timeout = 0, SyncTimeout = 0, OscTimeout = 0;
 	static Int32U SyncTime = 0, OscSyncTime = 0;
+	Int16U ItSyncIndex = 0, UtSyncIndex = 0;
 	
 	if(CONTROL_State == DS_InProcess)
 	{
@@ -362,6 +364,7 @@ void CONTROL_HandlePulse()
 					CONTROL_ResetData();
 					UtResult = UtCh2Result = ItResult = 0.0f;
 					SyncTime = 0;
+					ItSyncIndex = 0, UtSyncIndex = 0;
 
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
@@ -461,6 +464,7 @@ void CONTROL_HandlePulse()
 
 			case SS_CurrentPulseStart:
 				LOGIC_StartPulse();
+				ScopeState = false;
 
 				SyncTimeout = CONTROL_TimeCounter + SyncTime;
 				OscTimeout = CONTROL_TimeCounter + OscSyncTime;
@@ -469,13 +473,23 @@ void CONTROL_HandlePulse()
 				break;
 
 			case SS_WaitFinishProcess:
+
 				if(CONTROL_TimeCounter < CONTROL_Timeout)
 				{
-					if(CONTROL_TimeCounter >= OscTimeout && CONTROL_TimeCounter < SyncTimeout)
+					if(CONTROL_TimeCounter >= OscTimeout && CONTROL_TimeCounter < SyncTimeout && !ScopeState)
+					{
+						ScopeState = true;
 						LL_SyncScope(true);
+						UtSyncIndex = VALUES_POWER_DMA_SIZE - DMA_ReadDataCount(DMA_ADC_UT_CH);
+						ItSyncIndex = VALUES_POWER_DMA_SIZE - DMA_ReadDataCount(DMA_ADC_IT_CH);
+
+					}
 					else if(CONTROL_TimeCounter >= SyncTimeout)
 						if(LOGIC_FinishProcess())
+						{
+							ScopeState = false;
 							CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
+						}
 				}
 				else
 				{
@@ -490,7 +504,7 @@ void CONTROL_HandlePulse()
 
 					if(LOGIC_UpdateProblemsOrFaults() && LOGIC_NoIssuesFromLCSU())
 					{
-						LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult);
+						LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult, UtSyncIndex, ItSyncIndex);
 						if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
 						{
 							if((LOGIC_CheckResults(UtResult)) || Diagnostic)
@@ -646,7 +660,7 @@ void CONTROL_FinishedWithProblem(Int16U Problem)
 {
 	DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
 	DataTable[REG_PROBLEM] = Problem;
-	SelfTest = Diagnostic = false;
+	SelfTest = Diagnostic = ScopeState = false;
 	CONTROL_ResetHardware();
 	CONTROL_SetDeviceState(DS_Ready, SS_None);
 }

@@ -444,17 +444,17 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 }
 // ----------------------------------------
 
-void LOGIC_GetResults(float *UtResult, float *UtCh2Result, float *ItResult)
+void LOGIC_GetResults(float *UtResult, float *UtCh2Result, float *ItResult, Int16U UtIndex, Int16U ItIndex)
 {
 	float UtMaxVal = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : UT_MAX_VALUE;
 
-	*UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut);
+	*UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut, UtIndex);
 	if(((Int16U)DataTable[REG_PCB_VERSION] == PCB_VERSION_20) && (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT))
 	{
-		*UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg);
+		*UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg, UtIndex);
 		*UtResult = (*UtResult > UtMaxVal) ? *UtCh2Result : *UtResult;
 	}
-	*ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It);
+	*ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It, ItIndex);
 }
 // ----------------------------------------
 
