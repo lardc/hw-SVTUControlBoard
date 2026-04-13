@@ -26,6 +26,8 @@
 #define TIME_LCSU_DELAY_AFTER_SYNC	0.1f			// Пауза в LCSU перед началом формирования (в мс)
 #define TIME_DELAY_AFTER_PULSE		0.5f			// Пауза после формирования (в мс)
 #define TIME_START_FOR_OSC			0.075f			// Окно оцифровки в конце полки трапеции для осциллографа (в мс)
+#define TIME_SINE_DURATION			10				// Длительность импульса в форме синусоиды (в мс)
+#define TIME_SINE_MOD_DURATION		20				// Длительность хвоста модифицированного синуса	(в мс)
 
 // Параметры аналоговой подсистемы
 #define ADC_REF_VOLTAGE				3000.0f			// Опорное напряжение (в мВ)

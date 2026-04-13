@@ -254,19 +254,37 @@ bool LOGIC_GetLCSURiseRate()
 
 void LOGIC_CalcSyncTime(Int32U *SyncTime, Int32U *OscSyncTime)
 {
-	float TrapezeTime , RisingPart = 0, Flattop;
-
-	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	// SyncTime - время выключения синхронизаций
+	// OscSyncTime - время включения синхронизации осциллографа
+	switch((Int16U)DataTable[REG_PULSE_SHAPE])
 	{
-		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].Current != 0)
-			RisingPart = fmaxf(RisingPart, LCSU_DataArray[i].Current / LCSU_DataArray[i].RiseRate);
+		case SHAPE_SINE:
+			*SyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION + 2 * TIME_DELAY_AFTER_PULSE);
+			*OscSyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION / 2);
+			break;
+
+		case SHAPE_SINE_MOD:
+			*SyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION + 2 * TIME_DELAY_AFTER_PULSE + TIME_SINE_MOD_DURATION);
+			*OscSyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION / 2);
+			break;
+
+		case SHAPE_TRAPEZ:
+		{
+			float TrapezeTime , RisingPart = 0, Flattop;
+			for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+			{
+				if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].Current != 0)
+					RisingPart = fmaxf(RisingPart, LCSU_DataArray[i].Current / LCSU_DataArray[i].RiseRate);
+			}
+
+			Flattop =  DataTable[REG_PULSE_DURATION];
+			TrapezeTime = RisingPart * 2 + Flattop;
+
+			*SyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TrapezeTime + TIME_DELAY_AFTER_PULSE);
+			*OscSyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + RisingPart + Flattop - TIME_START_FOR_OSC);
+		}
+		break;
 	}
-
-	Flattop =  DataTable[REG_PULSE_DURATION];
-	TrapezeTime = RisingPart * 2 + Flattop;
-
-	*SyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TrapezeTime + TIME_DELAY_AFTER_PULSE);
-	*OscSyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + RisingPart + Flattop - TIME_START_FOR_OSC);
 }
 // ----------------------------------------
 

@@ -113,6 +113,10 @@
 #define PCB_THYRIS					0
 #define PCB_IGBT					1
 //
+#define SHAPE_SINE					0
+#define SHAPE_SINE_MOD				1
+#define SHAPE_TRAPEZ				2
+//
 #define COEF_UT2_K_DEF				1
 #define COEF_UT2_B_DEF				1
 //

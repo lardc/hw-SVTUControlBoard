@@ -94,8 +94,8 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{DIAG_TIME_MIN, DIAG_TIME_MAX, DIAG_TIME_DEF},							// 88
 		{DIAG_U_THRESHOLD_MIN, DIAG_U_THRESHOLD_MAX, DIAG_U_THRESHOLD_DEF},		// 89
 		{DIAG_I_THRESHOLD_MIN, DIAG_I_THRESHOLD_MAX, DIAG_I_THRESHOLD_DEF},		// 90
-		{EXT_DIAG_U_REF_MIN, EXT_DIAG_U_REF_MAX, EXT_DIAG_U_REF_DEF},									// 91
-		{EXT_DIAG_I_REF_MIN, EXT_DIAG_I_REF_MAX, EXT_DIAG_I_REF_DEF},									// 92
+		{EXT_DIAG_U_REF_MIN, EXT_DIAG_U_REF_MAX, EXT_DIAG_U_REF_DEF},			// 91
+		{EXT_DIAG_I_REF_MIN, EXT_DIAG_I_REF_MAX, EXT_DIAG_I_REF_DEF},			// 92
 		{0, 0, 0},																// 93
 		{0, 0, 0},																// 94
 		{0, 0, 0},																// 95
@@ -125,8 +125,8 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 119
 		{PCB_VERSION_10, PCB_VERSION_20, PCB_VERSION_10},						// 120
 		{PCB_THYRIS, PCB_IGBT, PCB_THYRIS},										// 121
-		{NO, YES, NO},															// 122
-		{NO, YES, NO},															// 123
+		{SHAPE_SINE, SHAPE_TRAPEZ, SHAPE_TRAPEZ},								// 122
+		{0, 0, 0},																// 123
 		{0, 0, 0},																// 124
 		{0, 0, 0},																// 125
 		{0, 0, 0},																// 126
@@ -154,8 +154,8 @@ const TableItemConstraint Constraint[DATA_TABLE_WP_START] = {
 		{0, 0, 0},																// 148
 		{0, 0, 0},																// 149
 		{-INT16S_MAX, INT16S_MAX, 0},											// 150
-		{0, 0, 0},																// 151
-		{0, 0, 0},																// 152
+		{NO, YES, NO},															// 151
+		{NO, YES, NO},															// 152
 		{0, 0, 0},																// 153
 		{0, 0, 0},																// 154
 		{0, 0, 0},																// 155
