@@ -18,7 +18,7 @@ bool LOGIC_IsLCSUInFaultOrDisabled();
 bool LOGIC_UpdateProblemsOrFaults();
 bool LOGIC_NoIssuesFromLCSU();
 bool LOGIC_GetLCSURiseRate();
-void LOGIC_CalcSyncTime(Int32U *SyncTime, Int32U *OscSyncTime);
+void LOGIC_CalcSyncTime(float *SyncTime, float *OscSyncTime);
 
 bool LOGIC_SetCurrentForCertainLCSU(Int16U Nid, float Current);
 bool LOGIC_DistributeCurrent(float Current);

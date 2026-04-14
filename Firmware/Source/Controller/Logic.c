@@ -151,30 +151,26 @@ bool LOGIC_IsLCSUInFaultOrDisabled()
 bool LOGIC_UpdateProblemsOrFaults()
 {
 	Int16U Register;
+	bool ResOk = true;
 
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
-			if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_PROBLEM, &Register))
+			if((ResOk = BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_PROBLEM, &Register)))
 			{
 				LCSU_DataArray[i].Problem = Register;
-				if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_FAULT_REASON, &Register))
+				if((ResOk = BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_FAULT_REASON, &Register)))
 					LCSU_DataArray[i].Fault = Register;
-				else
-				{
-					CONTROL_SwitchToFault(DF_INTERFACE);
-					return false;
-				}
-			}
-			else
-			{
-				CONTROL_SwitchToFault(DF_INTERFACE);
-				return false;
 			}
 		}
+		if(!ResOk)
+		{
+			CONTROL_SwitchToFault(DF_INTERFACE);
+			return ResOk;
+		}
 	}
-	return true;
+	return ResOk;
 }
 // ----------------------------------------
 
@@ -252,20 +248,20 @@ bool LOGIC_GetLCSURiseRate()
 }
 // ----------------------------------------
 
-void LOGIC_CalcSyncTime(Int32U *SyncTime, Int32U *OscSyncTime)
+void LOGIC_CalcSyncTime(float *SyncTime, float *OscSyncTime)
 {
 	// SyncTime - время выключения синхронизаций
 	// OscSyncTime - время включения синхронизации осциллографа
 	switch((Int16U)DataTable[REG_PULSE_SHAPE])
 	{
 		case SHAPE_SINE:
-			*SyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION + 2 * TIME_DELAY_AFTER_PULSE);
-			*OscSyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION / 2);
+			*SyncTime = TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION + 2 * TIME_DELAY_AFTER_PULSE;
+			*OscSyncTime = TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION / 2;
 			break;
 
 		case SHAPE_SINE_MOD:
-			*SyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION + 2 * TIME_DELAY_AFTER_PULSE + TIME_SINE_MOD_DURATION);
-			*OscSyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION / 2);
+			*SyncTime = TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION + 2 * TIME_DELAY_AFTER_PULSE + TIME_SINE_MOD_DURATION;
+			*OscSyncTime = TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION / 2;
 			break;
 
 		case SHAPE_TRAPEZ:
@@ -280,8 +276,8 @@ void LOGIC_CalcSyncTime(Int32U *SyncTime, Int32U *OscSyncTime)
 			Flattop =  DataTable[REG_PULSE_DURATION];
 			TrapezeTime = RisingPart * 2 + Flattop;
 
-			*SyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + TrapezeTime + TIME_DELAY_AFTER_PULSE);
-			*OscSyncTime = (Int32U)(TIME_LCSU_DELAY_AFTER_SYNC + RisingPart + Flattop - TIME_START_FOR_OSC);
+			*SyncTime = TIME_LCSU_DELAY_AFTER_SYNC + TrapezeTime + TIME_DELAY_AFTER_PULSE;
+			*OscSyncTime = TIME_LCSU_DELAY_AFTER_SYNC + RisingPart + Flattop - TIME_START_FOR_OSC;
 		}
 		break;
 	}
@@ -436,6 +432,7 @@ bool LOGIC_FinishProcess()
 	if(IT_DMASampleCompleted())
 	{
 			TIM_Stop(TIM1);
+			TIM_Stop(TIM6);
 			TIM_Stop(TIM7);
 			IsImpulse = false;
 			LL_SyncScope(false);

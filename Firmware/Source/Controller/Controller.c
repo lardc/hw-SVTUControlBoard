@@ -18,6 +18,7 @@
 #include "JSONDescription.h"
 #include "SaveToFlash.h"
 #include "Delay.h"
+#include "SysConfig.h"
 
 // Types
 //
@@ -31,13 +32,14 @@ SubState SUB_State = SS_None;
 bool IsImpulse = false;
 bool SelfTest = false;
 bool Diagnostic = false;
-bool ScopeState = false;
 static Boolean RequestSaveToFlash = false;
 
 volatile Int16U CONTROL_PowerValues_Counter = 0;
 volatile Int64U CONTROL_TimeCounter = 0;
 volatile Int64U CONTROL_Timeout = 0;
 volatile Int16U CONTROL_ExtInfoCounter = 0;
+volatile bool CONTROL_SyncTimeoutEvent = false;
+volatile bool CONTROL_OscTimeoutEvent = false;
 
 // Forward functions
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
@@ -56,6 +58,8 @@ Int16U CONTROL_CheckSelfTestResults();
 bool CONTROL_IsSafetyEvent();
 void CONTROL_InitStoragePointers();
 void CONTROL_InitJSONPointers();
+static Int32U CONTROL_ConvertMsToUs(float TimeMs);
+static void CONTROL_StartSyncTimers(float SyncTimeMs, float OscSyncTimeMs);
 
 // Functions
 //
@@ -141,6 +145,8 @@ void CONTROL_ResetHardware()
 	TIM_Stop(TIM1);
 	TIM_Stop(TIM6);
 	TIM_Stop(TIM7);
+	CONTROL_SyncTimeoutEvent = false;
+	CONTROL_OscTimeoutEvent = false;
 }
 //-----------------------------------------------
 
@@ -351,8 +357,8 @@ void CONTROL_HandlePowerOn()
 void CONTROL_HandlePulse()
 {
 	static float UtResult, UtCh2Result, ItResult;
-	static Int64U Timeout = 0, SyncTimeout = 0, OscTimeout = 0;
-	static Int32U SyncTime = 0, OscSyncTime = 0;
+	static Int64U Timeout = 0;
+	static float SyncTime = 0, OscSyncTime = 0;
 	static Int16U ItSyncIndex = 0, UtSyncIndex = 0;
 	
 	if(CONTROL_State == DS_InProcess)
@@ -364,6 +370,7 @@ void CONTROL_HandlePulse()
 					CONTROL_ResetData();
 					UtResult = UtCh2Result = ItResult = 0.0f;
 					SyncTime = 0;
+					OscSyncTime = 0;
 					ItSyncIndex = 0, UtSyncIndex = 0;
 
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
@@ -431,8 +438,6 @@ void CONTROL_HandlePulse()
 							if(LOGIC_GetLCSURiseRate())
 							{
 								LOGIC_CalcSyncTime(&SyncTime, &OscSyncTime);
-								SyncTimeout = 0;
-								OscTimeout = 0;
 								CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
 							}
 						break;
@@ -464,10 +469,8 @@ void CONTROL_HandlePulse()
 
 			case SS_CurrentPulseStart:
 				LOGIC_StartPulse();
-				ScopeState = false;
+				CONTROL_StartSyncTimers(SyncTime, OscSyncTime);
 
-				SyncTimeout = CONTROL_TimeCounter + SyncTime;
-				OscTimeout = CONTROL_TimeCounter + OscSyncTime;
 				CONTROL_Timeout = CONTROL_TimeCounter + DataTable[REG_SVTU_WAIT_FINISH_TIME];
 				CONTROL_SetDeviceState(DS_InProcess, SS_WaitFinishProcess);
 				break;
@@ -476,18 +479,18 @@ void CONTROL_HandlePulse()
 
 				if(CONTROL_TimeCounter < CONTROL_Timeout)
 				{
-					if(CONTROL_TimeCounter >= OscTimeout && CONTROL_TimeCounter < SyncTimeout && !ScopeState)
+					if(CONTROL_OscTimeoutEvent)
 					{
-						ScopeState = true;
+						CONTROL_OscTimeoutEvent = false;
 						LL_SyncScope(true);
 						UtSyncIndex = VALUES_POWER_DMA_SIZE - DMA_ReadDataCount(DMA_ADC_UT_CH);
 						ItSyncIndex = VALUES_POWER_DMA_SIZE - DMA_ReadDataCount(DMA_ADC_IT_CH);
-
 					}
-					else if(CONTROL_TimeCounter >= SyncTimeout)
+
+					if(CONTROL_SyncTimeoutEvent)
 						if(LOGIC_FinishProcess())
 						{
-							ScopeState = false;
+							CONTROL_SyncTimeoutEvent = false;
 							CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
 						}
 				}
@@ -595,6 +598,35 @@ void CONTROL_HandlePulse()
 }
 //-----------------------------------------------
 
+static Int32U CONTROL_ConvertMsToUs(float TimeMs)
+{
+	float timeUs = TimeMs * 1000.0f;
+	return (timeUs < 1.0f) ? 1 : (Int32U)(timeUs + 0.5f);
+}
+//------------------------------------------
+
+static void CONTROL_StartSyncTimers(float SyncTimeMs, float OscSyncTimeMs)
+{
+	CONTROL_SyncTimeoutEvent = false;
+	CONTROL_OscTimeoutEvent = false;
+
+	TIM_Stop(TIM6);
+	TIM_Stop(TIM7);
+
+	TIM_Config(TIM6, SYSCLK, CONTROL_ConvertMsToUs(SyncTimeMs));
+	TIM_Config(TIM7, SYSCLK, CONTROL_ConvertMsToUs(OscSyncTimeMs));
+
+	TIM_Reset(TIM6);
+	TIM_Reset(TIM7);
+	TIM_StatusClear(TIM6);
+	TIM_StatusClear(TIM7);
+
+	TIM_Start(TIM6);
+	TIM_Start(TIM7);
+}
+//------------------------------------------
+
+
 Int16U CONTROL_CheckSelfTestResults()
 {
 	if(fabsf((1 - DataTable[REG_RESULT_IT] / DataTable[REG_IT_READ_MAX]) * 100) > SELFTEST_ALLOWED_ERROR)
@@ -660,7 +692,7 @@ void CONTROL_FinishedWithProblem(Int16U Problem)
 {
 	DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
 	DataTable[REG_PROBLEM] = Problem;
-	SelfTest = Diagnostic = ScopeState = false;
+	SelfTest = Diagnostic = false;
 	CONTROL_ResetHardware();
 	CONTROL_SetDeviceState(DS_Ready, SS_None);
 }

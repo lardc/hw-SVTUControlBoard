@@ -152,16 +152,18 @@ float MEASURE_GateAverageCurrent()
 float MEASURE_CollectorAverageValue(pFloat32 MEMBUF_DMA_Intermediary, Int16U Index)
 {
 	Int16U MearusingPoints = 2 * MEASUREMENT_POINTS_IT_UT + 1;
-	Int16U StartIndex = Index - MEASUREMENT_POINTS_IT_UT;
-	// Проверка если индекс близок к концу массива
-	if(StartIndex >= (VALUES_POWER_DMA_SIZE - MearusingPoints))
-		StartIndex = VALUES_POWER_DMA_SIZE - MearusingPoints;
+	Int16U StartIndex;
 	// Проверка если индекс близок к началу массива
-	else if(StartIndex <= MEASUREMENT_POINTS_IT_UT)
+	if(Index <= MEASUREMENT_POINTS_IT_UT)
 	{
 		StartIndex = 0;
 		MearusingPoints = MEASUREMENT_POINTS_IT_UT;
 	}
+	// Проверка если индекс близок к концу массива
+	else if(Index >= (VALUES_POWER_DMA_SIZE - MearusingPoints))
+		StartIndex = VALUES_POWER_DMA_SIZE - MearusingPoints;
+	else
+		StartIndex = Index - MEASUREMENT_POINTS_IT_UT;
 
 	return MEASURE_ExtractAverageValues(MEMBUF_DMA_Intermediary, StartIndex, MearusingPoints);
 }

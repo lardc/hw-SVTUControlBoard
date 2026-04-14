@@ -142,6 +142,26 @@ void DMA2_Channel2_IRQHandler()
 }
 //-----------------------------------------
 
+void TIM6_DAC_IRQHandler()
+{
+	if(TIM_StatusCheck(TIM6))
+	{
+		CONTROL_SyncTimeoutEvent = true;
+		TIM_StatusClear(TIM6);
+	}
+}
+//-----------------------------------------
+
+void TIM7_IRQHandler()
+{
+	if(TIM_StatusCheck(TIM7))
+	{
+		CONTROL_OscTimeoutEvent = true;
+		TIM_StatusClear(TIM7);
+	}
+}
+//-----------------------------------------
+
 void USART1_IRQHandler()
 {
 	if(ZwSCI_RecieveCheck(USART1))

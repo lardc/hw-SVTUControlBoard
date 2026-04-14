@@ -50,6 +50,8 @@ typedef enum __SubState
 extern DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
 extern volatile Int16U CONTROL_ExtInfoCounter;
+extern volatile bool CONTROL_SyncTimeoutEvent;
+extern volatile bool CONTROL_OscTimeoutEvent;
 extern bool IsImpulse;
 extern SubState SUB_State;
 
