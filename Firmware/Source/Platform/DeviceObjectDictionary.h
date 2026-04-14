@@ -123,6 +123,12 @@
 #define REG_EXT_DIAG_U_REF				91	// Значение напряжения с которым идет сравнение в процессе диагностики (в В)
 #define REG_EXT_DIAG_I_REF				92	// Значение силы тока с которым идет сравнение в процессе диагностики (в мА)
 //
+#define REG_DAC_MINUS_VALUE				100
+#define REG_DAC_PLUS_VALUE				101
+#define REG_PULSE1_LEN					102
+#define REG_PAUSE_LEN					103
+#define REG_PULSE2_LEN					104
+//
 #define REG_PCB_VERSION					120	// 0 - версия платы 1.0
 											// 1 - версия  2.0
 #define REG_PCB_TIRIS_IGBT				121	// 0 - версия платы с тиристором

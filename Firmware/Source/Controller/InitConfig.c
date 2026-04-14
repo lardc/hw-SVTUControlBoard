@@ -54,7 +54,7 @@ void INITCFG_ConfigGPIO()
 	GPIO_SetState(GPIO_IND_CTRL, false);
 	GPIO_SetState(GPIO_IT_RANGE, false);
 	GPIO_SetState(GPIO_UGT_SELF_TEST, false);
-	GPIO_SetState(GPIO_SAFETY, false);
+	GPIO_SetState(GPIO_SAFETY, true);
 	
 	// Альтернативные функции
 	GPIO_InitAltFunction(GPIO_ALT_CAN_RX, AltFn_9);

@@ -75,6 +75,6 @@ bool LL_ItGetRange()
 
 void LL_SetSafetyState(bool State)
 {
-	GPIO_SetState(GPIO_SAFETY, State);
+	//GPIO_SetState(GPIO_SAFETY, State);
 }
 //------------------------------------

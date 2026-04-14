@@ -144,13 +144,75 @@ void CONTROL_ResetHardware()
 }
 //-----------------------------------------------
 
+void CONTROL_WriteDAC(Int16U Value, bool Channel)
+{
+	// CS
+	Channel ? GPIO_SetState(GPIO_AIN_ST, false) : GPIO_SetState(GPIO_UGT_SELF_TEST, false);
+	DELAY_US(1);
+
+	for(int i = 15; i >= 0; i--)
+	{
+		// CLOCK вниз
+		GPIO_SetState(GPIO_IND_CTRL, false);
+
+		// Данные
+		GPIO_SetState(GPIO_SYNC_LCSU, (Value >> i) & 0x1);
+		DELAY_US(1);
+
+		// CLOCK вверх
+		GPIO_SetState(GPIO_IND_CTRL, true);
+		DELAY_US(1);
+	}
+
+	// Данные, CS, CLOCK вверх
+	GPIO_SetState(GPIO_AIN_ST, true);
+	GPIO_SetState(GPIO_UGT_SELF_TEST, true);
+	GPIO_SetState(GPIO_SYNC_LCSU, true);
+	GPIO_SetState(GPIO_IND_CTRL, true);
+	DELAY_US(1);
+}
+//-----------------------------------------------
+
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 {
 	*pUserError = ERR_NONE;
 	
 	switch (ActionID)
 	{
-		case 20:
+		case 21:
+			CONTROL_WriteDAC(DataTable[REG_DAC_PLUS_VALUE], false);
+			CONTROL_WriteDAC(DataTable[REG_DAC_MINUS_VALUE], true);
+			break;
+
+		case 22:
+			//GPIO_SetState(GPIO_SAFETY, true);
+			//DELAY_US(50);
+
+			GPIO_SetState(GPIO_IT_RANGE, true);
+			DELAY_US(DataTable[REG_PULSE1_LEN]);
+			GPIO_SetState(GPIO_IT_RANGE, false);
+
+			//DELAY_US(50);
+			//GPIO_SetState(GPIO_SAFETY, false);
+			break;
+
+		case 23:
+			//GPIO_SetState(GPIO_SAFETY, true);
+			//DELAY_US(50);
+
+			GPIO_SetState(GPIO_IT_RANGE, true);
+			DELAY_US(DataTable[REG_PULSE1_LEN]);
+			GPIO_SetState(GPIO_IT_RANGE, false);
+			DELAY_US(DataTable[REG_PAUSE_LEN]);
+			GPIO_SetState(GPIO_IT_RANGE, true);
+			DELAY_US(DataTable[REG_PULSE2_LEN]);
+			GPIO_SetState(GPIO_IT_RANGE, false);
+
+			//DELAY_US(50);
+			//GPIO_SetState(GPIO_SAFETY, false);
+			break;
+
+		case 29:
 			GPIO_SetState(GPIO_AIN_ST, true);
 			GPIO_SetState(GPIO_IND_CTRL, true);
 			GPIO_SetState(GPIO_SYNC_LCSU, true);
