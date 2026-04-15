@@ -156,7 +156,7 @@ void TIM7_IRQHandler()
 {
 	if(TIM_StatusCheck(TIM7))
 	{
-		CONTROL_OscTimeoutEvent = true;
+		CONTROL_OscTurnOnEvent = true;
 		TIM_StatusClear(TIM7);
 	}
 }

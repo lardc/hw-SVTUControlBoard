@@ -1,4 +1,4 @@
-﻿// Header
+// Header
 //
 #include "Logic.h"
 
@@ -27,6 +27,7 @@
 typedef struct __LCSUStructData
 {
 	bool IsActive;
+	bool UsedInPulse;
 	LCSUState State;
 	float Current;
 	float RiseRate;
@@ -90,14 +91,22 @@ bool LOGIC_UpdateLCSUState()
 
 bool LOGIC_CallCommandForLCSU(Int16U Command)
 {
+	bool ResOk = true;
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
-		if(LCSU_DataArray[i].IsActive)
-			if(!BHL_Call(i + CachedLCSUStartNid, Command))
-			{
-				CONTROL_SwitchToFault(DF_INTERFACE);
-				return false;
-			}
+		if(Command == ACT_LCSU_PULSE_CONFIG)
+		{
+			if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].UsedInPulse)
+				ResOk = BHL_Call(i + CachedLCSUStartNid, Command);
+		}
+		else if(LCSU_DataArray[i].IsActive)
+			ResOk = BHL_Call(i + CachedLCSUStartNid, Command);
+
+		if(!ResOk)
+		{
+			CONTROL_SwitchToFault(DF_INTERFACE);
+			return false;
+		}
 	}
 	return true;
 }
@@ -128,7 +137,12 @@ bool LOGIC_AreLCSUInStateX(Int16U State)
 {
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
-		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State != State)
+		if(State == LCSU_PulseConfigReady)
+		{
+			if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State != State && LCSU_DataArray[i].UsedInPulse)
+				return false;
+		}
+		else if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State != State)
 			return false;
 	}
 	
@@ -272,6 +286,7 @@ void LOGIC_CalcSyncTime(float *SyncTime, float *OscSyncTime)
 				if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].Current != 0)
 					RisingPart = fmaxf(RisingPart, LCSU_DataArray[i].Current / LCSU_DataArray[i].RiseRate);
 			}
+			RisingPart = RisingPart / 1000;
 
 			Flattop =  DataTable[REG_PULSE_DURATION];
 			TrapezeTime = RisingPart * 2 + Flattop;
@@ -288,8 +303,9 @@ bool LOGIC_WriteLCSUConfig()
 {
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
-		if(LCSU_DataArray[i].IsActive)
+		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].UsedInPulse)
 		{
+
 			if(!BHL_WriteRegisterFloat(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
 			{
 				CONTROL_SwitchToFault(DF_INTERFACE);
@@ -332,29 +348,36 @@ bool LOGIC_SetCurrentForCertainLCSU(Int16U Nid, float Current)
 
 bool LOGIC_DistributeCurrent(float Current)
 {
+	Int16U UsedLCSU = 0;
+	float CurrentPerLCSU;
+
+	if (ActiveLCSUCounter == 0)
+	  return false;
+
+	for (Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	  	LCSU_DataArray[i].UsedInPulse = false;
+
+	// Определяем количество необходимых ячеек LCSU
+	UsedLCSU = (Current <= IT_MAX_VALUE_SINGLE_LCSU) ? 1 : ActiveLCSUCounter;
+
+	CurrentPerLCSU = Current / UsedLCSU;
+
 	// Ток превышает допустимый диапазон
-	if(Current > (CachedLCSUMaxCurrent * ActiveLCSUCounter))
+	if (CurrentPerLCSU > CachedLCSUMaxCurrent)
 		return false;
 
 	// Очистка уставки тока для всех LCSU
 	LOGIC_ResetLCSUCurrent();
 
 	// Запись значений и формы импульса тока
-	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	for(Int16U i = 0; (i < DataTable[REG_LCSU_COUNT_MAX] && UsedLCSU > 0); ++i)
 	{
-		if(LCSU_DataArray[i].IsActive)
-		{
-			if(Current >= CachedLCSUMaxCurrent)
-			{
-				LCSU_DataArray[i].Current = CachedLCSUMaxCurrent;
-				Current -= CachedLCSUMaxCurrent;
-			}
-			else
-			{
-				LCSU_DataArray[i].Current = Current;
-				Current = 0;
-			}
-		}
+		if (!LCSU_DataArray[i].IsActive)
+			continue;
+
+		LCSU_DataArray[i].Current = CurrentPerLCSU;
+		LCSU_DataArray[i].UsedInPulse = true;
+		UsedLCSU--;
 	}
 	
 	return true;

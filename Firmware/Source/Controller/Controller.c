@@ -39,7 +39,7 @@ volatile Int64U CONTROL_TimeCounter = 0;
 volatile Int64U CONTROL_Timeout = 0;
 volatile Int16U CONTROL_ExtInfoCounter = 0;
 volatile bool CONTROL_SyncTimeoutEvent = false;
-volatile bool CONTROL_OscTimeoutEvent = false;
+volatile bool CONTROL_OscTurnOnEvent = false;
 
 // Forward functions
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
@@ -146,7 +146,7 @@ void CONTROL_ResetHardware()
 	TIM_Stop(TIM6);
 	TIM_Stop(TIM7);
 	CONTROL_SyncTimeoutEvent = false;
-	CONTROL_OscTimeoutEvent = false;
+	CONTROL_OscTurnOnEvent = false;
 }
 //-----------------------------------------------
 
@@ -360,6 +360,7 @@ void CONTROL_HandlePulse()
 	static Int64U Timeout = 0;
 	static float SyncTime = 0, OscSyncTime = 0;
 	static Int16U ItSyncIndex = 0, UtSyncIndex = 0;
+	static bool SyncTimeoutReached = false;
 	
 	if(CONTROL_State == DS_InProcess)
 	{
@@ -372,6 +373,7 @@ void CONTROL_HandlePulse()
 					SyncTime = 0;
 					OscSyncTime = 0;
 					ItSyncIndex = 0, UtSyncIndex = 0;
+					SyncTimeoutReached = false;
 
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
@@ -381,10 +383,7 @@ void CONTROL_HandlePulse()
 			case SS_WaitPulsePause:
 				{
 					if(LOGIC_AreLCSUInStateX(LCSU_Ready))
-					{
-						if(LOGIC_UpdateProblemsOrFaults() && LOGIC_NoIssuesFromLCSU())
 							CONTROL_SetDeviceState(DS_InProcess, SS_ConfigPulse);
-					}
 					else
 						CONTROL_HandleFaultLCSUEvents(Timeout);
 				}
@@ -401,10 +400,11 @@ void CONTROL_HandlePulse()
 						
 						if(LOGIC_WriteLCSUConfig())
 							if(LOGIC_CallCommandForLCSU(ACT_LCSU_PULSE_CONFIG))
-							{
-								Timeout = CONTROL_TimeCounter + TIMEOUT_LCSU_SHORT;
-								CONTROL_SetDeviceState(DS_InProcess, SS_WaitConfig);
-							}
+								if(LOGIC_UpdateProblemsOrFaults() && LOGIC_NoIssuesFromLCSU())
+									{
+										Timeout = CONTROL_TimeCounter + TIMEOUT_LCSU_SHORT;
+										CONTROL_SetDeviceState(DS_InProcess, SS_WaitConfig);
+									}
 					}
 					else
 						CONTROL_SwitchToFault(DF_LCSU_CURRENT_CONFIG);
@@ -479,20 +479,26 @@ void CONTROL_HandlePulse()
 
 				if(CONTROL_TimeCounter < CONTROL_Timeout)
 				{
-					if(CONTROL_OscTimeoutEvent)
+					if(CONTROL_OscTurnOnEvent)
 					{
-						CONTROL_OscTimeoutEvent = false;
+						CONTROL_OscTurnOnEvent = false;
 						LL_SyncScope(true);
 						UtSyncIndex = VALUES_POWER_DMA_SIZE - DMA_ReadDataCount(DMA_ADC_UT_CH);
 						ItSyncIndex = VALUES_POWER_DMA_SIZE - DMA_ReadDataCount(DMA_ADC_IT_CH);
 					}
 
 					if(CONTROL_SyncTimeoutEvent)
+					{
+						CONTROL_SyncTimeoutEvent = false;
+						SyncTimeoutReached = true;
+						LL_SyncScope(false);
+						LL_SyncLCSU(false);
+						//GATE_StopProcess();
+					}
+
+					if(SyncTimeoutReached)
 						if(LOGIC_FinishProcess())
-						{
-							CONTROL_SyncTimeoutEvent = false;
 							CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
-						}
 				}
 				else
 				{
@@ -608,21 +614,31 @@ static Int32U CONTROL_ConvertMsToUs(float TimeMs)
 static void CONTROL_StartSyncTimers(float SyncTimeMs, float OscSyncTimeMs)
 {
 	CONTROL_SyncTimeoutEvent = false;
-	CONTROL_OscTimeoutEvent = false;
+	CONTROL_OscTurnOnEvent = false;
 
 	TIM_Stop(TIM6);
 	TIM_Stop(TIM7);
-
+	// На время перенастройки выключаем IRQ линий таймеров
+	NVIC_DisableIRQ(TIM6_DAC_IRQn);
+	NVIC_DisableIRQ(TIM7_IRQn);
 	TIM_Config(TIM6, SYSCLK, CONTROL_ConvertMsToUs(SyncTimeMs));
 	TIM_Config(TIM7, SYSCLK, CONTROL_ConvertMsToUs(OscSyncTimeMs));
-
 	TIM_Reset(TIM6);
 	TIM_Reset(TIM7);
 	TIM_StatusClear(TIM6);
 	TIM_StatusClear(TIM7);
-
+	NVIC_ClearPendingIRQ(TIM6_DAC_IRQn);
+	NVIC_ClearPendingIRQ(TIM7_IRQn);
+	// Включаем таймеры
 	TIM_Start(TIM6);
 	TIM_Start(TIM7);
+	// И сразу повторно чистим "хвосты" после CEN (на некоторых конфигурациях ловит спурию)
+	TIM_StatusClear(TIM6);
+	TIM_StatusClear(TIM7);
+	NVIC_ClearPendingIRQ(TIM6_DAC_IRQn);
+	NVIC_ClearPendingIRQ(TIM7_IRQn);
+	NVIC_EnableIRQ(TIM6_DAC_IRQn);
+	NVIC_EnableIRQ(TIM7_IRQn);
 }
 //------------------------------------------
 
