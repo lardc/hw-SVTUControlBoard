@@ -52,6 +52,10 @@ void LOGIC_FindLCSU()
 	CachedLCSUStartNid = DataTable[REG_LCSU_START_NID];
 	CachedLCSUMaxCurrent = DataTable[REG_LCSU_MAX_CURRENT];
 	
+	// Сброс при новом поиске
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+		LCSU_DataArray[i].IsActive = false;
+
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_DEV_STATE, NULL))

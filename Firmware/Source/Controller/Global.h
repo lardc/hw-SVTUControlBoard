@@ -48,6 +48,6 @@
 #define MEASUREMENT_POINTS_IT_UT	10				// Количество точек слева или справа от измеряемого индекса
 
 // Параметры DMA
-#define VALUES_POWER_DMA_SIZE		2000
+#define VALUES_POWER_DMA_SIZE		1000
 
 #endif // __GLOBAL_H
