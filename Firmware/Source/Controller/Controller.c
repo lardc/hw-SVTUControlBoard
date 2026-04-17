@@ -493,7 +493,6 @@ void CONTROL_HandlePulse()
 						SyncTimeoutReached = true;
 						LL_SyncScope(false);
 						LL_SyncLCSU(false);
-						//GATE_StopProcess();
 					}
 
 					if(SyncTimeoutReached)
