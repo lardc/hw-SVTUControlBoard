@@ -50,6 +50,8 @@ typedef enum __SubState
 extern DeviceState CONTROL_State;
 extern volatile Int64U CONTROL_TimeCounter;
 extern volatile Int16U CONTROL_ExtInfoCounter;
+extern volatile bool CONTROL_SyncTimeoutEvent;
+extern volatile bool CONTROL_OscTurnOnEvent;
 extern bool IsImpulse;
 extern SubState SUB_State;
 
@@ -57,6 +59,7 @@ extern SubState SUB_State;
 void CONTROL_Init();
 void CONTROL_Idle();
 void CONTROL_SwitchToFault(Int16U Reason);
+void CONTROL_FinishedWithProblem(Int16U Problem);
 void CONTROL_SafetyProcess();
 void CONTROL_HandleExternalLamp(bool IsImpulse);
 void CONTROL_InitJSONPointers();

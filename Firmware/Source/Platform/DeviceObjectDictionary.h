@@ -14,6 +14,7 @@
 #define ACT_DBG_EXT_INDICATION			14	// Управление внешней индикацией
 #define ACT_DBG_IT_RANGE				15	// Включение оптопары при измерении тока Id
 #define ACT_DBG_UG_ST					16	// Переключение канала измерения Ug в режим самотестирования
+#define ACT_DBG_SEARCH_LCSU				17	// Обновление списка активных ячеек LCSU
 //
 #define ACT_START_TEST					100	// Запуск процесса измерения
 #define ACT_STOP_TEST					101	// Остановка процесса измерения
@@ -127,8 +128,7 @@
 											// 1 - версия  2.0
 #define REG_PCB_TIRIS_IGBT				121	// 0 - версия платы с тиристором
 											// 1 - c IGBT
-#define REG_MUTE_SAFETY					122	// Игнорирование контура безопасности
-#define REG_DIAG_ACT					123	// Активация диагностического функционала
+#define REG_PULSE_SHAPE					122	// Форма импульса (0 - полусинус, 1 - мод. полусинус, 2 - трапеция)
 
 // Несохраняемы регистры чтения-записи
 #define REG_IT_SETPOINT					128	// Уставка силового тока (в А)
@@ -136,6 +136,8 @@
 #define REG_PULSE_DURATION				130	// Продолжительность пульсации (в мс)
 //
 #define REG_DBG							150	// Отладочный регистр
+#define REG_MUTE_SAFETY					151	// Игнорирование контура безопасности
+#define REG_DIAG_ACT					152	// Активация диагностического функционала
 
 // Регистры только чтение
 #define REG_DEV_STATE					192	// Регистр состояния
@@ -178,6 +180,8 @@
 // -----------------------------
 
 // Регистры LCSU
+#define REG_LCSU_RISE_RATE				17	// dI/dt фронтов трапецеидального импульса тока (А/мкс)
+
 #define REG_LCSU_PULSE_VALUE			128	// Значение амплитуды импульса тока (в А)
 #define REG_LCSU_TRAPEZE_DURATION		129	// Длительность импульса тока (мс)
 
@@ -186,6 +190,18 @@
 #define REG_LCSU_DISABLE_REASON			194
 #define REG_LCSU_WARNING				195
 #define REG_LCSU_PROBLEM				196
+// -----------------------------
+//  Fault and disable codes in LCSU
+#define DF_LCSU_NONE					0
+#define DF_LCSU_PROBLEM_BATTERY			1
+
+// Problems in LCSU
+#define PROBLEM_LCSU_NONE				0
+#define PROBLEM_LCSU_FOLLOWING_ERROR	1
+#define PROBLEM_LCSU_SYNC_STOP			2
+#define PROBLEM_LCSU_MANUAL_STOP		3
+#define PROBLEM_LCSU_TRAPEZE_INDEX		4
+#define PROBLEM_LCSU_SIN_CALC_FAIL		5
 // -----------------------------
 
 // Endpoints
@@ -213,6 +229,7 @@
 #define DF_SELFTEST_IT					6	// Ошибка измерения тока в режиме самотестирования
 #define DF_SELFTEST_GATE				7	// Ошибка формирования управления в режиме самотестирования
 #define DF_SVTU_WAIT_TIMEOUT			8	// Ошибка превышения времени установления флага готовности данных DMA
+#define DF_PROBLEM_BATTERY_LCSU			9	// Ошибка с батареей в LCSU
 
 // Warning
 #define WARNING_NONE					0	// Предупреждений нет
@@ -227,6 +244,12 @@
 #define PROBLEM_EXT_DIAG_SHORT			6	// КЗ в цепи измерения
 #define PROBLEM_VOLTAGE_OUT_OF_RANGE	7	// Измеренное напряжение вне рабочего диапазона (только для платы 1.0)
 #define PROBLEM_CURRENT_OUT_OF_RANGE	8	// Измеренный ток вне рабочего диапазона (только для платы 1.0)
+#define PROBLEM_FOLLOWING_ERROR_LCSU	9	// На LCSU выставился FE
+#define PROBLEM_SYNC_STOP_LCSU			10	// На LCSU остановился требуемый сигнал синхронизации
+#define PROBLEM_MANUAL_STOP_LCSU		11	// На LCSU была Принудительная остановка процесса
+#define PROBLEM_TRAPEZE_INDEX_LCSU		12	// На LCSU нет наличия индекса завершения полки трапеции
+#define PROBLEM_SIN_CALC_FAIL_LCSU		13	// На LCSU выставился PROBLEM_SIN_CALC_FAIL
+#define PROBLEM_LCSU_UNKNOWN_PROBLEM	14	// На LCSU новая\неизвестная ошибка
 
 // User Errors
 #define ERR_NONE						0

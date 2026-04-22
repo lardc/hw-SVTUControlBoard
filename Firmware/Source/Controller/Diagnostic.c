@@ -8,6 +8,7 @@
 #include "DeviceObjectDictionary.h"
 #include "Controller.h"
 #include "GateDriver.h"
+#include "Logic.h"
 
 // Functions
 //
@@ -51,6 +52,10 @@ bool DIAG_HandleDiagnosticAction(Int16U ActionID, Int16U *pUserError)
 		LL_AnalogInputsDiagGate(DataTable[REG_DBG]);
 		break;
 			
+	case ACT_DBG_SEARCH_LCSU:
+		LOGIC_FindLCSU();
+		break;
+
 		default:
 			return false;
 	}

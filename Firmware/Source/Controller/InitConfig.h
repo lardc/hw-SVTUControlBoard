@@ -12,6 +12,8 @@ void INITCFG_ConfigUART();
 void INITCFG_ConfigADC();
 void INITCFG_ConfigTimer3();
 void INITCFG_ConfigTimer1();
+void INITCFG_ConfigTimer6();
+void INITCFG_ConfigTimer7();
 void INITCFG_ConfigDMA();
 void INITCFG_ConfigWatchDog();
 void INITCFG_ConfigTimer2();

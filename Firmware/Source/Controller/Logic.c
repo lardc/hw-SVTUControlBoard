@@ -1,4 +1,4 @@
-﻿// Header
+// Header
 //
 #include "Logic.h"
 
@@ -27,8 +27,12 @@
 typedef struct __LCSUStructData
 {
 	bool IsActive;
+	bool UsedInPulse;
 	LCSUState State;
 	float Current;
+	float RiseRate;
+	Int8U Fault;
+	Int8U Problem;
 } LCSUData, *pLCSUData;
 
 // Variables
@@ -42,12 +46,16 @@ void LOGIC_ResetLCSUCurrent();
 
 // Functions
 //
-bool LOGIC_FindLCSU()
+void LOGIC_FindLCSU()
 {
 	ActiveLCSUCounter = 0;
 	CachedLCSUStartNid = DataTable[REG_LCSU_START_NID];
 	CachedLCSUMaxCurrent = DataTable[REG_LCSU_MAX_CURRENT];
 	
+	// Сброс при новом поиске
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+		LCSU_DataArray[i].IsActive = false;
+
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_DEV_STATE, NULL))
@@ -61,8 +69,6 @@ bool LOGIC_FindLCSU()
 	
 	DataTable[REG_LCSU_DETECTED] = ActiveLCSUCounter;
 	DataTable[REG_IT_READ_MAX] = CachedLCSUMaxCurrent * ActiveLCSUCounter;
-	
-	return ActiveLCSUCounter;
 }
 // ----------------------------------------
 
@@ -77,69 +83,82 @@ bool LOGIC_UpdateLCSUState()
 			if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_DEV_STATE, &Register))
 				LCSU_DataArray[i].State = Register;
 			else
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
 				return false;
+			}
 		}
 	}
-	
 	return true;
 }
 // ----------------------------------------
 
 bool LOGIC_CallCommandForLCSU(Int16U Command)
 {
+	bool ResOk = true;
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
-		if(LCSU_DataArray[i].IsActive)
+		if(Command == ACT_LCSU_PULSE_CONFIG)
 		{
-			if(!BHL_Call(i + CachedLCSUStartNid, Command))
-				return false;
+			if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].UsedInPulse)
+				ResOk = BHL_Call(i + CachedLCSUStartNid, Command);
+		}
+		else if(LCSU_DataArray[i].IsActive)
+			ResOk = BHL_Call(i + CachedLCSUStartNid, Command);
+
+		if(!ResOk)
+		{
+			CONTROL_SwitchToFault(DF_INTERFACE);
+			return false;
 		}
 	}
-	
 	return true;
 }
 // ----------------------------------------
 
 bool LOGIC_PowerEnableLCSU()
 {
-	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	if(!DataTable[REG_LCSU_DETECTED])
 	{
-		if(LCSU_DataArray[i].IsActive)
-		{
-			if(LCSU_DataArray[i].State == LCSU_None)
-			{
-				if(!BHL_Call(i + CachedLCSUStartNid, ACT_LCSU_ENABLE_POWER))
-					return false;
-			}
-		}
+		CONTROL_SwitchToFault(DF_INTERFACE);
+		return false;
 	}
 
-	if(!DataTable[REG_LCSU_DETECTED])
-		return false;
-	
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	{
+		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State == LCSU_None)
+			if(!BHL_Call(i + CachedLCSUStartNid, ACT_LCSU_ENABLE_POWER))
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
+				return false;
+			}
+	}
 	return true;
 }
 // ----------------------------------------
 
 bool LOGIC_AreLCSUInStateX(Int16U State)
 {
-	bool result = true;
-	
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
-		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State != State)
-			result = false;
+		if(State == LCSU_PulseConfigReady)
+		{
+			if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State != State && LCSU_DataArray[i].UsedInPulse)
+				return false;
+		}
+		else if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].State != State)
+			return false;
 	}
 	
-	return result;
+	return true;
 }
 // ----------------------------------------
 
-bool LOGIC_IsLCSUInFaultOrDisabled(Int16U Fault, Int16U Disabled)
+bool LOGIC_IsLCSUInFaultOrDisabled()
 {
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
-		if(LCSU_DataArray[i].State == Fault || LCSU_DataArray[i].State == Disabled)
+		if(LCSU_DataArray[i].IsActive && (LCSU_DataArray[i].State == LCSU_Fault || LCSU_DataArray[i].State == LCSU_Disabled))
 			return true;
 	}
 	
@@ -147,18 +166,162 @@ bool LOGIC_IsLCSUInFaultOrDisabled(Int16U Fault, Int16U Disabled)
 }
 // ----------------------------------------
 
-bool LOGIC_WriteLCSUConfig()
+bool LOGIC_UpdateProblemsOrFaults()
+{
+	Int16U Register;
+	bool ResOk = true;
+
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	{
+		if(LCSU_DataArray[i].IsActive)
+		{
+			if((ResOk = BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_PROBLEM, &Register)))
+			{
+				LCSU_DataArray[i].Problem = Register;
+				if((ResOk = BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_FAULT_REASON, &Register)))
+					LCSU_DataArray[i].Fault = Register;
+			}
+		}
+		if(!ResOk)
+		{
+			CONTROL_SwitchToFault(DF_INTERFACE);
+			return ResOk;
+		}
+	}
+	return ResOk;
+}
+// ----------------------------------------
+
+bool LOGIC_NoIssuesFromLCSU()
 {
 	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
 	{
 		if(LCSU_DataArray[i].IsActive)
 		{
-			if(!BHL_WriteRegisterFloat(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
-				if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, DataTable[REG_PULSE_DURATION]))
-					return false;
+			if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_FOLLOWING_ERROR)
+			{
+				CONTROL_FinishedWithProblem(PROBLEM_FOLLOWING_ERROR_LCSU);
+				return false;
+			}
+
+			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_SYNC_STOP)
+			{
+				CONTROL_FinishedWithProblem(PROBLEM_SYNC_STOP_LCSU);
+				return false;
+			}
+
+			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_MANUAL_STOP)
+			{
+				CONTROL_FinishedWithProblem(PROBLEM_MANUAL_STOP_LCSU);
+				return false;
+			}
+
+			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_TRAPEZE_INDEX)
+			{
+				CONTROL_FinishedWithProblem(PROBLEM_TRAPEZE_INDEX_LCSU);
+				return false;
+			}
+
+			else if(LCSU_DataArray[i].Problem == PROBLEM_LCSU_SIN_CALC_FAIL)
+			{
+				CONTROL_FinishedWithProblem(PROBLEM_SIN_CALC_FAIL_LCSU);
+				return false;
+			}
+
+			else if(LCSU_DataArray[i].Problem != PROBLEM_NONE)
+			{
+				CONTROL_FinishedWithProblem(PROBLEM_LCSU_UNKNOWN_PROBLEM);
+				return false;
+			}
+
+			if(LCSU_DataArray[i].Fault == DF_LCSU_PROBLEM_BATTERY)
+			{
+				CONTROL_SwitchToFault(DF_PROBLEM_BATTERY_LCSU);
+				return false;
+			}
 		}
 	}
-	
+	return true;
+}
+// ----------------------------------------
+
+bool LOGIC_GetLCSURiseRate()
+{
+	Int16U Register;
+
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	{
+		if(LCSU_DataArray[i].IsActive)
+		{
+			if(BHL_ReadRegister(i + CachedLCSUStartNid, REG_LCSU_RISE_RATE, &Register))
+				LCSU_DataArray[i].RiseRate = Register;
+			else
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
+				return false;
+			}
+		}
+	}
+	return true;
+}
+// ----------------------------------------
+
+void LOGIC_CalcSyncTime(float *SyncTime, float *OscSyncTime)
+{
+	// SyncTime - время выключения синхронизаций
+	// OscSyncTime - время включения синхронизации осциллографа
+	switch((Int16U)DataTable[REG_PULSE_SHAPE])
+	{
+		case SHAPE_SINE:
+			*SyncTime = TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION + 2 * TIME_DELAY_AFTER_PULSE;
+			*OscSyncTime = TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION / 2;
+			break;
+
+		case SHAPE_SINE_MOD:
+			*SyncTime = TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION + 2 * TIME_DELAY_AFTER_PULSE + TIME_SINE_MOD_DURATION;
+			*OscSyncTime = TIME_LCSU_DELAY_AFTER_SYNC + TIME_SINE_DURATION / 2;
+			break;
+
+		case SHAPE_TRAPEZ:
+		{
+			float TrapezeTime , RisingPart = 0, Flattop;
+			for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+			{
+				if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].Current != 0)
+					RisingPart = fmaxf(RisingPart, LCSU_DataArray[i].Current / LCSU_DataArray[i].RiseRate);
+			}
+			RisingPart = RisingPart / 1000;
+
+			Flattop =  DataTable[REG_PULSE_DURATION];
+			TrapezeTime = RisingPart * 2 + Flattop;
+
+			*SyncTime = TIME_LCSU_DELAY_AFTER_SYNC + TrapezeTime + TIME_DELAY_AFTER_PULSE;
+			*OscSyncTime = TIME_LCSU_DELAY_AFTER_SYNC + RisingPart + Flattop - TIME_START_FOR_OSC;
+		}
+		break;
+	}
+}
+// ----------------------------------------
+
+bool LOGIC_WriteLCSUConfig()
+{
+	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	{
+		if(LCSU_DataArray[i].IsActive && LCSU_DataArray[i].UsedInPulse)
+		{
+
+			if(!BHL_WriteRegisterFloat(i + CachedLCSUStartNid, REG_LCSU_PULSE_VALUE, LCSU_DataArray[i].Current))
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
+				return false;
+			}
+			if(!BHL_WriteRegister(i + CachedLCSUStartNid, REG_LCSU_TRAPEZE_DURATION, DataTable[REG_PULSE_DURATION]))
+			{
+				CONTROL_SwitchToFault(DF_INTERFACE);
+				return false;
+			}
+		}
+	}
 	return true;
 }
 // ----------------------------------------
@@ -189,29 +352,36 @@ bool LOGIC_SetCurrentForCertainLCSU(Int16U Nid, float Current)
 
 bool LOGIC_DistributeCurrent(float Current)
 {
+	Int16U UsedLCSU = 0;
+	float CurrentPerLCSU;
+
+	if (ActiveLCSUCounter == 0)
+	  return false;
+
+	for (Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	  	LCSU_DataArray[i].UsedInPulse = false;
+
+	// Определяем количество необходимых ячеек LCSU
+	UsedLCSU = (Current <= IT_MAX_VALUE_SINGLE_LCSU) ? 1 : ActiveLCSUCounter;
+
+	CurrentPerLCSU = Current / UsedLCSU;
+
 	// Ток превышает допустимый диапазон
-	if(Current > (CachedLCSUMaxCurrent * ActiveLCSUCounter))
+	if (CurrentPerLCSU > CachedLCSUMaxCurrent)
 		return false;
 
 	// Очистка уставки тока для всех LCSU
 	LOGIC_ResetLCSUCurrent();
 
 	// Запись значений и формы импульса тока
-	for(Int16U i = 0; i < DataTable[REG_LCSU_COUNT_MAX]; ++i)
+	for(Int16U i = 0; (i < DataTable[REG_LCSU_COUNT_MAX] && UsedLCSU > 0); ++i)
 	{
-		if(LCSU_DataArray[i].IsActive)
-		{
-			if(Current >= CachedLCSUMaxCurrent)
-			{
-				LCSU_DataArray[i].Current = CachedLCSUMaxCurrent;
-				Current -= CachedLCSUMaxCurrent;
-			}
-			else
-			{
-				LCSU_DataArray[i].Current = Current;
-				Current = 0;
-			}
-		}
+		if (!LCSU_DataArray[i].IsActive)
+			continue;
+
+		LCSU_DataArray[i].Current = CurrentPerLCSU;
+		LCSU_DataArray[i].UsedInPulse = true;
+		UsedLCSU--;
 	}
 	
 	return true;
@@ -285,39 +455,26 @@ void LOGIC_StartPulse()
 
 bool LOGIC_FinishProcess()
 {
-	static bool DMADataProcessed = false;
 	// Завершение оцифровки
 	if(IT_DMASampleCompleted())
 	{
-		if(!DMADataProcessed)
-		{
 			TIM_Stop(TIM1);
+			TIM_Stop(TIM6);
 			TIM_Stop(TIM7);
+			IsImpulse = false;
 			LL_SyncScope(false);
+			LL_SyncLCSU(false);
+			GATE_StopProcess();
+
 			// Пересчёт значений
 			MEASURE_ConvertUt(MEMBUF_DMA_Ut, VALUES_POWER_DMA_SIZE);
 			MEASURE_ConvertIt(MEMBUF_DMA_It, VALUES_POWER_DMA_SIZE, LL_ItGetRange());
 			if ((DataTable[REG_PCB_VERSION] == PCB_VERSION_20) && (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT))
 				MEASURE_ConvertUt2(MEMBUF_DMA_Ut2_UgIg, VALUES_POWER_DMA_SIZE);
-
-			DMADataProcessed = true;
-		}
-		// Завершение процесса только после отключения синхронизации по таймеру регулятора
-		if(!IsImpulse)
-		{
-			GATE_StopProcess();
-			DMADataProcessed = false; // Сброс флага для следующего цикла
 			return true;
-		}
-		else
-			// DMA завершен, но синхронизация еще работает - ждем отключения через регулятор
-			return false;
 	}
 	else
-	{
-		DMADataProcessed = false; // Сброс флага если DMA еще не завершен
 		return false;
-	}
 }
 // ----------------------------------------
 
@@ -335,17 +492,17 @@ void LOGIC_SaveToEndpoint(volatile pFloat32 InputArray, pFloat32 OutputArray, In
 }
 // ----------------------------------------
 
-void LOGIC_GetResults(float *UtResult, float *UtCh2Result, float *ItResult)
+void LOGIC_GetResults(float *UtResult, float *UtCh2Result, float *ItResult, Int16U UtIndex, Int16U ItIndex)
 {
 	float UtMaxVal = DataTable[REG_UT_MAX] ? DataTable[REG_UT_MAX] : UT_MAX_VALUE;
 
-	*UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut);
+	*UtResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut, UtIndex);
 	if(((Int16U)DataTable[REG_PCB_VERSION] == PCB_VERSION_20) && (DataTable[REG_PCB_TIRIS_IGBT] == PCB_IGBT))
 	{
-		*UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg);
+		*UtCh2Result = MEASURE_CollectorAverageValue(MEMBUF_DMA_Ut2_UgIg, UtIndex);
 		*UtResult = (*UtResult > UtMaxVal) ? *UtCh2Result : *UtResult;
 	}
-	*ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It);
+	*ItResult = MEASURE_CollectorAverageValue(MEMBUF_DMA_It, ItIndex);
 }
 // ----------------------------------------
 

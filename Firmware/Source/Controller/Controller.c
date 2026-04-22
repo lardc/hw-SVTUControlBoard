@@ -18,6 +18,7 @@
 #include "JSONDescription.h"
 #include "SaveToFlash.h"
 #include "Delay.h"
+#include "SysConfig.h"
 
 // Types
 //
@@ -37,6 +38,8 @@ volatile Int16U CONTROL_PowerValues_Counter = 0;
 volatile Int64U CONTROL_TimeCounter = 0;
 volatile Int64U CONTROL_Timeout = 0;
 volatile Int16U CONTROL_ExtInfoCounter = 0;
+volatile bool CONTROL_SyncTimeoutEvent = false;
+volatile bool CONTROL_OscTurnOnEvent = false;
 
 // Forward functions
 static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError);
@@ -53,9 +56,10 @@ void CONTROL_HandlePowerOff();
 void CONTROL_SaveDataToEndpoint();
 Int16U CONTROL_CheckSelfTestResults();
 bool CONTROL_IsSafetyEvent();
-void CONTROL_FinishedWithProblem(Int16U Problem);
 void CONTROL_InitStoragePointers();
 void CONTROL_InitJSONPointers();
+static Int32U CONTROL_ConvertMsToUs(float TimeMs);
+static void CONTROL_StartSyncTimers(float SyncTimeMs, float OscSyncTimeMs);
 
 // Functions
 //
@@ -141,6 +145,8 @@ void CONTROL_ResetHardware()
 	TIM_Stop(TIM1);
 	TIM_Stop(TIM6);
 	TIM_Stop(TIM7);
+	CONTROL_SyncTimeoutEvent = false;
+	CONTROL_OscTurnOnEvent = false;
 }
 //-----------------------------------------------
 
@@ -197,10 +203,8 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 		case ACT_STOP_TEST:
 			if(CONTROL_State == DS_InProcess)
 			{
-				LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS);
-				CONTROL_ResetToDefaults();
-				CONTROL_FinishedWithProblem(PROBLEM_FORCED_STOP);
-				CONTROL_SetDeviceState(DS_Ready, SS_None);
+				if(LOGIC_CallCommandForLCSU(ACT_LCSU_STOP_PROCESS))
+					CONTROL_FinishedWithProblem(PROBLEM_FORCED_STOP);
 			}
 			break;
 			
@@ -310,8 +314,7 @@ void CONTROL_LCSUStateUpdate()
 		if(CONTROL_TimeCounter > NextUpdate)
 		{
 			NextUpdate = CONTROL_TimeCounter + TIME_LCSU_UPDATE;
-			if(!LOGIC_UpdateLCSUState())
-				CONTROL_SwitchToFault(DF_INTERFACE);
+			LOGIC_UpdateLCSUState();
 		}
 	}
 }
@@ -327,13 +330,11 @@ void CONTROL_HandlePowerOn()
 		{
 			case SS_PowerOn:
 				{
-					if(LOGIC_PowerEnableLCSU() || DataTable[REG_EMULATION])
+					if(DataTable[REG_EMULATION] || LOGIC_PowerEnableLCSU())
 					{
 						Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 						CONTROL_SetDeviceState(DS_InProcess, SS_WaitCharge);
 					}
-					else
-						CONTROL_SwitchToFault(DF_INTERFACE);
 				}
 				break;
 				
@@ -357,6 +358,9 @@ void CONTROL_HandlePulse()
 {
 	static float UtResult, UtCh2Result, ItResult;
 	static Int64U Timeout = 0;
+	static float SyncTime = 0, OscSyncTime = 0;
+	static Int16U ItSyncIndex = 0, UtSyncIndex = 0;
+	static bool SyncTimeoutReached = false;
 	
 	if(CONTROL_State == DS_InProcess)
 	{
@@ -366,6 +370,10 @@ void CONTROL_HandlePulse()
 				{
 					CONTROL_ResetData();
 					UtResult = UtCh2Result = ItResult = 0.0f;
+					SyncTime = 0;
+					OscSyncTime = 0;
+					ItSyncIndex = 0, UtSyncIndex = 0;
+					SyncTimeoutReached = false;
 
 					Timeout = CONTROL_TimeCounter + DataTable[REG_LCSU_LONG_TIMEOUT];
 					CONTROL_SetDeviceState(DS_InProcess, SS_WaitPulsePause);
@@ -375,7 +383,7 @@ void CONTROL_HandlePulse()
 			case SS_WaitPulsePause:
 				{
 					if(LOGIC_AreLCSUInStateX(LCSU_Ready))
-						CONTROL_SetDeviceState(DS_InProcess, SS_ConfigPulse);
+							CONTROL_SetDeviceState(DS_InProcess, SS_ConfigPulse);
 					else
 						CONTROL_HandleFaultLCSUEvents(Timeout);
 				}
@@ -387,22 +395,16 @@ void CONTROL_HandlePulse()
 
 					if(LOGIC_DistributeCurrent(CurrentAmplitude)||DataTable[REG_EMULATION])
 					{
-						bool NoError = false;
 						LOGIC_SelectCurrentRange(CurrentAmplitude);
 						LL_AnalogInputsSelfTest(SelfTest);
 						
 						if(LOGIC_WriteLCSUConfig())
-						{
 							if(LOGIC_CallCommandForLCSU(ACT_LCSU_PULSE_CONFIG))
-							{
-								NoError = true;
-								Timeout = CONTROL_TimeCounter + TIMEOUT_LCSU_SHORT;
-								CONTROL_SetDeviceState(DS_InProcess, SS_WaitConfig);
-							}
-						}
-						
-						if(!NoError)
-							CONTROL_SwitchToFault(DF_INTERFACE);
+								if(LOGIC_UpdateProblemsOrFaults() && LOGIC_NoIssuesFromLCSU())
+									{
+										Timeout = CONTROL_TimeCounter + TIMEOUT_LCSU_SHORT;
+										CONTROL_SetDeviceState(DS_InProcess, SS_WaitConfig);
+									}
 					}
 					else
 						CONTROL_SwitchToFault(DF_LCSU_CURRENT_CONFIG);
@@ -433,7 +435,11 @@ void CONTROL_HandlePulse()
 
 					case RS_TargetReached:
 						if(CONTROL_TimeCounter >= Timeout)
-							CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
+							if(LOGIC_GetLCSURiseRate())
+							{
+								LOGIC_CalcSyncTime(&SyncTime, &OscSyncTime);
+								CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
+							}
 						break;
 
 					case RS_FollowingError:
@@ -443,11 +449,7 @@ void CONTROL_HandlePulse()
 							CONTROL_SwitchToFault(DF_SELFTEST_GATE);
 						}
 						else
-						{
-							CONTROL_ResetHardware();
 							CONTROL_FinishedWithProblem(PROBLEM_GATE_VOLTAGE);
-							CONTROL_SetDeviceState(DS_Ready, SS_None);
-						}
 						break;
 
 					case RS_GateShort:
@@ -457,11 +459,7 @@ void CONTROL_HandlePulse()
 							CONTROL_SwitchToFault(DF_SELFTEST_GATE);
 						}
 						else
-						{
-							GATE_StopProcess();
 							CONTROL_FinishedWithProblem(PROBLEM_GATE_SHORT);
-							CONTROL_SetDeviceState(DS_Ready, SS_None);
-						}
 						break;
 
 					default:
@@ -471,16 +469,35 @@ void CONTROL_HandlePulse()
 
 			case SS_CurrentPulseStart:
 				LOGIC_StartPulse();
+				CONTROL_StartSyncTimers(SyncTime, OscSyncTime);
 
 				CONTROL_Timeout = CONTROL_TimeCounter + DataTable[REG_SVTU_WAIT_FINISH_TIME];
 				CONTROL_SetDeviceState(DS_InProcess, SS_WaitFinishProcess);
 				break;
 
 			case SS_WaitFinishProcess:
+
 				if(CONTROL_TimeCounter < CONTROL_Timeout)
 				{
-					if(LOGIC_FinishProcess())
-						CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
+					if(CONTROL_OscTurnOnEvent)
+					{
+						CONTROL_OscTurnOnEvent = false;
+						LL_SyncScope(true);
+						UtSyncIndex = VALUES_POWER_DMA_SIZE - DMA_ReadDataCount(DMA_ADC_UT_CH);
+						ItSyncIndex = VALUES_POWER_DMA_SIZE - DMA_ReadDataCount(DMA_ADC_IT_CH);
+					}
+
+					if(CONTROL_SyncTimeoutEvent)
+					{
+						CONTROL_SyncTimeoutEvent = false;
+						SyncTimeoutReached = true;
+						LL_SyncScope(false);
+						LL_SyncLCSU(false);
+					}
+
+					if(SyncTimeoutReached)
+						if(LOGIC_FinishProcess())
+							CONTROL_SetDeviceState(DS_InProcess, SS_CheckResultAndPostPulseConfig);
 				}
 				else
 				{
@@ -492,27 +509,30 @@ void CONTROL_HandlePulse()
 			case SS_CheckResultAndPostPulseConfig:
 				{
 					CONTROL_SaveDataToEndpoint();
-					LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult);
 
-					if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
+					if(LOGIC_UpdateProblemsOrFaults() && LOGIC_NoIssuesFromLCSU())
 					{
-						if((LOGIC_CheckResults(UtResult)) || Diagnostic)
+						LOGIC_GetResults(&UtResult, &UtCh2Result, &ItResult, UtSyncIndex, ItSyncIndex);
+						if((DataTable[REG_PCB_VERSION] != PCB_VERSION_10) && DataTable[REG_DIAG_ACT])
 						{
-							TIM_Stop(TIM15);
-							GATE_CacheVariables();
-							GATE_RegulatorState = RS_Diagnostic;
-							LL_AnalogInputsDiagGate(true);
-							LL_AnalogInputsSelfTest(true);
-							DELAY_MS(3);
-							Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
-							GATE_StartProcess();
-							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseProcess);
+							if((LOGIC_CheckResults(UtResult)) || Diagnostic)
+							{
+								TIM_Stop(TIM15);
+								GATE_CacheVariables();
+								GATE_RegulatorState = RS_Diagnostic;
+								LL_AnalogInputsDiagGate(true);
+								LL_AnalogInputsSelfTest(true);
+								DELAY_MS(3);
+								Timeout = CONTROL_TimeCounter + DataTable[REG_EXT_DIAG_DURATION];
+								GATE_StartProcess();
+								CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseProcess);
+							}
+							else
+								CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 						}
 						else
 							CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 					}
-					else
-						CONTROL_SetDeviceState(DS_InProcess, SS_PostPulseSaveResults);
 				}
 				break;
 
@@ -526,17 +546,9 @@ void CONTROL_HandlePulse()
 					Diagnostic = false;
 
 					if(GATE_RegulatorState == RS_DiagDisconnected)
-					{
-						CONTROL_ResetHardware();
 						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_LINE_DISCON);
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
-					}
 					else if(GATE_RegulatorState == RS_DiagShort)
-					{
-						CONTROL_ResetHardware();
 						CONTROL_FinishedWithProblem(PROBLEM_EXT_DIAG_SHORT);
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
-					}
 					else
 					{
 						DataTable[REG_OP_RESULT] = OPRESULT_OK;
@@ -557,24 +569,26 @@ void CONTROL_HandlePulse()
 					{
 						DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_FAIL;
 						CONTROL_SwitchToFault(SelfTestResult);
+						break;
 					}
 					else
 					{
 						DataTable[REG_SELF_TEST_OP_RESULT] = OPRESULT_OK;
 						CONTROL_SetDeviceState(DS_Ready, SS_None);
+						break;
 					}
 				}
-				if(DataTable[REG_PCB_VERSION] == PCB_VERSION_10)
+				else if(DataTable[REG_PCB_VERSION] == PCB_VERSION_10)
 				{
 					if((UtResult > UT_MAX_VALUE) || (UtResult < UT_MIN_VALUE))
 					{
 						CONTROL_FinishedWithProblem(PROBLEM_VOLTAGE_OUT_OF_RANGE);
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
+						break;
 					}
 					if((ItResult > IT_MAX_VALUE) || (ItResult < IT_MIN_VALUE))
 					{
 						CONTROL_FinishedWithProblem(PROBLEM_CURRENT_OUT_OF_RANGE);
-						CONTROL_SetDeviceState(DS_Ready, SS_None);
+						break;
 					}
 				}
 				LOGIC_SaveResults(UtResult, ItResult);
@@ -588,6 +602,45 @@ void CONTROL_HandlePulse()
 	}
 }
 //-----------------------------------------------
+
+static Int32U CONTROL_ConvertMsToUs(float TimeMs)
+{
+	float timeUs = TimeMs * 1000.0f;
+	return (timeUs < 1.0f) ? 1 : (Int32U)(timeUs + 0.5f);
+}
+//------------------------------------------
+
+static void CONTROL_StartSyncTimers(float SyncTimeMs, float OscSyncTimeMs)
+{
+	CONTROL_SyncTimeoutEvent = false;
+	CONTROL_OscTurnOnEvent = false;
+
+	TIM_Stop(TIM6);
+	TIM_Stop(TIM7);
+	// На время перенастройки выключаем IRQ линий таймеров
+	NVIC_DisableIRQ(TIM6_DAC_IRQn);
+	NVIC_DisableIRQ(TIM7_IRQn);
+	TIM_Config(TIM6, SYSCLK, CONTROL_ConvertMsToUs(SyncTimeMs));
+	TIM_Config(TIM7, SYSCLK, CONTROL_ConvertMsToUs(OscSyncTimeMs));
+	TIM_Reset(TIM6);
+	TIM_Reset(TIM7);
+	TIM_StatusClear(TIM6);
+	TIM_StatusClear(TIM7);
+	NVIC_ClearPendingIRQ(TIM6_DAC_IRQn);
+	NVIC_ClearPendingIRQ(TIM7_IRQn);
+	// Включаем таймеры
+	TIM_Start(TIM6);
+	TIM_Start(TIM7);
+	// И сразу повторно чистим "хвосты" после CEN (на некоторых конфигурациях ловит спурию)
+	TIM_StatusClear(TIM6);
+	TIM_StatusClear(TIM7);
+	NVIC_ClearPendingIRQ(TIM6_DAC_IRQn);
+	NVIC_ClearPendingIRQ(TIM7_IRQn);
+	NVIC_EnableIRQ(TIM6_DAC_IRQn);
+	NVIC_EnableIRQ(TIM7_IRQn);
+}
+//------------------------------------------
+
 
 Int16U CONTROL_CheckSelfTestResults()
 {
@@ -618,18 +671,18 @@ void CONTROL_HandlePowerOff()
 
 		if(LOGIC_CallCommandForLCSU(ACT_LCSU_DISABLE_POWER))
 			CONTROL_SetDeviceState(DS_None, SS_None);
-		else
-			CONTROL_SwitchToFault(DF_INTERFACE);
 	}
 }
 //-----------------------------------------------
 
 void CONTROL_HandleFaultLCSUEvents(Int64U Timeout)
 {
-	if(LOGIC_IsLCSUInFaultOrDisabled(LCSU_Fault, LCSU_Disabled))
+	if(LOGIC_IsLCSUInFaultOrDisabled())
 	{
-		CONTROL_SwitchToFault(DF_LCSU_UNEXPECTED_STATE);
+		if(LOGIC_UpdateProblemsOrFaults() && LOGIC_NoIssuesFromLCSU())
+			CONTROL_SwitchToFault(DF_LCSU_UNEXPECTED_STATE);
 	}
+
 	else if(CONTROL_TimeCounter > Timeout)
 		CONTROL_SwitchToFault(DF_LCSU_STATE_TIMEOUT);
 }
@@ -654,6 +707,9 @@ void CONTROL_FinishedWithProblem(Int16U Problem)
 {
 	DataTable[REG_OP_RESULT] = OPRESULT_FAIL;
 	DataTable[REG_PROBLEM] = Problem;
+	SelfTest = Diagnostic = false;
+	CONTROL_ResetHardware();
+	CONTROL_SetDeviceState(DS_Ready, SS_None);
 }
 //-----------------------------------------------
 
@@ -661,11 +717,7 @@ void CONTROL_SafetyProcess()
 {
 	if(CONTROL_IsSafetyEvent() && CONTROL_State == DS_InProcess && SUB_State != SS_PowerOn && SUB_State != SS_WaitCharge
 			&& SUB_State != SS_PowerOff)
-	{
-		CONTROL_ResetHardware();
 		CONTROL_FinishedWithProblem(PROBLEM_SAFETY);
-		CONTROL_SetDeviceState(DS_Ready, SS_None);
-	}
 }
 // ----------------------------------------
 

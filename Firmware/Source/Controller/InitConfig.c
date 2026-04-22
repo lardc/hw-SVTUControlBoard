@@ -207,6 +207,26 @@ void INITCFG_ConfigTimer2()
 }
 //------------------------------------
 
+void INITCFG_ConfigTimer6()
+{
+	TIM_Clock_En(TIM_6);
+	TIM_Config(TIM6, SYSCLK, 1);
+	TIM_OnePulseMode(TIM6, true);
+	TIM_Interupt(TIM6, 0, true);
+	TIM_Stop(TIM6);
+}
+//------------------------------------
+
+void INITCFG_ConfigTimer7()
+{
+	TIM_Clock_En(TIM_7);
+	TIM_Config(TIM7, SYSCLK, 1);
+	TIM_OnePulseMode(TIM7, true);
+	TIM_Interupt(TIM7, 0, true);
+	TIM_Stop(TIM7);
+}
+//------------------------------------
+
 void INITCFG_ConfigDMA()
 {
 	DMA_Clk_Enable(DMA1_ClkEN);
