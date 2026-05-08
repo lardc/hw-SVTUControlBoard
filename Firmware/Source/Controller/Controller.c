@@ -187,11 +187,11 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 		case 22:
 			//GPIO_SetState(GPIO_SAFETY, true);
 			//DELAY_US(50);
-
+			__disable_irq();
 			GPIO_SetState(GPIO_IT_RANGE, true);
 			DELAY_US(DataTable[REG_PULSE1_LEN]);
 			GPIO_SetState(GPIO_IT_RANGE, false);
-
+			__enable_irq();
 			//DELAY_US(50);
 			//GPIO_SetState(GPIO_SAFETY, false);
 			break;
@@ -199,7 +199,7 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 		case 23:
 			//GPIO_SetState(GPIO_SAFETY, true);
 			//DELAY_US(50);
-
+			__disable_irq();
 			GPIO_SetState(GPIO_IT_RANGE, true);
 			DELAY_US(DataTable[REG_PULSE1_LEN]);
 			GPIO_SetState(GPIO_IT_RANGE, false);
@@ -207,25 +207,26 @@ static Boolean CONTROL_DispatchAction(Int16U ActionID, pInt16U pUserError)
 			GPIO_SetState(GPIO_IT_RANGE, true);
 			DELAY_US(DataTable[REG_PULSE2_LEN]);
 			GPIO_SetState(GPIO_IT_RANGE, false);
-
+			__enable_irq();
 			//DELAY_US(50);
 			//GPIO_SetState(GPIO_SAFETY, false);
 			break;
 
 		case 29:
+			IWDG_ConfigureSlowUpdate();
 			GPIO_SetState(GPIO_AIN_ST, true);
 			GPIO_SetState(GPIO_IND_CTRL, true);
 			GPIO_SetState(GPIO_SYNC_LCSU, true);
 			GPIO_SetState(GPIO_IT_RANGE, true);
 			GPIO_SetState(GPIO_UGT_SELF_TEST, true);
-			GPIO_SetState(GPIO_SAFETY, true);
-			DELAY_US(1000);
+			//GPIO_SetState(GPIO_SAFETY, true);
+			DELAY_US(500000);
 			GPIO_SetState(GPIO_AIN_ST, false);
 			GPIO_SetState(GPIO_IND_CTRL, false);
 			GPIO_SetState(GPIO_SYNC_LCSU, false);
 			GPIO_SetState(GPIO_IT_RANGE, false);
 			GPIO_SetState(GPIO_UGT_SELF_TEST, false);
-			GPIO_SetState(GPIO_SAFETY, false);
+			//GPIO_SetState(GPIO_SAFETY, false);
 			break;
 
 		case ACT_ENABLE_POWER:
