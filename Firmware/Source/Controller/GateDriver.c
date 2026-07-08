@@ -14,7 +14,7 @@
 
 // Variables
 //
-RegulatorState GATE_RegulatorState = RS_None;
+volatile RegulatorState GATE_RegulatorState = RS_None;
 //
 float RegulatorQp = 0;
 float RegulatorQi = 0;
