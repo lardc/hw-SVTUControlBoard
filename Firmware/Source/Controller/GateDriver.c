@@ -120,6 +120,8 @@ void GATE_CacheVariables()
 																						// т.к иначе она не успевает накопиться за время работы
 
 	GATE_RegulatorState = RS_None;
+	DataTable[REG_DBG_GATE_STATE] = GATE_RegulatorState;
+	DataTable[REG_DBG_GATE_COUNTER] = GateValues_Counter;
 }
 //------------------------------------
 
@@ -240,5 +242,7 @@ void GATE_SaveToEndpoints(float Voltage, float Current, float Error)
 
 		GateValues_Counter++;
 	}
+	DataTable[REG_DBG_GATE_STATE] = GATE_RegulatorState;
+	DataTable[REG_DBG_GATE_COUNTER] = GateValues_Counter;
 }
 //------------------------------------

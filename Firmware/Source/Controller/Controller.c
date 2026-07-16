@@ -427,6 +427,8 @@ void CONTROL_HandlePulse()
 				break;
 				
 			case SS_GateVoltageProcess:
+				DataTable[REG_DBG_TIMEOUT] = Timeout;
+				DataTable[REG_DBG_COUNTER] = CONTROL_TimeCounter;
 				switch (GATE_RegulatorState)
 				{
 					case RS_InProcess:
