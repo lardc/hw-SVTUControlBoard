@@ -439,6 +439,10 @@ void LOGIC_StartPulse()
 	{
 		DMA_ChannelReload(DMA_ADC_UT2_UGIG, VALUES_POWER_DMA_SIZE);
 		DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
+		// ADC1 (UT2) тактируется TIM1 — должен быть ADSTART до старта TIM1.
+		// Раньше это делал GATE_StartProcess; для IGBT gate его больше не трогает.
+		ADC_InterruptClearFlag(ADC1, OVR);
+		ADC_SamplingStart(ADC1);
 	}
 	DMA_ChannelEnable(DMA_ADC_IT_CH, true);
 	DMA_ChannelEnable(DMA_ADC_UT_CH, true);

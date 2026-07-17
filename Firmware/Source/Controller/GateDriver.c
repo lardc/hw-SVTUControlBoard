@@ -11,6 +11,7 @@
 #include "math.h"
 #include "MemBuffers.h"
 #include "Controller.h"
+#include "Constraints.h"
 
 // Variables
 //
@@ -74,21 +75,47 @@ void GATE_SetUg(float Value)
 
 void GATE_StartProcess()
 {
-	ADC_SamplingStart(ADC1);
+	// Сначала остановить источник триггера и ADC — иначе OVR при перезарядке DMA
+	TIM_Stop(TIM2);
+	ADC_SamplingStop(ADC2);
+	ADC_InterruptClearFlag(ADC2, OVR);
+
+	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, false);
+	DMA_TransferCompleteReset(DMA2, DMA_IFCR_CGIF1);
+	DMA_ChannelReload(DMA_ADC_IGBT_UGIG, 2);
+	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
+
+	// Для IGBT gate идёт только через ADC2/DMA2_CH1.
+	// UT2 (DMA1_CH1) заряжается в LOGIC_StartPulse под TIM1.
+	if ((Int16U)DataTable[REG_PCB_TIRIS_IGBT] != PCB_IGBT)
+	{
+		DMA_ChannelEnable(DMA_ADC_UT2_UGIG, false);
+		DMA_TransferCompleteReset(DMA1, DMA_IFCR_CGIF1);
+		DMA_ChannelReload(DMA_ADC_UT2_UGIG, 2);
+		DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
+		ADC_SamplingStop(ADC1);
+		ADC_InterruptClearFlag(ADC1, OVR);
+		ADC_SamplingStart(ADC1);
+	}
+
 	ADC_SamplingStart(ADC2);
 	TIM_Start(TIM2);
-
-	// Запуск DMA для версий платы 2.0
-	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, true);
-	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, true);
 }
 //------------------------------------
 
 void GATE_StopProcess()
 {
+	// TIM/ADC стоп до Disable DMA — иначе триггер при EN=0 даёт OVR
+	TIM_Stop(TIM2);
+	ADC_SamplingStop(ADC2);
+
 	DMA_ChannelEnable(DMA_ADC_IGBT_UGIG, false);
 	DMA_ChannelEnable(DMA_ADC_UT2_UGIG, false);
-	TIM_Stop(TIM2);
+
+	DMA_TransferCompleteReset(DMA2, DMA_IFCR_CGIF1);
+	DMA_TransferCompleteReset(DMA1, DMA_IFCR_CGIF1);
+	ADC_InterruptClearFlag(ADC2, OVR);
+
 	GATE_SetUg(0);
 }
 //------------------------------------
@@ -127,7 +154,7 @@ void GATE_CacheVariables()
 
 void GATE_RegulatorProcess(float VoltageSample, float CurrentSample)
 {
-	float RegulatorError, RegulatorOut, Qp, RegulatorVoltage = 0;
+	float RegulatorError = 0, RegulatorOut, Qp, RegulatorVoltage = 0;
 	static float Qi = 0;
 
 	// Формирование линейно нарастающего фронта импульса напряжения

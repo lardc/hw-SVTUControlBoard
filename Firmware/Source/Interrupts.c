@@ -115,6 +115,9 @@ void DMA2_Channel1_IRQHandler()
 
 		GATE_RegulatorProcess(GateVoltage, GateCurrent);
 
+		if (ADC2->ISR & ADC_ISR_OVR)
+			ADC_InterruptClearFlag(ADC2, OVR);
+
 		ADC_SamplingStart(ADC2);
 	}
 }

@@ -164,8 +164,6 @@
 
 #define REG_DBG_GATE_STATE				214
 #define REG_DBG_GATE_COUNTER			215
-#define REG_DBG_TIMEOUT					216
-#define REG_DBG_COUNTER					217
 //
 #define REG_FWINFO_SLAVE_NID			256	// Device CAN slave node ID
 #define REG_FWINFO_MASTER_NID			257	// Device CAN master node ID (if presented)
