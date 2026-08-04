@@ -426,7 +426,7 @@ void CONTROL_HandlePulse()
 						GATE_StartProcess();
 						Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME_DELAY];
 						TimeoutLong = CONTROL_TimeCounter + DataTable[REG_UG_EDGE_TIME]/1000
-						         + DataTable[REG_PULSE_TIME_DELAY] + 50;
+										+ DataTable[REG_PULSE_TIME_DELAY] + DELAY_ADDITIONAL_TIMEOUT;
 
 						CONTROL_SetDeviceState(DS_InProcess, SS_GateVoltageProcess);
 					}

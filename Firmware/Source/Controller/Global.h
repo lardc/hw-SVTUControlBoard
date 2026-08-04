@@ -28,6 +28,7 @@
 #define TIME_START_FOR_OSC			0.075f			// Окно оцифровки в конце полки трапеции для осциллографа (в мс)
 #define TIME_SINE_DURATION			10				// Длительность импульса в форме синусоиды (в мс)
 #define TIME_SINE_MOD_DURATION		20				// Длительность хвоста модифицированного синуса	(в мс)
+#define DELAY_ADDITIONAL_TIMEOUT	50				// в мс
 
 // Параметры аналоговой подсистемы
 #define ADC_REF_VOLTAGE				3000.0f			// Опорное напряжение (в мВ)
