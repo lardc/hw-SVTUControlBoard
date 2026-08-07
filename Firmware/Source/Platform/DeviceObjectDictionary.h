@@ -161,6 +161,9 @@
 #define REG_BHL_DEVICE					211	// Ошибка интерфейса ВУ: NID устройства
 #define REG_BHL_FUNCTION				212	// Ошибка интерфейса ВУ: код функции
 #define REG_BHL_EXT_DATA				213	// Ошибка интерфейса ВУ: расширенная информация
+
+#define REG_DBG_GATE_STATE				214
+#define REG_DBG_GATE_COUNTER			215
 //
 #define REG_FWINFO_SLAVE_NID			256	// Device CAN slave node ID
 #define REG_FWINFO_MASTER_NID			257	// Device CAN master node ID (if presented)

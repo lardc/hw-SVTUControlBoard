@@ -151,7 +151,7 @@ void INITCFG_ConfigADC()
 				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_UG_CH, 1);
 				ADC_ChannelSet_Sequence(ADC2, ADC2_IGBT_IG_CH, 2);
 				ADC_ChannelSeqLen(ADC2, 2);
-				ADC_DMAEnable(ADC2, true);
+				ADC_DMAConfig(ADC2);
 			}
 			break;
 	}

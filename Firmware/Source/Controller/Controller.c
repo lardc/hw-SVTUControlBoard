@@ -358,6 +358,7 @@ void CONTROL_HandlePulse()
 {
 	static float UtResult, UtCh2Result, ItResult;
 	static Int64U Timeout = 0;
+	static Int64U TimeoutLong = 0;
 	static float SyncTime = 0, OscSyncTime = 0;
 	static Int16U ItSyncIndex = 0, UtSyncIndex = 0;
 	static bool SyncTimeoutReached = false;
@@ -415,9 +416,17 @@ void CONTROL_HandlePulse()
 				{
 					if(LOGIC_AreLCSUInStateX(LCSU_PulseConfigReady))
 					{
+						// Rise rate и SyncTime — до старта gate (CAN не в критической фазе с DMA IRQ)
+						if(!LOGIC_GetLCSURiseRate())
+							break;
+
+						LOGIC_CalcSyncTime(&SyncTime, &OscSyncTime);
+
 						GATE_CacheVariables();
 						GATE_StartProcess();
-						Timeout = 0;
+						Timeout = CONTROL_TimeCounter + DataTable[REG_PULSE_TIME_DELAY];
+						TimeoutLong = CONTROL_TimeCounter + DataTable[REG_UG_EDGE_TIME]/1000
+										+ DataTable[REG_PULSE_TIME_DELAY] + DELAY_ADDITIONAL_TIMEOUT;
 
 						CONTROL_SetDeviceState(DS_InProcess, SS_GateVoltageProcess);
 					}
@@ -435,11 +444,7 @@ void CONTROL_HandlePulse()
 
 					case RS_TargetReached:
 						if(CONTROL_TimeCounter >= Timeout)
-							if(LOGIC_GetLCSURiseRate())
-							{
-								LOGIC_CalcSyncTime(&SyncTime, &OscSyncTime);
-								CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
-							}
+							CONTROL_SetDeviceState(DS_InProcess, SS_CurrentPulseStart);
 						break;
 
 					case RS_FollowingError:
@@ -463,6 +468,8 @@ void CONTROL_HandlePulse()
 						break;
 
 					default:
+						if (CONTROL_TimeCounter >= TimeoutLong)
+							CONTROL_FinishedWithProblem(PROBLEM_GATE_VOLTAGE);
 						break;
 				}
 				break;

@@ -18,7 +18,7 @@ typedef enum __RegulatorState
 // Variables
 //
 extern Int16U GateValues_Counter;
-extern RegulatorState GATE_RegulatorState;
+extern volatile RegulatorState GATE_RegulatorState;
 
 // Functions
 //

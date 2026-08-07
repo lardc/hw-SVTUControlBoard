@@ -74,7 +74,7 @@
 #define I_THRESHOLD_DEF				300
 //
 #define IT_SETPOINT_MIN				50
-#define IT_SETPOINT_MAX				6500
+#define IT_SETPOINT_MAX				7200
 #define IT_SETPOINT_DEF				500
 //
 #define UG_SETPOINT_MIN				5
